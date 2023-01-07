@@ -2,7 +2,7 @@
 
 import threading as th
 import configparser as cp
-import time, serial, setproctitle
+import time, serial
 from core.utils import sysUtils
 from core.redisOps import redisOps
 from core.logutils import logUtils
@@ -23,9 +23,10 @@ class serRedBot(th.Thread):
       self.last_msg_dts_utc = ""
 
    def run(self):
-      _dict = {"boot_dts_utc": sysUtils.dts_utc()
-         , "dev": self.dev, "lan_ip": sysUtils.lan_ip()
-         , "hostname": sysUtils.HOST}
+      pub_channel: str = self.cp["REDIS"]["PUB_READS_CHANNEL"]
+      _dict = {"boot_dts_utc": sysUtils.dts_utc(), "dev": self.dev
+         , "lan_ip": sysUtils.lan_ip(), "hostname": sysUtils.HOST
+         , "pub_reads_channel": pub_channel}
       self.redops.update_diag_tag(self.diag_tag, mapdct=_dict, restart=True)
       while True:
          self.__run_loop()
