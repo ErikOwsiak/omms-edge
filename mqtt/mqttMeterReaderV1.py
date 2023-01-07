@@ -5,6 +5,8 @@ import typing as t
 import configparser as _cp
 import xml.etree.ElementTree as et
 import paho.mqtt.client as mqtt
+import redis
+
 from core.utils import sysUtils as utils
 from core.redisOps import redisOps
 from mqtt.meter_strucs import regInfo
@@ -68,11 +70,15 @@ class mqttMeterReaderV1(object):
          # -- set user data --
          self.clt.user_data_set(self)
          self.clt.connect(self.host, self.port)
-         _dict = {"boot_dts_utc": utils.dts_utc()
-            , "dev": "n/a", "lan_ip": utils.lan_ip()
-            , "hostname": utils.HOST}
+         pub_channel: str = self.xcp["REDIS"]["PUB_READS_CHANNEL"]
+         _dict = {"boot_dts_utc": utils.dts_utc(), "dev": "n/a"
+            , "lan_ip": utils.lan_ip(), "hostname": utils.HOST
+            , "pub_reads_channel": pub_channel}
          self.redops.update_diag_tag(self.diag_tag, mapdct=_dict, restart=True)
          return 0
+      except ConnectionRefusedError as e:
+         print("Check Redis connection info: host/port")
+         logUtils.log_exp(e)
       except Exception as e:
          logUtils.log_exp(e)
          return 1

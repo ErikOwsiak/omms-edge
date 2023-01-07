@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<broker host="localhost" port="21883" pwd="">
+<broker host="localhost" port="1883" pwd="">
    <regtable>
       <reg type="total_kwh" path="channels/0/state/total_forward_active_energy" />
       <reg type="l1_total_kwh" path="channels/0/state/phases/1/total_forward_active_energy" />

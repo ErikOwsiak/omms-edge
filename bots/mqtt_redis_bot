@@ -11,8 +11,10 @@ from core.debug import debug
 
 
 cp: _cp.ConfigParser = _cp.ConfigParser()
-cp.read("conf/mqtt_redis_bot.ini")
-
+loaded: [] = cp.read("conf/mqtt_redis_bot.ini")
+if len(loaded) == 0:
+   print("NoLoadedConfFiles")
+   exit(1)
 
 # -- red ops --
 IS_DEBUG: bool = debug.is_dev_box()
