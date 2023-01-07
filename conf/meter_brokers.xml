@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<broker host="localhost" port="1882">
+   <meters>
+      <meter dbid="1001" sn="supla/devices/zamel-mew-01-11d2be">
+         <reg type="total_kwh" name="channels/0/state/total_forward_active_energy" />
+         <reg type="l1_total_kwh" name="channels/0/state/phases/1/total_forward_active_energy" />
+         <reg type="l2_total_kwh" name="channels/0/state/phases/2/total_forward_active_energy" />
+         <reg type="l3_total_kwh" name="channels/0/state/phases/3/total_forward_active_energy" />
+      </meter>
+      <meter dbid="1080" sn="supla/devices/zamel-mew-01-472378">
+         <reg type="total_kwh" name="channels/0/state/total_forward_active_energy" />
+         <reg type="l1_total_kwh" name="channels/0/state/phases/1/total_forward_active_energy" />
+         <reg type="l2_total_kwh" name="channels/0/state/phases/2/total_forward_active_energy" />
+         <reg type="l3_total_kwh" name="channels/0/state/phases/3/total_forward_active_energy" />
+      </meter>
+   </meters>
+</broker>

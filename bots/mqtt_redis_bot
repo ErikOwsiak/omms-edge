@@ -1,0 +1,65 @@
+#!/usr/bin/env python3
+
+import configparser as _cp
+import os.path
+import time, setproctitle
+# -- sys imports --
+from core.utils import sysUtils as utils
+from mqtt.mqttMeterReaderV1 import mqttMeterReaderV1
+from core.redisOps import redisOps
+from core.debug import debug
+
+
+cp: _cp.ConfigParser = _cp.ConfigParser()
+cp.read("conf/mqtt_redis_bot.ini")
+
+
+# -- red ops --
+IS_DEBUG: bool = debug.is_dev_box()
+if IS_DEBUG:
+   redops: redisOps = redisOps(cp, "DEV_REDIS_CONN")
+else:
+   redops: redisOps = redisOps(cp)
+
+
+"""
+   load mqtt meter_xml_nodes
+"""
+XML_METER_FILE = "conf/mqtt_meters.xml"
+if not os.path.exists(XML_METER_FILE):
+   raise FileNotFoundError(XML_METER_FILE)
+mqttReaderV1: mqttMeterReaderV1 = mqttMeterReaderV1(XML_METER_FILE, cp, redops)
+if not mqttReaderV1.load_xml_conf():
+   exit(1)
+
+"""
+   init mqtt code
+"""
+if mqttReaderV1.mqtt_init() != 0:
+   exit(2)
+
+"""
+   start reader 
+"""
+if not mqttReaderV1.start():
+   exit(1)
+
+# -- main loop --
+LOOP_SLEEP_SECS: float = float(cp["TIMING"]["LOOP_SLEEP_SECS"])
+
+def main():
+   setproctitle.setproctitle("mqttRedisBot")
+   diag_tag: str = cp["RUNNER"]["DIAG_TAG"]
+   while True:
+      print("[ mqtt_redis_bot: main ]")
+      if mqttReaderV1.last_report:
+         msg = "mqttReaderV1 TRUE"
+         dct: {} = {"dts_utc": utils.dts_utc(), "msg": msg}
+         mqttReaderV1.redops.update_diag_tag(diag_tag=diag_tag, mapdct=dct, restart=False)
+      # -- -- -- --
+      time.sleep(LOOP_SLEEP_SECS)
+
+
+# -- start here --
+if __name__ == "__main__":
+   main()

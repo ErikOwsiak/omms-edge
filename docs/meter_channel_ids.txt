@@ -1,0 +1,9 @@
+
+1. meter is not required to have unique ID
+2. meter is read over linux dev like /dev/ttyUSB*; most of the time it will be over USB device
+
+
+   [ meter ] --> [ meter/channel reader ] --> [ redis ]
+
+   meter id:
+      [MT#:ABCADF8788]/[MR#:ABCD1234]/[ED#:hostname]

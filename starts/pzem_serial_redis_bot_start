@@ -1,0 +1,13 @@
+#!/bin/bash
+
+cd ..
+echo ""
+echo "pwd:  $(pwd)"
+export PYTHONPATH=$(pwd)
+echo "PYTHONPATH:   $PYTHONPATH"
+echo ""
+
+# -- set x bit if not already --
+chmod +x bots/pzem_serial_redis_bot
+# -- start bot --
+bots/pzem_serial_redis_bot

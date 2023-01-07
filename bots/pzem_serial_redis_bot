@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+
+import setproctitle
+import time, configparser
+# -- app --
+from core.redisOps import redisOps
+from core.serRedBot import serRedBot
+from core.debug import debug
+from core.utils import sysUtils as utils
+
+
+conf: configparser.ConfigParser = configparser.ConfigParser()
+conf.read("conf/ser_red_bot.ini")
+
+
+IS_DEBUG: bool = debug.is_dev_box()
+if IS_DEBUG:
+   redops: redisOps = redisOps(conf, "DEV_REDIS_CONN")
+else:
+   redops: redisOps = redisOps(conf)
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+# -- worker thread --
+serRedBotProxyThread: serRedBot = serRedBot(conf, redops)
+serRedBotProxyThread.start()
+
+
+# -- block on main file --
+def main():
+   diag_tag: str = conf["RUNNER"]["DIAG_TAG"]
+   while True:
+      print("[ serial_redis_runner: main ]")
+      if serRedBotProxyThread.is_alive():
+         msg = "serRedBotProxyThread.is_alive TRUE"
+         print(msg)
+         dct: {} = {"dts_utc": utils.dts_utc(), "msg": msg}
+         redops.update_diag_tag(diag_tag=diag_tag, mapdct=dct, restart=False)
+      # -- -- -- --
+      time.sleep(16.0)
+
+
+# -- -- start here -- --
+if __name__ == "__main__":
+   setproctitle.setproctitle("serRedRunner")
+   main()
