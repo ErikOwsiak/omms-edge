@@ -50,7 +50,8 @@ LOOP_SLEEP_SECS: float = float(cp["TIMING"]["LOOP_SLEEP_SECS"])
 
 def main():
    setproctitle.setproctitle("mqttRedisBot")
-   diag_tag: str = cp["RUNNER"]["DIAG_TAG"]
+   diag_tag: str = cp["SYSINFO"]["DIAG_TAG"]
+   diag_tag = utils.diag_tag_prefix(diag_tag)
    while True:
       print("[ mqtt_redis_bot: main ]")
       if mqttReaderV1.last_report:

@@ -84,14 +84,14 @@ LOOP_SLEEP_SECS: float = float(cp["TIMING"]["LOOP_SLEEP_SECS"])
 
 def main():
    setproctitle.setproctitle("modbusRedisBot")
-   diag_tag: str = cp["RUNNER"]["DIAG_TAG"]
+   diag_tag: str = cp["SYSINFO"]["DIAG_TAG"]
    diag_tag = utils.diag_tag_prefix(diag_tag)
    while True:
       try:
          print("[ modbus_redis_bot: main ]")
          if True:
             msg = "modbusRedisRelay TRUE"
-            dct: {} = {"dts_utc": utils.dts_utc(), "msg": msg}
+            dct: {} = {"bot_dts_utc": utils.dts_utc(), "msg": msg}
             modbusRedisRelayTh.redops.update_diag_tag(diag_tag=diag_tag, mapdct=dct, restart=False)
          # -- -- -- --
          time.sleep(LOOP_SLEEP_SECS)
