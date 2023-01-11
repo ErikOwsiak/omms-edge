@@ -58,6 +58,7 @@ class ttyUSBDeviceScanner(_th.Thread):
          print(f"\n\n\t--[ testing usb_port: {usb_ser} ]--\n")
          for meter in dev_meters.meters:
             _meter, _dev = self.__on_meter(meter, usb_ser)
+            print([_meter, _dev])
             if _meter and _dev:
                accu.append((_meter, _dev))
             # -- test detection threshold limit --
