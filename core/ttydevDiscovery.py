@@ -90,6 +90,7 @@ class ttyUSBDeviceScanner(_th.Thread):
    def __try_ping_meter_on_usb_ports(self, meter: et.Element, com_xml: et.Element) -> (et.Element, str):
       # -- -- -- --
       accu: {} = {}
+      model_xml: str = meter.attrib["modelXML"]
       bus_addr: int = int(meter.attrib["busAddr"])
       bus_addr_reg_hex = meter.attrib["modbus_addr_reg"]
       # -- -- -- --
@@ -97,12 +98,15 @@ class ttyUSBDeviceScanner(_th.Thread):
          if not os.path.exists(usb_dev):
             continue
          # -- -- --
+         print(f"\n[ modelXML: {model_xml} ]")
          modbus_inst: mm.Instrument = self.__get_inst__(usb_dev, com_xml, bus_addr)
          resp: pingResults = self.__do_ping(modbus_inst, bus_addr_reg_hex)
          if resp.err_code != 0:
             accu[usb_dev] = resp
+            print("NoPong!")
             continue
          else:
+            print("PingOK!")
             return meter, usb_dev
       # -- -- -- --
       return None, None
@@ -114,11 +118,10 @@ class ttyUSBDeviceScanner(_th.Thread):
       try:
          time.sleep(0.480)
          reg_loc = int(bus_addr_reg_hex, HEX)
-         print(f"ping: {inst.address} | on_dev: {inst.serial.name} | on_reg: {reg_loc}")
+         print(f"ping :: bus_addr: {inst.address} | on_dev: {inst.serial.name} | on_reg: {reg_loc}")
          val = inst.read_register(reg_loc)
          err_code = 1
          if int(inst.address) == int(val):
-            print("PingOK!")
             err_code = 0
       except Exception as e:
          err_code = 2
