@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# setup run folder
+devfld=/run/iotech/omms/dev
+mkdir -p $devfld
+err0=$?
+
+if [ -d $devfld ]; then
+  export OMMS_DEV_FLDR=$devfld
+else
+  export OMMS_DEV_FLDR=MKDIR_ERROR_$err0
+fi
