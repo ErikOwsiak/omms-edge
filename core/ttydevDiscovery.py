@@ -29,6 +29,7 @@ class ttyUSBDeviceScanner(_th.Thread):
       self.model_xmls: {} = {}
       self.meters: t.List[et.Element] = []
       self.usb_ser_ports: [] = None
+      self.is_done: bool = False
 
    def init(self):
       self.usb_ser_ports = ports.serial_ports_arr("USB")
@@ -38,7 +39,8 @@ class ttyUSBDeviceScanner(_th.Thread):
          if self.__main_loop() == 0:
             break
       # -- end of test loop --
-      print("-- [ ping_end ] --")
+      self.is_done = True
+      print("\n\t-- [ pinging_end ] --\n")
 
    def __main_loop(self) -> int:
       # -- per ttydev meters --

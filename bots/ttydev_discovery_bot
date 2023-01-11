@@ -71,6 +71,11 @@ def main():
    # -- MAIN LOOP --
    loop_cnt = 0
    while True:
+      # -- -- -- --
+      if scannerTh.is_done:
+         print("\texit...")
+         return
+      # -- -- -- --
       print(f"[ {proc_name}: main ]")
       msg = f"ttydev_discovery_bot TICK {loop_cnt}"
       dct: {} = {"dts_utc": utils.dts_utc(), "msg": msg}
