@@ -74,7 +74,7 @@ def main():
       # -- -- -- --
       if scannerTh.is_done:
          print("\texit...\n\n")
-         return
+         exit(0)
       # -- -- -- --
       print(f"[ {proc_name}: main ]")
       msg = f"ttydev_discovery_bot TICK {loop_cnt}"
