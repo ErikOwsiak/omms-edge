@@ -66,7 +66,8 @@ class ttyUSBDeviceScanner(_th.Thread):
       os.chdir(dev_path)
       for d, a in self.located_map:
          if os.path.exists(d):
-            os.system(f"ln -s {d} {a}")
+            if not os.path.exists(a):
+               os.system(f"ln -s {d} {a}")
             if os.path.exists(a):
                print(f"\tDEVLINK_OK!: {a}")
             else:
