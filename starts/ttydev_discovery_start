@@ -5,7 +5,7 @@ cd ..
 export PYTHONPATH=$(pwd)
 echo $PYTHONPATH
 
-pyfile=bots/tty_dev_discovery_bot
+pyfile=bots/ttydev_discovery_bot
 # -- set x bit if not already --
 chmod +x $pyfile
 # -- start bot --
