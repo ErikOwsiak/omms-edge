@@ -51,10 +51,10 @@ class ttyUSBDeviceScanner(_th.Thread):
 
    def __on_ttydev_meters(self, dev_meters: ttydevMeters):
       # -- per meter in ttydev --
-      accu: [] = []
       located: [] = []
       # -- inner method --
       def __on_usb_ser_port(usb_ser):
+         accu: [] = []
          print(f"\n\n\t--[ testing usb_port: {usb_ser} ]--\n")
          for meter in dev_meters.meters:
             _meter, _dev = self.__on_meter(meter, usb_ser)
@@ -68,6 +68,7 @@ class ttyUSBDeviceScanner(_th.Thread):
                self.__on_threshold_reached(_dict)
             else:
                pass
+         return
       # -- -- -- --
       THRESHOLD_LIMIT: int = int(self.cp_ttydev_disco_bot["SYSINFO"]["THRESHOLD_LIMIT"])
       for usb_ser_port in self.usb_ser_ports:
