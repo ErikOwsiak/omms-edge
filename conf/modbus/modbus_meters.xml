@@ -60,7 +60,6 @@
             <meter busAddr="39" modelXML="orno/orno516.xml" />
             <meter busAddr="40" modelXML="orno/orno516.xml" />
             <meter busAddr="41" modelXML="orno/orno516.xml" />
-            <!-- right most closet has number 3 on top of the knobs -->
             <meter busAddr="46" modelXML="orno/orno516.xml" />
             <meter busAddr="47" modelXML="orno/orno516.xml" />
             <meter busAddr="48" modelXML="orno/orno516.xml" />
