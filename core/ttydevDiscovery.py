@@ -50,19 +50,24 @@ class ttyUSBDeviceScanner(_th.Thread):
    def __on_ttydev_meters(self, dev_meters: ttydevMeters):
       # -- per meter in ttydev --
       accu: [] = []
+      THRESHOLD_LIMIT: int = int(self.cp_ttydev_disco_bot["SYSINFO"]["THRESHOLD_LIMIT"])
       for meter in dev_meters.meters:
          _meter, _dev = self.__on_meter(meter)
          if _meter and _dev:
             accu.append((_meter, _dev))
+         # -- test detection threshold limit --
+         if len(accu) >= THRESHOLD_LIMIT:
+            print("THRESHOLD_LIMIT_REACHED")
+            break
       # -- -- -- --
-      THRESHOLD_LIMIT: int = int(self.cp_ttydev_disco_bot["SYSINFO"]["THRESHOLD_LIMIT"])
       if len(accu) < THRESHOLD_LIMIT:
-         pass
-      else:
-         pass
+         print("THRESHOLD_LIMIT_NOT_REACHED")
+         return
       # -- -- -- --
       dev = dev_meters.dev
       alias = dev_meters.alias
+      print(f"create dev link: {dev} -> {alias}")
+      time.sleep(2.0)
 
    def __on_meter(self, meter: et.Element) -> ():
       # -- load meter xml file --
