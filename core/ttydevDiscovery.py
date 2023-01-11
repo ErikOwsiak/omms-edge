@@ -68,7 +68,7 @@ class ttyUSBDeviceScanner(_th.Thread):
             a_path = f"{dev_path}/{a}"
             if not os.path.exists(a_path):
                os.system(f"ln -s {d} {a_path}")
-            if os.path.exists(a):
+            if os.path.exists(a_path):
                print(f"\tDEVLINK_OK!: {a_path}")
             else:
                print(f"\tDEVLINK_ERROR: {a_path}")
