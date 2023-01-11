@@ -79,14 +79,12 @@ class ttyUSBDeviceScanner(_th.Thread):
          a_path = f"{dev_path}/{a}"
          _meter, _dev = self.__on_meter(m, a_path)
          if (_meter is not None) and (_dev is not None):
-            buff = f"DEV: {d}\nDEV_LINK_TESTED_OK: {a_path}"
+            b0, b1 = f"DEV: {d}", f"DEV_LINK_TESTED_OK: {a_path}"
          else:
-            buff = f"DEV: {d}\nDEV_LINK_TESTED_ERR: {a_path}"
+            b0, b1 = f"DEV: {d}", f"DEV_LINK_TESTED_ERR: {a_path}"
          # -- -- -- -- --
-         print(buff)
-         _d = {d: buff}
-         self.redops.update_diag_tag(self.diag_tag, mapdct=_d)
-
+         print([b0, b1])
+         self.redops.update_diag_tag(self.diag_tag, mapdct={d: b1}, restart=True)
 
    def __on_ttydev_meters(self, dev_meters: ttydevMeters):
       # -- inner method --
