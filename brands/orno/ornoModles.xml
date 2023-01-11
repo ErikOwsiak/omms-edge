@@ -1,0 +1,4 @@
+<models brand="orno">
+    <model name="orno504" modelXML="orno504.xml" specs="phases:1;" />
+    <model name="orno516" modelXML="orno516.xml" specs="phases:3;" />
+</models>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<meter type="electric" tag="orno504" brand="orno" model="orno504">
+    <comm type="serial" baudrate="9600" parity="N" stopbits="1" timeoutSecs="0.25" />
+    <regs>
+        <!-- mode="" -> defaults: register; unit="" -> defaults: no unit -->
+        <reg type="ln_v" addr="0x0000" size="1" decpnt="1" mode="register" units="Volts" />
+        <reg type="tl_a" addr="0x0001" size="1" decpnt="1" mode="" units="Amps" />
+        <reg type="GridFreqHz" addr="0x0002" size="1" decpnt="1" mode="" units="Hz" />
+        <reg type="tl_w" addr="0x0003" size="1" decpnt="0" modes="" units="Watts" />
+        <reg type="tl_var" addr="0x0004" size="1" decpnt="1" modes="" unit="VAr" />
+        <reg type="tl_va" addr="0x0005" size="1" decpnt="1" modes="" units="VA" />
+        <reg type="tl_pf" addr="0x0006" size="1" decpnt="3" modes="" units="" formatter="round2" />
+        <!-- # adam said it should be divided by 1000 -->
+        <reg type="tl_kwh" addr="0x0007" size="2" decpnt="1" mode="int" units="kWh" formatter="divide1000r2" />
+        <reg type="tl_kvarh" addr="0x0009" size="2" decpnt="4" mode="int" units="kVArh" formatter="divide1000r2" />
+        <reg type="SerialNum" addr="0x000B" size="3" decpnt="0" mode="" units="" />
+        <reg type="BaudRate" addr="0x000E" size="1" decpnt="0" mode="" units="" />
+        <reg type="ModbusAddr" addr="0x000F" size="1" decpnt="0" mode="" units="" />
+    </regs>
+</meter>

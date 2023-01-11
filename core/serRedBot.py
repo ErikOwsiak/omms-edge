@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
+import time, serial
 import threading as th
 import configparser as cp
-import time, serial
+# -- system --
 from core.utils import sysUtils
 from core.redisOps import redisOps
 from core.logutils import logUtils

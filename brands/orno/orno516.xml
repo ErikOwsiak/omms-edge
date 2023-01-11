@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<meter type="electric" tag="orno516" brand="orno" model="orno516">
+    <comm type="serial" baudrate="9600" parity="E" stopbits="1" timeoutSecs="0.25" />
+    <regs>
+        <!-- mode="" -> defaults: register; unit="" -> defaults: no unit -->
+        <reg type="SerialNum" addr="0x0000" size="2" decpnt="1" mode="" units="" />
+        <reg type="ModbusAddr" addr="0x0002" size="1" decpnt="0" mode="" units="" />
+        <reg type="BaudRate" addr="0x0003" size="1" decpnt="1" mode="" units="" />
+        <reg type="SWVer" addr="0x0004" size="2" decpnt="3" mode="float" units="" formatter="rnd2" />
+        <reg type="HWVer" addr="0x0006" size="2" decpnt="3" mode="float" units="" formatter="round2" />
+        <!-- <reg type="CT_Rate" addr="0x0008" size="1" decpnt="1" mode="" units="" />
+        <reg type="S0_OutputRate" addr="0x0009" size="2" decpnt="0" mode="" units="" />
+        <reg type="A3" addr="0x000B" size="2"  decpnt="0" mode="" units="" />
+        <reg type="CycleTime" addr="0x000D" size="1" decpnt="0" mode="" units="" /> -->
+        <!-- volts & frequency -->
+        <reg type="l1_v" addr="0x000E" size="2" decpnt="2" mode="float" units="" formatter="round2" />
+        <reg type="l2_v" addr="0x0010" size="2" decpnt="2" mode="float" units="" formatter="round2" />
+        <reg type="l3_v" addr="0x0012" size="2" decpnt="2" mode="float" units="" formatter="round2" />
+        <reg type="grid_hz" addr="0x0014" size="2" decpnt="2" mode="float" units="" formatter="round2" />
+        <!-- amps -->
+        <reg type="l1_a" addr="0x0016" size="2" decpnt="2" mode="float" units="" formatter="round2" />
+        <reg type="l2_a" addr="0x0018" size="2" decpnt="2" mode="float" units="" formatter="round2" />
+        <reg type="l3_a" addr="0x001A" size="2" decpnt="2" mode="float" units="" formatter="round2" />
+        <!-- reactive power -->
+        <reg type="tl_w" addr="0x001C" size="2" decpnt="0" mode="float" units="kw" formatter="times1000r2" />
+        <reg type="l1_w" addr="0x001E" size="2" decpnt="0" mode="float" units="kw" formatter="times1000r2" />
+        <reg type="l2_w" addr="0x0020" size="2" decpnt="0" mode="float" units="kw" formatter="times1000r2" />
+        <reg type="l3_w" addr="0x0022" size="2" decpnt="0" mode="float" units="kw" formatter="times1000r2" />
+        <!-- reactive power -->
+        <!--
+        <reg address="0x0024" size="2" name="TotalReactivePower" decpnt="2" mode="float"
+                  unit="kVArh" formatter="round2"/>
+        <reg address="0x0026" size="2" name="L1_ReactivePower" decpnt="2" mode="float"
+                  unit="kVArh" formatter="round2" />
+        <reg address="0x0028" size="2" name="L2_ReactivePower" decpnt="2" mode="float"
+                  unit="kVArh" formatter="round2" />
+        <reg address="0x0030" size="2" name="L3_ReactivePower" decpnt="2" mode="float"
+                  unit="kVArh" formatter="round2" /> -->
+        <!-- power factor -->
+        <reg type="tl_pf" addr="0x0034" size="2" decpnt="2" mode="float" units="" formatter="round2"/>
+        <reg type="l1_pf" addr="0x0036" size="2" decpnt="2" mode="float" units="" formatter="round2" />
+        <reg type="l2_pf" addr="0x0038" size="2" decpnt="2" mode="float" units="" formatter="round2" />
+        <reg type="l3_pf" addr="0x003A" size="2" decpnt="2" mode="float" units="" formatter="round2" />
+        <!-- active energy -->
+        <reg type="tl_kwh" addr="0x0100" size="2" decpnt="2" mode="float" units="" formatter="round2"/>
+        <reg type="l1_kwh" addr="0x0102" size="2" decpnt="2" mode="float" units="" formatter="round2" />
+        <reg type="l2_kwh" addr="0x0104" size="2" decpnt="2" mode="float" units="" formatter="round2" />
+        <reg type="l3_kwh" addr="0x0106" size="2" decpnt="2" mode="float" units="" formatter="round2" />
+        <!-- reactive energy -->
+        <!-- <reg address="0x0118" size="2" name="TotalReactiveEnergy" decpnt="2" mode="float"
+                  unit="kVArh" formatter="round2"/>
+        <reg address="0x011A" size="2" name="L1_TotalReactiveEnergy" decpnt="2" mode="float"
+                  unit="kVArh" formatter="round2" />
+        <reg address="0x011C" size="2" name="L2_TotalReactiveEnergy" decpnt="2" mode="float"
+                  unit="kVArh" formatter="round2" />
+        <reg address="0x011E" size="2" name="L3_TotalReactiveEnergy" decpnt="2" mode="float"
+                  unit="kVArh" formatter="round2" /> -->
+    </regs>
+</meter>

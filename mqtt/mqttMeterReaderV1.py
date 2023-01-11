@@ -147,7 +147,7 @@ class mqttMeterReaderV1(object):
       self.host = root.attrib["host"]
       self.port = int(root.attrib["port"])
       self.pwd = root.attrib["pwd"]
-      self.meter_xml_nodes: t.List[et.Element] = root.findall("meters/meter")
+      self.meter_xml_nodes: t.List[et.Element] = root.findall("edge_meters/meter")
       # -- add syspath to meter node xml --
       for node in self.meter_xml_nodes:
          node.attrib["syspath"] = utils.syspath(self.channel, node.attrib["tag"])

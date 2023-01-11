@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+   reg: -> register
+   runIndex: -> 0 means do not run this stream
+   runInterval: -> Xm: every X minutes;
+-->
+<streams>
+    <!-- definition to collect billable data -->
+    <stream name="kWhrs" enabled="1" runIndex="1" runInterval="40" dataTable="stream.kwhrs_raw">
+        <reg type="ModbusAddr" lbl="ModbusAddress" default="null" />
+        <reg type="tl_kwh" lbl="TotalActiveEnergy" default="null" />
+        <reg type="l1_kwh" lbl="L1_TotalActiveEnergy" default="null" />
+        <reg type="l2_kwh" lbl="L2_TotalActiveEnergy" default="null" />
+        <reg type="l3_kwh" lbl="L3_TotalActiveEnergy" default="null" />
+    </stream>
+    <!-- run to keep history of power consumption -->
+    <stream name="powerStats" enabled="1" runIndex="2" runInterval="20" dataTable="stream.power_stats">
+        <reg type="ModbusAddr" lbl="ModbusAddress" default="null" />
+        <!-- volts -->
+        <reg type="ln_v" lbl="Line_Volts" default="null" />
+        <reg type="l1_v" lbl="L1_Volts" default="null" />
+        <reg type="l2_v" lbl="L2_Volts" default="null" />
+        <reg type="l3_v" lbl="L3_Volts" default="null" />
+        <!-- freq hz -->
+        <reg type="grid_hz" lbl="Line_Hz" default="null" />
+        <!-- <reg type="l1_hz" lbl="L1_Hz" default="null" />
+        <reg type="l2_hz" lbl="L2_Hz" default="null" />
+        <reg type="l3_hz" lbl="L3_Hz" default="null" /> -->
+        <!-- amps -->
+        <reg type="tl_a" lbl="Total_Amps" default="null" />
+        <reg type="l1_a" lbl="L1_Amps" default="null" />
+        <reg type="l2_a" lbl="L2_Amps" default="null" />
+        <reg type="l3_a" lbl="L3_Amps" default="null" />
+        <!-- watts -->
+        <reg type="tl_w" lbl="Total_Watts" default="null" />
+        <reg type="l1_w" lbl="L1_Watts" default="null" />
+        <reg type="l2_w" lbl="L2_Watts" default="null" />
+        <reg type="l3_w" lbl="L3_Watts" default="null" />
+        <!-- power factor -->
+        <reg type="tl_pf" lbl="Total_PowerFactor" default="null" />
+        <reg type="l1_pf" lbl="L1_PowerFactor" default="null" />
+        <reg type="l2_pf" lbl="L2_PowerFactor" default="null" />
+        <reg type="l3_pf" lbl="L3_PowerFactor" default="null" />
+    </stream>
+</streams>

@@ -29,10 +29,31 @@ class redisOps(object):
          md5 = hashlib.md5(bytearray(buff.encode("utf-8")))
          md5str = f"0x{md5.hexdigest().upper()}"
          last_msg_dtsutc = utils.dts_utc()
-         _dict = {"dts_utc": last_msg_dtsutc, "msg_md5": md5str, "msg": buff}
+         _dict = {"dts_utc": last_msg_dtsutc, "msg_md5": md5str, "#RPT": buff}
          rv = self.red.delete(path)
          print(f"rv: {rv}")
          rv = self.red.hset(path, mapping=_dict)
+         print(f"rv: {rv}")
+      except Exception as e:
+         logUtils.log_exp(e)
+
+   def save_meter_data(self, path: str, _dict: {}, delold: bool = False):
+      try:
+         rv0 = 0
+         read_db_idx = int(self.cp["REDIS"]["DB_IDX_READS"])
+         self.red.select(read_db_idx)
+         if delold:
+            rv0 = self.red.delete(path)
+         rv1 = self.red.hset(path, mapping=_dict)
+         print(f"[ del: {rv0}; hset: {rv1}; ]")
+      except Exception as e:
+         logUtils.log_exp(e)
+
+   def update_read(self, path: str, key: str, val: str):
+      try:
+         read_db_idx = int(self.cp["REDIS"]["DB_IDX_READS"])
+         self.red.select(read_db_idx)
+         rv = self.red.hset(path, mapping={key: val})
          print(f"rv: {rv}")
       except Exception as e:
          logUtils.log_exp(e)
@@ -78,22 +99,9 @@ class redisOps(object):
       except Exception as e:
          logUtils.log_exp(e)
 
-
    def __ping_host(self) -> bool:
       try:
          return self.red.ping()
       except Exception as e:
          print(e)
          return False
-
-
-# -- -- test -- --
-if __name__ == "__main__":
-    _cp: cp.ConfigParser = cp.ConfigParser()
-    _cp.read("../conf/ser_red_bot.ini")
-    rp: redisOps = redisOps(_cp, CONN_SEC="DEV_REDIS_CONN")
-    rp.pub_diag_debug("hello")
-    rp.pub_read("xxxxxxxxxxxxxxxxxxxxxx")
-    rp.save_read("xxxx", "asdfasdfasdfasdfasfdasfdasfdf")
-    rp.save_heartbeat("xxxxxx", "asdfasdfasfasfasfassafasfasfasfasdf")
-    rp.update_diag_tag("diag_tag", "start", "blablab")

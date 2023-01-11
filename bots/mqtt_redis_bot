@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
 import configparser as _cp
-import os.path
-import time, setproctitle
+import os.path, time, setproctitle
 # -- sys imports --
 from core.utils import sysUtils as utils
 from mqtt.mqttMeterReaderV1 import mqttMeterReaderV1

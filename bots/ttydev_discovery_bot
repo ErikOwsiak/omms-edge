@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+
+import os, setproctitle
+import configparser as _cp, time
+import xml.etree.ElementTree as _et
+# -- core --
+from core.debug import debug
+from core.utils import sysUtils as utils
+from core.redisOps import redisOps
+from core.logutils import logUtils
+from modbus.modbusRedisRelay import modbusRedisRelay
+from modbus.modbusEdgeMeters import modbusEdgeMeters
+from modbus.ttydevMeters import ttydevMeters
+from core.ttydevDiscovery import ttyUSBDeviceScanner
+
+
+# -- load config file for: modbus_redis_bot --
+modbus_redis_bot_cp: _cp = _cp.ConfigParser()
+loaded: [] = modbus_redis_bot_cp.read("conf/modbus_redis_bot.ini")
+if len(loaded) == 0:
+   print("no ini files loaded")
+   exit(1)
+
+ttydev_disco_bot_cp: _cp = _cp.ConfigParser()
+loaded: [] = ttydev_disco_bot_cp.read("conf/ttydev_discovery.ini")
+if len(loaded) == 0:
+   print("no ini files loaded")
+   exit(1)
+
+# -- -- -- -- load redis object  -- -- -- --
+if debug.is_dev_box():
+   redops = redisOps(modbus_redis_bot_cp, CONN_SEC="DEV_REDIS_CONN")
+else:
+   redops: redisOps = redisOps(modbus_redis_bot_cp)
+# -- ping server --
+if not redops.red.ping():
+   print("UnableToPingRedisServer")
+   exit(1)
+#  -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+"""
+   these are edge modbus based meters that can be grouped to multiple
+   /dev/ttyUSBx devices under linux
+   MM_XML_PATH is file with ALL modbus meters in the building grouped by 
+   EDGE (HOST) -> ttyUSBx device 
+"""
+MM_XML_PATH: str = modbus_redis_bot_cp["METERS"]["MODBUS_METERS_XML"]
+if not os.path.exists(MM_XML_PATH):
+   print(f"FileNotFound: {MM_XML_PATH}")
+   exit(1)
+MM_XML = _et.parse(MM_XML_PATH).getroot()
+# -- -- -- -- -- --
+xpath: str = f"edges/edge[@hostname='{utils.HOST}']/ttydev"
+ttydev_meters_arr: [ttydevMeters] = [ttydevMeters(n) for n in MM_XML.findall(xpath)]
+for item in ttydev_meters_arr:
+   item.init()
+# -- -- -- -- -- --
+
+scannerTh: ttyUSBDeviceScanner = ttyUSBDeviceScanner(redops
+   , ttydev_disco_bot_cp, modbus_redis_bot_cp, ttydev_meters_arr)
+scannerTh.init()
+scannerTh.start()
+
+
+def main():
+   # -- -- -- --
+   proc_name = ttydev_disco_bot_cp["RUNNER"]["PROC_NAME"]
+   setproctitle.setproctitle(proc_name)
+   diag_tag: str = ttydev_disco_bot_cp["RUNNER"]["DIAG_TAG"]
+   MAIN_LOOP_SECS = int(ttydev_disco_bot_cp["RUNNER"]["MAIN_LOOP_SECS"])
+   # -- MAIN LOOP --
+   loop_cnt = 0
+   while True:
+      print(f"[ {proc_name}: main ]")
+      msg = f"ttydev_discovery_bot TICK {loop_cnt}"
+      dct: {} = {"dts_utc": utils.dts_utc(), "msg": msg}
+      scannerTh.redops.update_diag_tag(diag_tag=diag_tag, mapdct=dct, restart=False)
+      # -- -- -- --
+      loop_cnt += 1
+      time.sleep(MAIN_LOOP_SECS)
+
+
+# -- start here --
+if __name__ == "__main__":
+   main()

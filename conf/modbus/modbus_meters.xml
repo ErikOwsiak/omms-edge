@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+   edge is a computer running at an electrical room or electrical-box
+   pubChannel -> if "" use pub channel from ini file for this bot
+            else: use pubChannel to publish to redis
+-->
+<system>
+   <edges>
+      <edge hostname="omms-edge-a5" pubChannel="">
+         <meters start="yes" tag="ModbusEdgeA5" ttyDevice="auto">
+            <meter busAddr="10" modelXML="orno516.xml" />
+            <meter busAddr="11" modelXML="orno516.xml" />
+            <meter busAddr="12" modelXML="orno516.xml" />
+            <meter busAddr="13" modelXML="orno516.xml" />
+            <meter busAddr="14" modelXML="orno504.xml" />
+            <meter busAddr="15" modelXML="orno516.xml" />
+            <meter busAddr="16" modelXML="orno504.xml" />
+         </meters>
+      </edge>
+      <edge hostname="omms-edge-b410" pubChannel="">
+         <meters start="yes" tag="ModbusA" ttyDevice="auto">
+            <meter busAddr="10" modelXML="orno/orno516.xml" />
+            <!-- <meter busAddress="11" modelXML="orno516.xml" />
+            <meter busAddress="12" modelXML="orno516.xml" />
+            <meter busAddress="13" modelXML="orno516.xml" /> -->
+            <meter busAddr="14" modelXML="orno/orno516.xml" />
+            <meter busAddr="15" modelXML="orno/orno516.xml" />
+            <meter busAddr="16" modelXML="orno/orno516.xml" />
+            <meter busAddr="17" modelXML="orno/orno516.xml" />
+            <meter busAddr="18" modelXML="orno/orno516.xml" />
+            <meter busAddr="19" modelXML="orno/orno516.xml" />
+            <meter busAddr="20" modelXML="orno/orno516.xml" />
+            <meter busAddr="21" modelXML="orno/orno516.xml" />
+            <meter busAddr="22" modelXML="orno/orno516.xml" />
+         </meters>
+      </edge>
+      <edge hostname="omms-edge-p16" pubChannel="">
+         <!-- modbusProcess runs per tty device -->
+         <meters start="yes" tag="ModbusA" ttyDevice="auto">
+            <meter busAddr="15" modelXML="orno/orno516.xml" />
+            <meter busAddr="16" modelXML="orno/orno516.xml" />
+            <meter busAddr="17" modelXML="orno/orno516.xml" />
+            <meter busAddr="18" modelXML="orno/orno516.xml" />
+            <meter busAddr="19" modelXML="orno/orno516.xml" />
+            <meter busAddr="21" modelXML="orno/orno516.xml" />
+            <meter busAddr="22" modelXML="orno/orno516.xml" />
+            <meter busAddr="23" modelXML="orno/orno516.xml" />
+            <meter busAddr="24" modelXML="orno/orno516.xml" />
+         </meters>
+         <meters start="yes" tag="ModbusB" ttyDevice="auto">
+            <meter busAddr="29" modelXML="orno516.xml" />
+            <meter busAddr="30" modelXML="orno516.xml" />
+            <meter busAddr="31" modelXML="orno516.xml" />
+            <meter busAddr="32" modelXML="orno516.xml" />
+            <meter busAddr="33" modelXML="orno516.xml" />
+            <meter busAddr="34" modelXML="orno516.xml" />
+            <meter busAddr="35" modelXML="orno516.xml" />
+            <meter busAddr="36" modelXML="orno516.xml" />
+            <meter busAddr="37" modelXML="orno516.xml" />
+            <meter busAddr="38" modelXML="orno516.xml" />
+            <meter busAddr="39" modelXML="orno516.xml" />
+            <meter busAddr="40" modelXML="orno516.xml" />
+            <meter busAddr="41" modelXML="orno516.xml" />
+            <!-- right most closet has number 3 on top of the knobs -->
+            <meter busAddr="46" modelXML="orno516.xml" />
+            <meter busAddr="47" modelXML="orno516.xml" />
+            <meter busAddr="48" modelXML="orno516.xml" />
+            <meter busAddr="49" modelXML="orno516.xml" />
+            <meter busAddr="50" modelXML="orno516.xml" />
+            <meter busAddr="51" modelXML="orno516.xml" />
+            <meter busAddr="52" modelXML="orno516.xml" />
+            <meter busAddr="53" modelXML="orno516.xml" />
+         </meters>
+      </edge>
+      <edge hostname="3cpo" pubChannel="MODBUS_DEVLAB_READS">
+         <ttydev run="yes" tag="ModbusEdgeA5" alias="modbusPortA" dev="auto" modbusBugID="bugID1">
+            <meter busAddr="10" modelXML="orno/orno516.xml" />
+            <meter busAddr="11" modelXML="orno/orno516.xml" />
+            <meter busAddr="12" modelXML="orno/orno516.xml" />
+            <meter busAddr="13" modelXML="orno/orno516.xml" />
+            <meter busAddr="14" modelXML="orno/orno504.xml" />
+            <meter busAddr="15" modelXML="orno/orno516.xml" />
+            <meter busAddr="16" modelXML="orno/orno504.xml" />
+         </ttydev>
+         <ttydev run="yes" tag="ModbusEdgeA7" alias="modbusPortB" dev="auto" modbusBugID="bugID2">
+            <meter busAddr="20" modelXML="orno/orno516.xml" />
+            <meter busAddr="21" modelXML="orno/orno516.xml" />
+            <meter busAddr="22" modelXML="orno/orno516.xml" />
+            <meter busAddr="23" modelXML="orno/orno516.xml" />
+            <meter busAddr="24" modelXML="orno/orno504.xml" />
+            <meter busAddr="25" modelXML="orno/orno516.xml" />
+            <meter busAddr="26" modelXML="orno/orno504.xml" />
+         </ttydev>
+      </edge>
+   </edges>
+</system>

@@ -1,4 +1,7 @@
 
+import configparser as _cp
+import os.path
+
 import serial, time, typing as t
 from serial.tools import list_ports as ser_tools
 
@@ -11,25 +14,57 @@ RESP_TIMEOUT = 2.0
 
 class ports(object):
 
-   def __init__(self):
-      self.ports: t.List[serial.Serial] = []
+   def __init__(self, cp: _cp.ConfigParser = None):
+      self.cp: _cp.ConfigParser = cp
+      self.serial_ports: [] = []
       self.found: {} = {}
 
-   def load_serials(self):
-      self.ports = ser_tools.comports()
+   def load_serials(self) -> int:
+      # -- -- -- --
+      self.serial_ports = [p.device for p in ser_tools.comports()]
+      # -- -- -- --
+      path: str = self.cp["SYSINFO"]["OMMS_DEV_PATH"]
+      if not os.path.exists(path):
+         return 1
+      # -- -- -- --
+      file_lst = os.listdir(path)
+      for fl in file_lst:
+         self.serial_ports.append(f"{path}/{fl}")
+      # -- -- -- --
+
+   @staticmethod
+   def locate_ttydev(tag: str) -> str:
+      with open("/run/iotech/omms/ttydev_discovery") as f:
+         lns = f.readlines()
+      # -- select line --
+      return [ln.strip() for ln in lns if f":{tag}::" in ln][0]
+
+   @staticmethod
+   def alias_pull_path(alias: str) -> [str, None]:
+      path = "/run/iotech/omms/dev"
+      flst = os.listdir(path)
+      if alias in flst:
+         return f"{path}/{alias}"
+      else:
+         return None
+
+   @staticmethod
+   def serial_ports_arr(patt: str):
+      arr: [] = [p.device for p in ser_tools.comports() if patt in p.device]
+      return arr
 
    def print(self):
-      print("-> system ports")
-      if self.ports is None or len(self.ports) == 0:
+      print("-> system serial_ports")
+      if self.serial_ports is None or len(self.serial_ports) == 0:
          self.load_serials()
-      for p in self.ports:
+      for p in self.serial_ports:
          print(f"\tport: {p}")
       print("-> done")
 
    def scan(self):
-      if self.ports is None:
+      if self.serial_ports is None:
          self.load_serials()
-      for port in self.ports:
+      for port in self.serial_ports:
          if self.probe_port(port.device):
             break
       # -- --
