@@ -55,6 +55,7 @@ class ttyUSBDeviceScanner(_th.Thread):
       located: [] = []
       # -- inner method --
       def __on_usb_ser_port(usb_ser):
+         print(f"\n\t--[ testing usb_port: {usb_ser} ]--\n")
          for meter in dev_meters.meters:
             _meter, _dev = self.__on_meter(meter, usb_ser)
             if _meter and _dev:
