@@ -95,7 +95,6 @@ class redisOps(object):
             rv = self.red.hset(diag_tag, mapping={key: val})
          else:
             rv = self.red.hset(diag_tag, mapping=mapdct)
-         print(f"rv: {rv}")
       except Exception as e:
          logUtils.log_exp(e)
 
