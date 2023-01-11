@@ -7,6 +7,7 @@ import xml.etree.ElementTree as et
 # -- system --
 from system.ports import ports
 from core.redisOps import redisOps
+from core.utils import sysUtils as utils
 from modbus.ttydevMeters import ttydevMeters
 from modbus.pingResults import pingResults
 
@@ -35,6 +36,9 @@ class ttyUSBDeviceScanner(_th.Thread):
 
    def init(self):
       self.usb_ser_ports = ports.serial_ports_arr("USB")
+      _d = {"init_dts_utc": utils.dts_utc()
+         , "usb_ser_ports": " \n".join(self.usb_ser_ports)}
+      self.redops.update_diag_tag(self.diag_tag, mapdct=_d, restart=True)
 
    def run(self):
       while True:
