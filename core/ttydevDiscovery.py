@@ -40,8 +40,8 @@ class ttyUSBDeviceScanner(_th.Thread):
       # -- end of test loop --
       self.is_done = True
       print("\n[ usb dev ports mappings ]")
-      for s in self.located_map:
-         print(f" -> {s}")
+      for d, a in self.located_map:
+         print(f" -> {d} | {a}")
       print("\n\t-- [ pinging_end ] --\n")
 
    def __main_loop(self) -> int:
@@ -51,6 +51,10 @@ class ttyUSBDeviceScanner(_th.Thread):
          self.__on_ttydev_meters(ttydev_meters)
       # -- -- -- --
       return 0
+
+   def __create_dev_aliases(self):
+
+      pass
 
    def __on_ttydev_meters(self, dev_meters: ttydevMeters):
       # -- inner method --
@@ -63,7 +67,7 @@ class ttyUSBDeviceScanner(_th.Thread):
                accu.append((_meter, _dev))
             # -- test detection threshold limit --
             if len(accu) >= THRESHOLD_LIMIT:
-               self.located_map.append(f"{usb_ser} | {dev_meters.alias}")
+               self.located_map.append((usb_ser, dev_meters.alias))
                self.located_ports.append(usb_ser)
                _dict = {"_dev": _dev, "dev": dev_meters.dev
                   , "alias": dev_meters.alias, "tag": dev_meters.tag}
