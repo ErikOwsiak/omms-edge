@@ -47,28 +47,28 @@
             <meter busAddr="24" modelXML="orno/orno516.xml" />
          </ttydev>
          <ttydev run="yes" tag="ModbusAddrs_29_53" alias="modbusPortB" dev="auto" modbusBugID="">
-            <meter busAddr="29" modelXML="orno516.xml" />
-            <meter busAddr="30" modelXML="orno516.xml" />
-            <meter busAddr="31" modelXML="orno516.xml" />
-            <meter busAddr="32" modelXML="orno516.xml" />
-            <meter busAddr="33" modelXML="orno516.xml" />
-            <meter busAddr="34" modelXML="orno516.xml" />
-            <meter busAddr="35" modelXML="orno516.xml" />
-            <meter busAddr="36" modelXML="orno516.xml" />
-            <meter busAddr="37" modelXML="orno516.xml" />
-            <meter busAddr="38" modelXML="orno516.xml" />
-            <meter busAddr="39" modelXML="orno516.xml" />
-            <meter busAddr="40" modelXML="orno516.xml" />
-            <meter busAddr="41" modelXML="orno516.xml" />
+            <meter busAddr="29" modelXML="orno/orno516.xml" />
+            <meter busAddr="30" modelXML="orno/orno516.xml" />
+            <meter busAddr="31" modelXML="orno/orno516.xml" />
+            <meter busAddr="32" modelXML="orno/orno516.xml" />
+            <meter busAddr="33" modelXML="orno/orno516.xml" />
+            <meter busAddr="34" modelXML="orno/orno516.xml" />
+            <meter busAddr="35" modelXML="orno/orno516.xml" />
+            <meter busAddr="36" modelXML="orno/orno516.xml" />
+            <meter busAddr="37" modelXML="orno/orno516.xml" />
+            <meter busAddr="38" modelXML="orno/orno516.xml" />
+            <meter busAddr="39" modelXML="orno/orno516.xml" />
+            <meter busAddr="40" modelXML="orno/orno516.xml" />
+            <meter busAddr="41" modelXML="orno/orno516.xml" />
             <!-- right most closet has number 3 on top of the knobs -->
-            <meter busAddr="46" modelXML="orno516.xml" />
-            <meter busAddr="47" modelXML="orno516.xml" />
-            <meter busAddr="48" modelXML="orno516.xml" />
-            <meter busAddr="49" modelXML="orno516.xml" />
-            <meter busAddr="50" modelXML="orno516.xml" />
-            <meter busAddr="51" modelXML="orno516.xml" />
-            <meter busAddr="52" modelXML="orno516.xml" />
-            <meter busAddr="53" modelXML="orno516.xml" />
+            <meter busAddr="46" modelXML="orno/orno516.xml" />
+            <meter busAddr="47" modelXML="orno/orno516.xml" />
+            <meter busAddr="48" modelXML="orno/orno516.xml" />
+            <meter busAddr="49" modelXML="orno/orno516.xml" />
+            <meter busAddr="50" modelXML="orno/orno516.xml" />
+            <meter busAddr="51" modelXML="orno/orno516.xml" />
+            <meter busAddr="52" modelXML="orno/orno516.xml" />
+            <meter busAddr="53" modelXML="orno/orno516.xml" />
          </ttydev>
       </edge>
       <edge hostname="3cpo" pubChannel="MODBUS_DEVLAB_READS">
