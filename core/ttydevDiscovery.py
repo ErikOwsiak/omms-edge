@@ -25,6 +25,7 @@ class ttyUSBDeviceScanner(_th.Thread):
       self.cp_ttydev_disco_bot: _cp.ConfigParser = ttydev_disco_bot_cp
       self.cp_modbus_redis_bot: _cp.ConfigParser = modbus_redis_bot_cp
       self.ttydev_meters_arr: [ttydevMeters] = ttydev_meters_arr
+      self.diag_tag = self.cp_ttydev_disco_bot["SYSINFO"]["DIAG_TAG"]
       self.model_xmls: {} = {}
       self.meters: t.List[et.Element] = []
       self.usb_ser_ports: [] = None
@@ -78,9 +79,14 @@ class ttyUSBDeviceScanner(_th.Thread):
          a_path = f"{dev_path}/{a}"
          _meter, _dev = self.__on_meter(m, a_path)
          if (_meter is not None) and (_dev is not None):
-            print(f"DEV: {d}\nDEV_LINK_TESTED_OK: {a_path}")
+            buff = f"DEV: {d}\nDEV_LINK_TESTED_OK: {a_path}"
          else:
-            print(f"DEV: {d}\nDEV_LINK_TESTED_ERR: {a_path}")
+            buff = f"DEV: {d}\nDEV_LINK_TESTED_ERR: {a_path}"
+         # -- -- -- -- --
+         print(buff)
+         _d = {d: buff}
+         self.redops.update_diag_tag(self.diag_tag, mapdct=_d)
+
 
    def __on_ttydev_meters(self, dev_meters: ttydevMeters):
       # -- inner method --
