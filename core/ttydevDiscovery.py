@@ -14,12 +14,14 @@ from modbus.pingResults import pingResults
 class ttyUSBDeviceScanner(_th.Thread):
 
    def __init__(self, redops: redisOps
+         , system_cp: _cp.ConfigParser
          , ttydev_disco_bot_cp: _cp.ConfigParser
          , modbus_redis_bot_cp: _cp.ConfigParser
          , ttydev_meters_arr):
       # -- -- -- run -- -- --
       super().__init__()
       self.redops: redisOps = redops
+      self.cp_system: _cp.ConfigParser = system_cp
       self.cp_ttydev_disco_bot: _cp.ConfigParser = ttydev_disco_bot_cp
       self.cp_modbus_redis_bot: _cp.ConfigParser = modbus_redis_bot_cp
       self.ttydev_meters_arr: [ttydevMeters] = ttydev_meters_arr
@@ -42,6 +44,8 @@ class ttyUSBDeviceScanner(_th.Thread):
       print("\n[ usb dev ports mappings ]")
       for d, a in self.located_map:
          print(f" -> {d} | {a}")
+      # -- create ttydev aliases in
+      self.__create_dev_aliases()
       print("\n\t-- [ pinging_end ] --\n")
 
    def __main_loop(self) -> int:
@@ -53,8 +57,18 @@ class ttyUSBDeviceScanner(_th.Thread):
       return 0
 
    def __create_dev_aliases(self):
-
-      pass
+      # -- -- -- -- -- -- -- --
+      dev_path = self.cp_system["CORE"]["OMMS_DEV_PATH"]
+      if not os.path.exists(dev_path):
+         print(f"PathNotFound: {dev_path}")
+         return
+      # -- -- -- -- -- -- -- --
+      os.chdir(dev_path)
+      for d, a in self.located_map:
+         if os.path.exists(d):
+            os.system(f"ln -s {d} {a}")
+         print(f" -> {d} | {a}")
+      # -- -- -- -- -- -- -- --
 
    def __on_ttydev_meters(self, dev_meters: ttydevMeters):
       # -- inner method --

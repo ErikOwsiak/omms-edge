@@ -14,6 +14,12 @@ from modbus.ttydevMeters import ttydevMeters
 from core.ttydevDiscovery import ttyUSBDeviceScanner
 
 
+SYSTEM_CP: _cp.ConfigParser = _cp.ConfigParser()
+loaded: [] = SYSTEM_CP.read("conf/system.ini")
+if len(loaded) == 0:
+   print("no ini files loaded")
+   exit(1)
+
 # -- load config file for: modbus_redis_bot --
 modbus_redis_bot_cp: _cp = _cp.ConfigParser()
 loaded: [] = modbus_redis_bot_cp.read("conf/modbus_redis_bot.ini")
@@ -55,9 +61,9 @@ ttydev_meters_arr: [ttydevMeters] = [ttydevMeters(n) for n in MM_XML.findall(xpa
 for item in ttydev_meters_arr:
    item.init()
 # -- -- -- -- -- --
-
 scannerTh: ttyUSBDeviceScanner = ttyUSBDeviceScanner(redops
-   , ttydev_disco_bot_cp, modbus_redis_bot_cp, ttydev_meters_arr)
+   , SYSTEM_CP, ttydev_disco_bot_cp, modbus_redis_bot_cp, ttydev_meters_arr)
+# -- -- -- -- -- --
 scannerTh.init()
 scannerTh.start()
 
