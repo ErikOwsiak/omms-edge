@@ -28,6 +28,7 @@ class ttyUSBDeviceScanner(_th.Thread):
       self.meters: t.List[et.Element] = []
       self.usb_ser_ports: [] = None
       self.is_done: bool = False
+      self.located_ports: [] = []
 
    def init(self):
       self.usb_ser_ports = ports.serial_ports_arr("USB")
@@ -42,18 +43,16 @@ class ttyUSBDeviceScanner(_th.Thread):
 
    def __main_loop(self) -> int:
       # -- per ttydev meters --
+      self.located_ports.clear()
       for ttydev_meters in self.ttydev_meters_arr:
          self.__on_ttydev_meters(ttydev_meters)
       # -- -- -- --
       return 0
 
    def __on_ttydev_meters(self, dev_meters: ttydevMeters):
-      # -- per meter in ttydev --
-      located: [] = []
       # -- inner method --
       def __on_usb_ser_port(usb_ser):
          accu: [] = []
-         nonlocal located
          print(f"\n\n\t--[ testing usb_port: {usb_ser} ]--\n")
          for meter in dev_meters.meters:
             _meter, _dev = self.__on_meter(meter, usb_ser)
@@ -61,7 +60,7 @@ class ttyUSBDeviceScanner(_th.Thread):
                accu.append((_meter, _dev))
             # -- test detection threshold limit --
             if len(accu) >= THRESHOLD_LIMIT:
-               located.append(usb_ser)
+               self.located_ports.append(usb_ser)
                _dict = {"_dev": _dev, "dev": dev_meters.dev
                   , "alias": dev_meters.alias, "tag": dev_meters.tag}
                self.__on_threshold_reached(_dict)
@@ -72,10 +71,10 @@ class ttyUSBDeviceScanner(_th.Thread):
       # -- -- -- --
       THRESHOLD_LIMIT: int = int(self.cp_ttydev_disco_bot["SYSINFO"]["THRESHOLD_LIMIT"])
       for usb_ser_port in self.usb_ser_ports:
-         if usb_ser_port not in located:
+         if usb_ser_port not in self.located_ports:
             __on_usb_ser_port(usb_ser_port)
          else:
-            print(f"dev_located: {usb_ser_port}")
+            print(f"\n\t[ dev_located: {usb_ser_port} ]\n")
       # -- -- -- --
 
    def __on_threshold_reached(self, _dict: {}):
