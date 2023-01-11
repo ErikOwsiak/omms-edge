@@ -73,7 +73,7 @@ def main():
    while True:
       # -- -- -- --
       if scannerTh.is_done:
-         print("\texit...")
+         print("\texit...\n\n")
          return
       # -- -- -- --
       print(f"[ {proc_name}: main ]")
