@@ -50,15 +50,28 @@ class ttyUSBDeviceScanner(_th.Thread):
    def __on_ttydev_meters(self, dev_meters: ttydevMeters):
       # -- per meter in ttydev --
       accu: [] = []
+      located: [] = []
+      # -- inner method --
+      def __on_usb_ser_port(usb_ser):
+         for meter in dev_meters.meters:
+            _meter, _dev = self.__on_meter(meter, usb_ser)
+            if _meter and _dev:
+               accu.append((_meter, _dev))
+            # -- test detection threshold limit --
+            if len(accu) >= THRESHOLD_LIMIT:
+               located.append(usb_ser)
+               _dict = {"_dev": _dev, "dev": dev_meters.dev
+                  , "alias": dev_meters.alias, "tag": dev_meters.tag}
+               self.__on_threshold_reached(_dict)
+            else:
+               pass
+      # -- -- -- --
       THRESHOLD_LIMIT: int = int(self.cp_ttydev_disco_bot["SYSINFO"]["THRESHOLD_LIMIT"])
-      for meter in dev_meters.meters:
-         _meter, _dev = self.__on_meter(meter)
-         if _meter and _dev:
-            accu.append((_meter, _dev))
-         # -- test detection threshold limit --
-         if len(accu) >= THRESHOLD_LIMIT:
-            print("THRESHOLD_LIMIT_REACHED")
-            break
+      for usb_ser_port in self.usb_ser_ports:
+         if usb_ser_port not in located:
+            __on_usb_ser_port(usb_ser_port)
+         else:
+            print(f"dev_located: {usb_ser_port}")
       # -- -- -- --
       if len(accu) < THRESHOLD_LIMIT:
          print("THRESHOLD_LIMIT_NOT_REACHED")
@@ -69,7 +82,11 @@ class ttyUSBDeviceScanner(_th.Thread):
       print(f"create dev link: {dev} -> {alias}")
       time.sleep(2.0)
 
-   def __on_meter(self, meter: et.Element) -> ():
+   def __on_threshold_reached(self, _dict: {}):
+      print("__on_threshold_reached")
+      print(_dict)
+
+   def __on_meter(self, meter: et.Element, dev_port: str) -> ():
       # -- load meter xml file --
       model_xml = meter.attrib["modelXML"]
       path = f"brands/{model_xml}"
@@ -90,31 +107,29 @@ class ttyUSBDeviceScanner(_th.Thread):
       if comm_xml is None:
          pass
       # -- -- run -- --
-      return self.__try_ping_meter_on_usb_ports(meter, comm_xml)
+      return self.__try_ping_meter_on_usb_port(dev_port, meter, comm_xml)
 
-   def __try_ping_meter_on_usb_ports(self, meter: et.Element, com_xml: et.Element) -> (et.Element, str):
+   def __try_ping_meter_on_usb_port(self
+         , usb_dev_port: str
+         , meter: et.Element
+         , com_xml: et.Element) -> (et.Element, str):
       # -- -- -- --
-      accu: {} = {}
       model_xml: str = meter.attrib["modelXML"]
       bus_addr: int = int(meter.attrib["busAddr"])
       bus_addr_reg_hex = meter.attrib["modbus_addr_reg"]
       # -- -- -- --
-      for usb_dev in self.usb_ser_ports:
-         if not os.path.exists(usb_dev):
-            continue
-         # -- -- --
-         print(f"\n[ modelXML: {model_xml} ]")
-         modbus_inst: mm.Instrument = self.__get_inst__(usb_dev, com_xml, bus_addr)
-         resp: pingResults = self.__do_ping(modbus_inst, bus_addr_reg_hex)
-         if resp.err_code != 0:
-            accu[usb_dev] = resp
-            print("NoPong!")
-            continue
-         else:
-            print("PingOK!")
-            return meter, usb_dev
-      # -- -- -- --
-      return None, None
+      if not os.path.exists(usb_dev_port):
+         return None, None
+      # -- -- --
+      print(f"\n[ modelXML: {model_xml} ]")
+      modbus_inst: mm.Instrument = self.__get_inst__(usb_dev_port, com_xml, bus_addr)
+      resp: pingResults = self.__do_ping(modbus_inst, bus_addr_reg_hex)
+      if resp.err_code != 0:
+         print("NoPong!")
+         return None, None
+      else:
+         print("PingOK!")
+         return meter, usb_dev_port
 
    def __do_ping(self, inst: mm.Instrument, bus_addr_reg_hex: str) -> pingResults:
       HEX = 16
