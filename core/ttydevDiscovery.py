@@ -13,8 +13,6 @@ from modbus.pingResults import pingResults
 
 class ttyUSBDeviceScanner(_th.Thread):
 
-   AUTO = "AUTO"
-
    def __init__(self, redops: redisOps
          , ttydev_disco_bot_cp: _cp.ConfigParser
          , modbus_redis_bot_cp: _cp.ConfigParser
@@ -55,6 +53,7 @@ class ttyUSBDeviceScanner(_th.Thread):
       # -- inner method --
       def __on_usb_ser_port(usb_ser):
          accu: [] = []
+         nonlocal located
          print(f"\n\n\t--[ testing usb_port: {usb_ser} ]--\n")
          for meter in dev_meters.meters:
             _meter, _dev = self.__on_meter(meter, usb_ser)
