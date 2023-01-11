@@ -23,12 +23,12 @@ class ttyUSBDeviceScanner(_th.Thread):
       self.cp_ttydev_disco_bot: _cp.ConfigParser = ttydev_disco_bot_cp
       self.cp_modbus_redis_bot: _cp.ConfigParser = modbus_redis_bot_cp
       self.ttydev_meters_arr: [ttydevMeters] = ttydev_meters_arr
-      # self.ttyDev = ttyDev
       self.model_xmls: {} = {}
       self.meters: t.List[et.Element] = []
       self.usb_ser_ports: [] = None
       self.is_done: bool = False
       self.located_ports: [] = []
+      self.located_map: [] = []
 
    def init(self):
       self.usb_ser_ports = ports.serial_ports_arr("USB")
@@ -60,6 +60,7 @@ class ttyUSBDeviceScanner(_th.Thread):
                accu.append((_meter, _dev))
             # -- test detection threshold limit --
             if len(accu) >= THRESHOLD_LIMIT:
+               self.located_map.append(f"{usb_ser} | {dev_meters.alias}")
                self.located_ports.append(usb_ser)
                _dict = {"_dev": _dev, "dev": dev_meters.dev
                   , "alias": dev_meters.alias, "tag": dev_meters.tag}
