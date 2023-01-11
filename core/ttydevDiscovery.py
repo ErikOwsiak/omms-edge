@@ -64,7 +64,7 @@ class ttyUSBDeviceScanner(_th.Thread):
          return
       # -- -- -- -- -- -- -- --
       os.chdir(dev_path)
-      for d, a in self.located_map:
+      for d, a, _ in self.located_map:
          if os.path.exists(d):
             if not os.path.exists(a):
                os.system(f"ln -s {d} {a}")
@@ -73,7 +73,13 @@ class ttyUSBDeviceScanner(_th.Thread):
             else:
                print(f"\tDEVLINK_ERROR: {a}")
       # -- -- -- -- -- -- -- --
-
+      # -- test dev links --
+      for d, a, m in self.located_map:
+         _meter, _dev = self.__on_meter(m, a)
+         if (_meter is not None) and (_dev is not None):
+            print(f"DEV_LINK_TESTED_OK: {a}")
+         else:
+            print(f"DEV_LINK_TESTED_ERR: {a}")
 
    def __on_ttydev_meters(self, dev_meters: ttydevMeters):
       # -- inner method --
@@ -86,7 +92,7 @@ class ttyUSBDeviceScanner(_th.Thread):
                accu.append((_meter, _dev))
             # -- test detection threshold limit --
             if len(accu) >= THRESHOLD_LIMIT:
-               self.located_map.append((usb_ser, dev_meters.alias))
+               self.located_map.append((usb_ser, dev_meters.alias, _meter))
                self.located_ports.append(usb_ser)
                _dict = {"_dev": _dev, "dev": dev_meters.dev
                   , "alias": dev_meters.alias, "tag": dev_meters.tag}
