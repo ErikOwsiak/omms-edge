@@ -36,7 +36,7 @@ class ttyUSBDeviceScanner(_th.Thread):
 
    def init(self):
       self.usb_ser_ports = ports.serial_ports_arr("USB")
-      _d = {"init_dts_utc": utils.dts_utc()
+      _d = {"start_dts_utc": utils.dts_utc()
          , "usb_ser_ports": " | ".join(self.usb_ser_ports)}
       self.redops.update_diag_tag(self.diag_tag, mapdct=_d, restart=True)
 
@@ -51,6 +51,8 @@ class ttyUSBDeviceScanner(_th.Thread):
          print(f" -> {d} | {a}")
       # -- create ttydev aliases in
       self.__create_dev_aliases()
+      _d = {"end_dts_utc": utils.dts_utc()}
+      self.redops.update_diag_tag(self.diag_tag, mapdct=_d)
       print("\n\t-- [ pinging_end ] --\n")
 
    def __main_loop(self) -> int:
