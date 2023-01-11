@@ -25,6 +25,7 @@ class modbusRedisRelay(_th.Thread):
       super().__init__()
       self.cp: _cp.ConfigParser = cp
       self.diag_tag: str = str(self.cp["SYSINFO"]["DIAG_TAG"])
+      self.diag_tag = sysUtils.diag_tag_prefix(self.diag_tag)
       self.omms_dev_path: str = str(self.cp["SYSINFO"]["OMMS_DEV_PATH"])
       self.redops: redisOps = redops
       self.sys_ports: ports = ports(self.cp)

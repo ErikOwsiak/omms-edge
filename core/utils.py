@@ -11,9 +11,15 @@ class sysUtils(object):
    BUILDING = ""
    with open("/etc/hostname") as f:
       HOST = f.read().strip()
+   with open("/etc/iotech/prefix") as f:
+      PREFIX = f.read().strip()
 
    def __init__(self):
       pass
+
+   @staticmethod
+   def diag_tag_prefix(dtag: str):
+      return dtag.replace("?", sysUtils.PREFIX).strip()
 
    @staticmethod
    def lan_ip():

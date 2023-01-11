@@ -28,9 +28,7 @@ class ttyUSBDeviceScanner(_th.Thread):
       self.ttydev_meters_arr: [ttydevMeters] = ttydev_meters_arr
       # -- -- -- --
       self.diag_tag = self.cp_ttydev_disco_bot["SYSINFO"]["DIAG_TAG"]
-      with open("/etc/iotech/prefix") as f:
-         prefix = f.read().strip()
-      self.diag_tag = self.diag_tag.replace("?", prefix)
+      self.diag_tag = utils.diag_tag_prefix(self.diag_tag)
       # -- -- -- --
       self.model_xmls: {} = {}
       self.meters: t.List[et.Element] = []
