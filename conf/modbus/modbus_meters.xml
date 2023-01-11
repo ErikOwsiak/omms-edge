@@ -69,6 +69,9 @@
             <meter busAddr="52" modelXML="orno/orno516.xml" />
             <meter busAddr="53" modelXML="orno/orno516.xml" />
          </ttydev>
+         <ttydev run="yes" tag="ModbusAddrs_60" alias="modbusPortC" dev="auto" modbusBugID="">
+            <meter busAddr="60" modelXML="orno/orno516.xml" />
+         </ttydev>
       </edge>
       <edge hostname="3cpo" pubChannel="MODBUS_DEVLAB_READS">
          <ttydev run="yes" tag="ModbusEdgeA5" alias="modbusPortA" dev="auto" modbusBugID="bugID1">

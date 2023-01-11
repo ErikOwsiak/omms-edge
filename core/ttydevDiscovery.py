@@ -102,7 +102,9 @@ class ttyUSBDeviceScanner(_th.Thread):
             if (_meter is not None) and (_dev is not None):
                accu.append((_meter, _dev))
             # -- test detection threshold limit --
-            if len(accu) >= THRESHOLD_LIMIT:
+            if (len(accu) == 1 and len(dev_meters.meters) == 1) \
+                  or (len(accu) >= THRESHOLD_LIMIT and len(dev_meters.meters) > 1):
+               # -- -- -- -- --
                self.located_map.append((usb_ser, dev_meters.alias, _meter))
                self.located_ports.append(usb_ser)
                _dict = {"_dev": _dev, "dev": dev_meters.dev
