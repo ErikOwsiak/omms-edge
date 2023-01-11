@@ -35,8 +35,7 @@
          </meters>
       </edge>
       <edge hostname="omms-edge-p16" pubChannel="">
-         <!-- modbusProcess runs per tty device -->
-         <meters start="yes" tag="ModbusA" ttyDevice="auto">
+         <ttydev run="yes" tag="ModbusAddrs_15_24" alias="modbusPortA" dev="auto" modbusBugID="">
             <meter busAddr="15" modelXML="orno/orno516.xml" />
             <meter busAddr="16" modelXML="orno/orno516.xml" />
             <meter busAddr="17" modelXML="orno/orno516.xml" />
@@ -46,8 +45,8 @@
             <meter busAddr="22" modelXML="orno/orno516.xml" />
             <meter busAddr="23" modelXML="orno/orno516.xml" />
             <meter busAddr="24" modelXML="orno/orno516.xml" />
-         </meters>
-         <meters start="yes" tag="ModbusB" ttyDevice="auto">
+         </ttydev>
+         <ttydev run="yes" tag="ModbusAddrs_29_53" alias="modbusPortB" dev="auto" modbusBugID="">
             <meter busAddr="29" modelXML="orno516.xml" />
             <meter busAddr="30" modelXML="orno516.xml" />
             <meter busAddr="31" modelXML="orno516.xml" />
@@ -70,7 +69,7 @@
             <meter busAddr="51" modelXML="orno516.xml" />
             <meter busAddr="52" modelXML="orno516.xml" />
             <meter busAddr="53" modelXML="orno516.xml" />
-         </meters>
+         </ttydev>
       </edge>
       <edge hostname="3cpo" pubChannel="MODBUS_DEVLAB_READS">
          <ttydev run="yes" tag="ModbusEdgeA5" alias="modbusPortA" dev="auto" modbusBugID="bugID1">
