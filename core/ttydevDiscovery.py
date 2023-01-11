@@ -78,14 +78,6 @@ class ttyUSBDeviceScanner(_th.Thread):
          else:
             print(f"dev_located: {usb_ser_port}")
       # -- -- -- --
-      if len(accu) < THRESHOLD_LIMIT:
-         print("THRESHOLD_LIMIT_NOT_REACHED")
-         return
-      # -- -- -- --
-      dev = dev_meters.dev
-      alias = dev_meters.alias
-      print(f"create dev link: {dev} -> {alias}")
-      time.sleep(2.0)
 
    def __on_threshold_reached(self, _dict: {}):
       print("__on_threshold_reached")
