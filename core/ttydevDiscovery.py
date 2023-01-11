@@ -37,7 +37,7 @@ class ttyUSBDeviceScanner(_th.Thread):
    def init(self):
       self.usb_ser_ports = ports.serial_ports_arr("USB")
       _d = {"init_dts_utc": utils.dts_utc()
-         , "usb_ser_ports": " \n".join(self.usb_ser_ports)}
+         , "usb_ser_ports": " | ".join(self.usb_ser_ports)}
       self.redops.update_diag_tag(self.diag_tag, mapdct=_d, restart=True)
 
    def run(self):
