@@ -39,6 +39,9 @@ class ttyUSBDeviceScanner(_th.Thread):
             break
       # -- end of test loop --
       self.is_done = True
+      print("[ usb dev ports mappings ]")
+      for s in self.located_map:
+         print(f"\t{s}")
       print("\n\t-- [ pinging_end ] --\n")
 
    def __main_loop(self) -> int:
