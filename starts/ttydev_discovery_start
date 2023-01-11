@@ -1,0 +1,12 @@
+#!/bin/bash
+
+cd ..
+# echo "cwd: $(pwd)"
+export PYTHONPATH=$(pwd)
+echo $PYTHONPATH
+
+pyfile=bots/mqtt_redis_bot
+# -- set x bit if not already --
+chmod +x $pyfile
+# -- start bot --
+$pyfile
