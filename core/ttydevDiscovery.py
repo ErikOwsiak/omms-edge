@@ -84,7 +84,7 @@ class ttyUSBDeviceScanner(_th.Thread):
             b0, b1 = f"DEV: {d}", f"DEV_LINK_TESTED_ERR: {a_path}"
          # -- -- -- -- --
          print([b0, b1])
-         self.redops.update_diag_tag(self.diag_tag, mapdct={d: b1}, restart=True)
+         self.redops.update_diag_tag(self.diag_tag, mapdct={d: b1})
 
    def __on_ttydev_meters(self, dev_meters: ttydevMeters):
       # -- inner method --
