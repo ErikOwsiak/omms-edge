@@ -42,7 +42,7 @@ class ttyUSBDeviceScanner(_th.Thread):
       # -- end of test loop --
       self.is_done = True
       print("\n[ usb dev ports mappings ]")
-      for d, a in self.located_map:
+      for d, a, _ in self.located_map:
          print(f" -> {d} | {a}")
       # -- create ttydev aliases in
       self.__create_dev_aliases()
