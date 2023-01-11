@@ -67,8 +67,12 @@ class ttyUSBDeviceScanner(_th.Thread):
       for d, a in self.located_map:
          if os.path.exists(d):
             os.system(f"ln -s {d} {a}")
-         print(f" -> {d} | {a}")
+            if os.path.exists(a):
+               print(f"\tDEVLINK_OK!: {a}")
+            else:
+               print(f"\tDEVLINK_ERROR: {a}")
       # -- -- -- -- -- -- -- --
+
 
    def __on_ttydev_meters(self, dev_meters: ttydevMeters):
       # -- inner method --
