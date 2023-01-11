@@ -63,23 +63,24 @@ class ttyUSBDeviceScanner(_th.Thread):
          print(f"PathNotFound: {dev_path}")
          return
       # -- -- -- -- -- -- -- --
-      os.chdir(dev_path)
       for d, a, _ in self.located_map:
          if os.path.exists(d):
-            if not os.path.exists(a):
-               os.system(f"ln -s {d} {a}")
+            a_path = f"{dev_path}/{a}"
+            if not os.path.exists(a_path):
+               os.system(f"ln -s {d} {a_path}")
             if os.path.exists(a):
-               print(f"\tDEVLINK_OK!: {a}")
+               print(f"\tDEVLINK_OK!: {a_path}")
             else:
-               print(f"\tDEVLINK_ERROR: {a}")
+               print(f"\tDEVLINK_ERROR: {a_path}")
       # -- -- -- -- -- -- -- --
       # -- test dev links --
       for d, a, m in self.located_map:
-         _meter, _dev = self.__on_meter(m, a)
+         a_path = f"{dev_path}/{a}"
+         _meter, _dev = self.__on_meter(m, a_path)
          if (_meter is not None) and (_dev is not None):
-            print(f"DEV_LINK_TESTED_OK: {a}")
+            print(f"DEV_LINK_TESTED_OK: {a_path}")
          else:
-            print(f"DEV_LINK_TESTED_ERR: {a}")
+            print(f"DEV_LINK_TESTED_ERR: {a_path}")
 
    def __on_ttydev_meters(self, dev_meters: ttydevMeters):
       # -- inner method --
