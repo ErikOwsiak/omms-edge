@@ -70,9 +70,13 @@ scannerTh.start()
 
 def main():
    # -- -- -- --
+   with open("/etc/iotech/prefix") as f:
+      prefix = f.read().strip()
+   diag_tag: str = ttydev_disco_bot_cp["SYSINFO"]["DIAG_TAG"]
+   diag_tag = diag_tag.replace("?", prefix)
+   # -- -- -- --
    proc_name = ttydev_disco_bot_cp["RUNNER"]["PROC_NAME"]
    setproctitle.setproctitle(proc_name)
-   diag_tag: str = ttydev_disco_bot_cp["RUNNER"]["DIAG_TAG"]
    MAIN_LOOP_SECS = int(ttydev_disco_bot_cp["RUNNER"]["MAIN_LOOP_SECS"])
    # -- MAIN LOOP --
    loop_cnt = 0
@@ -84,7 +88,7 @@ def main():
       # -- -- -- --
       print(f"[ {proc_name}: main ]")
       msg = f"ttydev_discovery_bot TICK {loop_cnt}"
-      dct: {} = {"dts_utc": utils.dts_utc(), "msg": msg}
+      dct: {} = {"bot_dts_utc": utils.dts_utc(), "msg": msg}
       scannerTh.redops.update_diag_tag(diag_tag=diag_tag, mapdct=dct, restart=False)
       # -- -- -- --
       loop_cnt += 1

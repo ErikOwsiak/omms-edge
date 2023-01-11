@@ -27,6 +27,11 @@ class ttyUSBDeviceScanner(_th.Thread):
       self.cp_modbus_redis_bot: _cp.ConfigParser = modbus_redis_bot_cp
       self.ttydev_meters_arr: [ttydevMeters] = ttydev_meters_arr
       self.diag_tag = self.cp_ttydev_disco_bot["SYSINFO"]["DIAG_TAG"]
+      # -- -- -- --
+      with open("/etc/iotech/prefix") as f:
+         prefix = f.read().strip()
+      self.diag_tag = self.diag_tag.replace("?", prefix)
+      # -- -- -- --
       self.model_xmls: {} = {}
       self.meters: t.List[et.Element] = []
       self.usb_ser_ports: [] = None
