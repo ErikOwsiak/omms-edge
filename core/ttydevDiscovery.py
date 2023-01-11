@@ -78,9 +78,9 @@ class ttyUSBDeviceScanner(_th.Thread):
          a_path = f"{dev_path}/{a}"
          _meter, _dev = self.__on_meter(m, a_path)
          if (_meter is not None) and (_dev is not None):
-            print(f"DEV_LINK_TESTED_OK: {a_path}")
+            print(f"DEV: {d}\nDEV_LINK_TESTED_OK: {a_path}")
          else:
-            print(f"DEV_LINK_TESTED_ERR: {a_path}")
+            print(f"DEV: {d}\nDEV_LINK_TESTED_ERR: {a_path}")
 
    def __on_ttydev_meters(self, dev_meters: ttydevMeters):
       # -- inner method --
