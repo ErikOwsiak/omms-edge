@@ -14,16 +14,17 @@ RESP_TIMEOUT = 2.0
 
 class ports(object):
 
-   def __init__(self, cp: _cp.ConfigParser = None):
-      self.cp: _cp.ConfigParser = cp
+   SYS_INI: _cp.ConfigParser = None
+
+   def __init__(self, sys_ini: _cp.ConfigParser = None):
+      self.sys_int: _cp.ConfigParser = sys_ini
+      ports.SYS_INI = sys_ini
       self.serial_ports: [] = []
       self.found: {} = {}
 
    def load_serials(self) -> int:
-      # -- -- -- --
       self.serial_ports = [p.device for p in ser_tools.comports()]
-      # -- -- -- --
-      path: str = self.cp["SYSINFO"]["OMMS_DEV_PATH"]
+      path: str = self.SYS_INI["CORE"]["RUN_IOTECH_DEV"]
       if not os.path.exists(path):
          return 1
       # -- -- -- --
@@ -40,13 +41,18 @@ class ports(object):
       return [ln.strip() for ln in lns if f":{tag}::" in ln][0]
 
    @staticmethod
-   def alias_pull_path(alias: str) -> [str, None]:
-      path = "/run/iotech/omms/dev"
+   def alias_full_path(alias: str) -> [str, None]:
+      # -- -- -- --
+      if ports.SYS_INI is None:
+         raise Exception("SYS_INI_IS_NONE")
+      # -- -- -- --
+      path = ports.SYS_INI["CORE"]["RUN_IOTECH_DEV"]
       flst = os.listdir(path)
       if alias in flst:
          return f"{path}/{alias}"
       else:
          return None
+      # -- -- -- --
 
    @staticmethod
    def serial_ports_arr(patt: str):

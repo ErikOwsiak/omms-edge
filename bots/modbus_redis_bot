@@ -9,7 +9,6 @@ from core.utils import sysUtils as utils
 from core.redisOps import redisOps
 from core.logutils import logUtils
 from modbus.modbusRedisRelay import modbusRedisRelay
-from modbus.modbusEdgeMeters import modbusEdgeMeters
 from modbus.ttydevMeters import ttydevMeters
 
 
@@ -24,23 +23,21 @@ from modbus.ttydevMeters import ttydevMeters
       7. if time is up ... run thread per stream
 """
 
-sys_cp: _cp = _cp.ConfigParser()
-loaded: [] = sys_cp.read("conf/system.ini")
+# -- -- -- -- --
+SYS_INI: _cp = _cp.ConfigParser()
+loaded: [] = SYS_INI.read("conf/system.ini")
 if len(loaded) == 0:
    print("no ini files loaded")
    exit(1)
+# -- -- -- -- --
+SEC_INI = SYS_INI["MODBUS"]
 
-cp: _cp = _cp.ConfigParser()
-loaded: [] = cp.read("conf/modbus_redis_bot.ini")
-if len(loaded) == 0:
-   print("no ini files loaded")
-   exit(1)
 
 # -- -- -- -- load redis object  -- -- -- --
 if debug.is_dev_box():
-   redops = redisOps(cp, CONN_SEC="DEV_REDIS_CONN")
+   redops = redisOps(SYS_INI, CONN_SEC="REDIS_DEV")
 else:
-   redops: redisOps = redisOps(cp)
+   redops: redisOps = redisOps(SYS_INI)
 # -- ping server --
 if not redops.red.ping():
    print("UnableToPingRedisServer")
@@ -51,7 +48,7 @@ if not redops.red.ping():
    reg_streams have timing attached to them
    register_streams.xml
 """
-RS_XML_PATH: str = cp["METERS"]["REG_STREAMS_XML"]
+RS_XML_PATH: str = SEC_INI["REG_STREAMS_XML"]
 if not os.path.exists(RS_XML_PATH):
    print(f"FileNotFound: {RS_XML_PATH}")
    exit(1)
@@ -63,7 +60,7 @@ RS_XML = _et.parse(RS_XML_PATH)
    MM_XML_PATH is file with ALL modbus meters in the building grouped by 
    EDGE (HOST) -> ttyUSBx device 
 """
-MM_XML_PATH: str = cp["METERS"]["MODBUS_METERS_XML"]
+MM_XML_PATH: str = SEC_INI["MODBUS_METERS_XML"]
 if not os.path.exists(MM_XML_PATH):
    print(f"FileNotFound: {MM_XML_PATH}")
    exit(1)
@@ -79,8 +76,8 @@ for item in ttydev_meters_arr:
 """
    -- -- -- -- run relay thread -- -- -- --
 """
-time.sleep(2.0)
-modbusRedisRelayTh: modbusRedisRelay = modbusRedisRelay(cp, sys_cp, redops, ttydev_meters_arr, RS_XML)
+modbusRedisRelayTh: modbusRedisRelay = \
+   modbusRedisRelay(SYS_INI, redops, ttydev_meters_arr, RS_XML)
 modbusRedisRelayTh.init()
 modbusRedisRelayTh.start()
 

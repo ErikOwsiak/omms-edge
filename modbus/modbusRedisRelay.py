@@ -19,20 +19,20 @@ from ommslib.shared.core.elecRegStream import elecRegStream
 
 class modbusRedisRelay(_th.Thread):
 
-   def __init__(self, cp: _cp.ConfigParser
-         , sys_cp: _cp.ConfigParser
+   def __init__(self, sys_ini: _cp.ConfigParser
          , redops: redisOps
          , dev_meters: [ttydevMeters]
          , reg_streams_xml: _et.ElementTree):
       # -- -- -- -- -- -- -- --
       super().__init__()
-      self.cp: _cp.ConfigParser = cp
-      self.sys_cp: _cp.ConfigParser = sys_cp
-      self.diag_tag: str = str(self.cp["SYSINFO"]["DIAG_TAG"])
+      self.sys_ini: _cp.ConfigParser = sys_ini
+      self.sec_ini = self.sys_ini["MODBUS"]
+      self.diag_tag: str = str(self.sec_ini["DIAG_TAG"])
       self.diag_tag = sysUtils.set_systag(self.diag_tag)
-      self.run_iotech_dev: str = str(self.sys_cp["CORE"]["RUN_IOTECH_DEV"])
+      self.run_iotech_dev: str = str(self.sys_ini["CORE"]["RUN_IOTECH_DEV"])
+      self.channel = self.sec_ini["SYSPATH_CHANNEL"]
       self.redops: redisOps = redops
-      self.sys_ports: ports = ports(self.cp)
+      self.sys_ports: ports = ports(self.sys_ini)
       # -- edge modbus edge_meters --
       self.dev_meters_arr: [ttydevMeters] = dev_meters
       # -- register reg_streams --
@@ -41,6 +41,7 @@ class modbusRedisRelay(_th.Thread):
       self.stream_thread = None
       self.meter_model_xmls: {} = {}
       self.blank_meters: {} = {}
+      self.model_xmls: {} = {}
 
    def init(self):
       try:
@@ -52,33 +53,51 @@ class modbusRedisRelay(_th.Thread):
          logUtils.log_exp(e)
 
    def run(self) -> None:
-      self.__init_meter_pings()
+      self.__on_init_ping_meters()
       self.stream_thread: _th.Thread = self.stream_thread
       self.stream_thread.start()
       self.__main_loop()
 
-   def __init_meter_pings(self):
-      model_xmls: {} = {}
-      for ttydev in self.dev_meters_arr:
+   def __on_init_ping_meters(self):
+      def __on_ttydev(_ttydev: ttydevMeters) -> bool:
+         # -- -- -- -- --
          try:
-            ttydev: ttydevMeters = ttydev
-            alias = ttydev.alias
-
+            # -- --
+            ttydev: ttydevMeters = _ttydev
+            if ttydev.dev == "auto":
+               full_dev_path = ports.alias_full_path(ttydev.alias)
+            else:
+               full_dev_path = ttydev.dev
+            # -- --
             for meter_xml in ttydev.meters:
                model_xml = meter_xml.attrib["modelXML"]
                xml_path = f"brands/{model_xml}"
-               if model_xml not in model_xmls.keys():
-                  model_xmls[model_xml] = _et.parse(xml_path).getroot()
+               if xml_path not in self.model_xmls.keys():
+                  self.model_xmls[xml_path] = _et.parse(xml_path).getroot()
                # -- -- -- --
-               xmlelm: _et.Element = model_xmls[model_xml]
-               meter: modbusMeterV1 = modbusMeterV1(self.cp, xmlelm)
-               meter.clear_reinit(meter.modbus_addr, meter.tty_dev,)
-               meter.set_syspath("")
-
-               err, msg = meter.ping()
+               xmlelm: _et.Element = self.model_xmls[xml_path]
+               bus_addr = meter_xml.attrib["busAddr"]
+               meter: modbusMeterV1 = modbusMeterV1(self.sys_ini, int(bus_addr), full_dev_path, xmlelm)
+               if meter.init():
+                  meter.set_syspath(sysUtils.syspath(self.channel, bus_addr))
+                  err, msg = meter.ping()
+                  if err != 0:
+                     print(f"PingError: {msg}")
+                     return False
+                  else:
+                     print(f"InitPingOk: {bus_addr}")
+                     return True
+               else:
+                  print(f"MeterPingInitError: {bus_addr}")
+                  return False
                # -- -- -- --
          except Exception as e:
             logUtils.log_exp(e)
+            return False
+      # -- -- -- -- --
+      for item in self.dev_meters_arr:
+         rval: bool = __on_ttydev(item)
+      # -- -- -- -- --
 
    def __load_rs_xml(self) -> bool:
       xpath = "stream[@enabled='1']"
@@ -169,7 +188,7 @@ class modbusRedisRelay(_th.Thread):
          self.meter_model_xmls[modelxml] = _et.parse(path).getroot()
       # -- -- do -- --
       model_xml = self.meter_model_xmls[modelxml]
-      mb_meter: modbusMeterV1 = modbusMeterV1(cp=self.cp, modelxml=model_xml)
+      mb_meter: modbusMeterV1 = modbusMeterV1(cp=self.sys_ini, modelxml=model_xml)
       mb_meter.init()
       # -- -- do -- --
       error_code = 0
@@ -199,7 +218,7 @@ class modbusRedisRelay(_th.Thread):
 
    def __main_loop(self):
       # -- -- report -- --
-      pub_channel: str = self.cp["REDIS"]["PUB_READS_CHANNEL"]
+      pub_channel: str = self.sys_ini["REDIS"]["PUB_READS_CHANNEL"]
       _dict = {"boot_dts_utc": sysUtils.dts_utc(), "dev": "n/a"
          , "lan_ip": sysUtils.lan_ip(), "hostname": sysUtils.HOST
          , "pub_reads_channel": pub_channel}

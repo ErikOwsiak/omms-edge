@@ -26,18 +26,29 @@ from ommslib.shared.core.elecRegStrEnums import elecRegStrEnumsShort
 """
 
 class modbusMeterV1(object):
-
-   def __init__(self, cp: _cp.ConfigParser, modelxml: _et.Element):
-      self.cp: _cp.ConfigParser = cp
-      self.modelxml: _et.Element = modelxml
+   """
+      meter needs:
+         1. modbus address
+         2. serial info
+         3. model registers -> actual register address as define by the model
+         4. stream registers -> generic register defs used as lookups into the above
+   """
+   def __init__(self, sys_ini: _cp.ConfigParser
+         , bus_addr: int
+         , tty_dev_path: str
+         , model_xml: _et.Element
+         , elec_reg_stream: elecRegStream = None):
+      # -- -- -- --
+      self.sys_ini: _cp.ConfigParser = sys_ini
+      self.modbus_addr: int = bus_addr
+      self.tty_dev_path: str = tty_dev_path
+      self.model_xml: _et.Element = model_xml
+      self.elec_reg_stream: elecRegStream = elec_reg_stream
+      # -- set on init call --
       self.serial_info: meterSerialConf = None
-      self.modbus_addr: int = 0
-      self.stream_frame_regs: _et.Element = None
       self.model_regs: {} = {}
-      self.ers: elecRegStream = None
       self.syspath: str = ""
-      self.ports: sys_ports = sys_ports()
-      self.tty_dev: str = ""
+      self.ports: sys_ports = sys_ports(self.sys_ini)
       self.modbusInst: _min_mbus.Instrument = None
 
    """
@@ -50,10 +61,10 @@ class modbusMeterV1(object):
    """
    def init(self):
       try:
-         # load model regs into a dictionary
-         elm: _et.Element = self.modelxml.find("comm[@type='serial']")
+         # -- setup serial info --
+         elm: _et.Element = self.model_xml.find("comm[@type='serial']")
          self.serial_info = meterSerialConf(elm)
-         regs: [_et.Element] = self.modelxml.findall("regs/reg")
+         regs: [_et.Element] = self.model_xml.findall("regs/reg")
          if len(regs) == 0:
             raise Exception("[ ModelRegsNotLoaded ]")
          # -- do --
@@ -61,32 +72,15 @@ class modbusMeterV1(object):
          if len(self.model_regs) == 0:
             raise Exception("ModelRegsNotParsed")
          # -- int ports --
-         self.ports.load_serials(cp=self.cp)
+         self.ports.load_serials()
+         # -- modbus inst. --
+         self.modbusInst: _min_mbus.Instrument = self.__createInstrument()
+         return True
       except Exception as e:
          logUtils.log_exp(e)
 
    def set_syspath(self, syspath: str):
       self.syspath = syspath
-
-   def clear_reinit(self, addr: int, ttydev: str, ers: elecRegStream) -> bool:
-      try:
-         self.modbus_addr = addr
-         self.tty_dev = ttydev
-         self.stream_frame_regs = ers
-         # -- new modbus inst --
-         if self.modbusInst is None:
-            self.modbusInst: _min_mbus.Instrument = self.__createInstrument()
-         else:
-            if self.modbusInst.serial.isOpen():
-               self.modbusInst.serial.close()
-            self.modbusInst.address = addr
-            self.modbusInst.serial.port = self.tty_dev
-            if not self.modbusInst.serial.isOpen():
-               self.modbusInst.serial.open()
-         return True
-      except Exception as e:
-         logUtils.log_exp(e)
-         return False
 
    def ping(self) -> (int, str):
       try:
@@ -156,11 +150,11 @@ class modbusMeterV1(object):
 
    def __createInstrument(self) -> _min_mbus.Instrument:
       # - - - - - - - - - -
-      if self.tty_dev not in self.ports.serial_ports:
-         raise Exception(f"CommPortNotFound: {self.tty_dev}")
+      if self.tty_dev_path not in self.ports.serial_ports:
+         raise Exception(f"CommPortNotFound: {self.tty_dev_path}")
       # - - - - -
       meterInst: _min_mbus.Instrument = \
-         _min_mbus.Instrument(port=self.tty_dev, slaveaddress=self.modbus_addr
+         _min_mbus.Instrument(port=self.tty_dev_path, slaveaddress=self.modbus_addr
             , mode=_min_mbus.MODE_RTU, debug=False)
       # - - - - -
       if meterInst is None:

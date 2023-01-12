@@ -8,11 +8,11 @@ import serial, typing as t
 class sysUtils(object):
 
    with open("/etc/hostname") as f:
-      GEOLOC = f.read().strip()
-   with open("/etc/hostname") as f:
-      BUILDING = f.read().strip()
-   with open("/etc/hostname") as f:
       HOST = f.read().strip()
+   with open("/etc/iotech/geoloc") as f:
+      GEOLOC = f.read().strip()
+   with open("/etc/iotech/building") as f:
+      BUILDING = f.read().strip()
    with open("/etc/iotech/systag") as f:
       SYSTAG = f.read().strip()
 

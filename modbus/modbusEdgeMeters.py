@@ -61,7 +61,7 @@ class modbusEdgeMeters(object):
          dev = ttydisc[(pos + len(patt)):].strip(")")
       # -- use dev in: OMMS_DEV_PATH/dev/alias
       elif dev == "auto" and alias != "":
-         dev_alias = ports.alias_pull_path(alias)
+         dev_alias = ports.alias_full_path(alias)
          if dev_alias:
             pass
          else:
