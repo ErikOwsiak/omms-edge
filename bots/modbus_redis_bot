@@ -84,7 +84,7 @@ modbusRedisRelayTh.start()
 
 
 # -- main loop --
-LOOP_SLEEP_SECS: float = float(SEC_INI["LOOP_SLEEP_SECS"])
+MAIN_LOOP_SECS: float = float(SEC_INI["MAIN_LOOP_SECS"])
 
 def main():
    setproctitle.setproctitle("omms-modbus")
@@ -98,7 +98,7 @@ def main():
             dct: {} = {"bot_dts_utc": utils.dts_utc(), "msg": msg}
             modbusRedisRelayTh.redops.update_diag_tag(diag_tag=diag_tag, mapdct=dct, restart=False)
          # -- -- -- --
-         time.sleep(LOOP_SLEEP_SECS)
+         time.sleep(MAIN_LOOP_SECS)
       except Exception as e:
          logUtils.log_exp(e)
 
