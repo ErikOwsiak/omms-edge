@@ -9,6 +9,11 @@ echo ""
 echo "  --[ START_START ]--"
 echo ""
 
+
+START_MQTT_BOT=1
+START_MODBUS_BOT=1
+
+
 START_DIR=$(pwd)
 
 : ' ---------------------------------------------------------------------------
@@ -78,8 +83,23 @@ echo ""
 echo "  -- [ EXIT_CODE: $EXIT_CODE ] --"
 echo ""
 
+
+# -------------------------------
 # 3. start modbus bot
-PYFILE="bots/modbus_redis_bot"
+if [ $START_MODBUS_BOT -eq 1 ]; then
+  PYFILE="bots/modbus_redis_bot"
+  # -- set x bit if not already --
+  chmod +x $PYFILE
+  # -- start bot --
+  echo "- - -"
+  echo "PYFILE: $PYFILE"
+  echo "- - -"
+  $PYFILE >> /dev/null &
+fi
+
+# -------------------------------
+# 4. start mqtt bot
+PYFILE="bots/mqtt_redis_bot"
 # -- set x bit if not already --
 chmod +x $PYFILE
 # -- start bot --
@@ -87,6 +107,7 @@ echo "- - -"
 echo "PYFILE: $PYFILE"
 echo "- - -"
 $PYFILE >> /dev/null &
+
 
 
 
