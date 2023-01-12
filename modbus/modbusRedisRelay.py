@@ -53,7 +53,6 @@ class modbusRedisRelay(_th.Thread):
          logUtils.log_exp(e)
 
    def run(self) -> None:
-      self.__on_init_ping_meters()
       self.stream_thread: _th.Thread = self.stream_thread
       self.stream_thread.start()
       self.__main_loop()
@@ -114,9 +113,15 @@ class modbusRedisRelay(_th.Thread):
       return len(self.reg_streams) > 0
 
    def __stream_thread(self):
+      # -- -- -- -- -- -- -- --
+      try:
+         self.__on_init_ping_meters()
+      except Exception as e:
+         logUtils.log_exp(e)
+      # -- -- -- -- -- -- -- --
       while True:
          try:
-            # -- -- -- -- -- -- -- --
+            # -- -- -- -- -- --
             for stream in self.reg_streams:
                if not stream.is_time_to_run():
                   continue
@@ -124,7 +129,7 @@ class modbusRedisRelay(_th.Thread):
                   stream.update_last_run()
                else:
                   pass
-            # -- -- -- -- -- -- -- --
+            # -- -- -- -- -- --
             time.sleep(4.0)
             print("stream_thread")
          except Exception as e:
