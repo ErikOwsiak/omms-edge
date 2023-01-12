@@ -94,7 +94,8 @@ if [ $START_MODBUS_BOT -eq 1 ]; then
   echo "- - -"
   echo "PYFILE: $PYFILE"
   echo "- - -"
-  $PYFILE >> /dev/null &
+  # $PYFILE >> /dev/null &
+  $PYFILE
 else
   echo ""
   echo "NotStarting: $PYFILE"
@@ -117,7 +118,8 @@ if [ $START_MQTT_BOT -eq 1 ]; then
   echo "- - -"
   echo "PYFILE: $PYFILE"
   echo "- - -"
-  $PYFILE >> /dev/null &
+  # $PYFILE >> /dev/null &
+  $PYFILE
 else
   echo ""
   echo "NotStarting: $PYFILE"
