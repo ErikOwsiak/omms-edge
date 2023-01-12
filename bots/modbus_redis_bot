@@ -78,16 +78,17 @@ for item in ttydev_meters_arr:
 """
 modbusRedisRelayTh: modbusRedisRelay = \
    modbusRedisRelay(SYS_INI, redops, ttydev_meters_arr, RS_XML)
+# -- -- -- -- -- --
 modbusRedisRelayTh.init()
 modbusRedisRelayTh.start()
 
 
 # -- main loop --
-LOOP_SLEEP_SECS: float = float(cp["TIMING"]["LOOP_SLEEP_SECS"])
+LOOP_SLEEP_SECS: float = float(SEC_INI["LOOP_SLEEP_SECS"])
 
 def main():
-   setproctitle.setproctitle("modbusRedisBot")
-   diag_tag: str = cp["SYSINFO"]["DIAG_TAG"]
+   setproctitle.setproctitle("omms-modbus")
+   diag_tag: str = SEC_INI["DIAG_TAG"]
    diag_tag = utils.set_systag(diag_tag)
    while True:
       try:

@@ -218,10 +218,9 @@ class modbusRedisRelay(_th.Thread):
 
    def __main_loop(self):
       # -- -- report -- --
-      pub_channel: str = self.sys_ini["REDIS"]["PUB_READS_CHANNEL"]
-      _dict = {"boot_dts_utc": sysUtils.dts_utc(), "dev": "n/a"
-         , "lan_ip": sysUtils.lan_ip(), "hostname": sysUtils.HOST
-         , "pub_reads_channel": pub_channel}
+      pub_channel: str = self.sec_ini["PUB_READS_CHANNEL"]
+      _dict = {"boot_dts_utc": sysUtils.dts_utc(), "lan_ip": sysUtils.lan_ip()
+         , "hostname": sysUtils.HOST, "pub_reads_channel": pub_channel}
       self.redops.update_diag_tag(self.diag_tag, mapdct=_dict, restart=True)
       # -- -- run -- --
       while True:
