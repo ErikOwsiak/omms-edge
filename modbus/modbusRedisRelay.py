@@ -31,6 +31,8 @@ class modbusRedisRelay(_th.Thread):
       self.diag_tag = sysUtils.set_systag(self.diag_tag)
       self.run_iotech_dev: str = str(self.sys_ini["CORE"]["RUN_IOTECH_DEV"])
       self.channel = self.sec_ini["SYSPATH_CHANNEL"]
+      self.red_pub_channel: str = self.sec_ini["REDIS_PUB_CHNL"]
+      self.red_pub_channel = sysUtils.set_systag(self.red_pub_channel)
       self.redops: redisOps = redops
       self.sys_ports: ports = ports(self.sys_ini)
       # -- edge modbus edge_meters --
@@ -223,9 +225,8 @@ class modbusRedisRelay(_th.Thread):
 
    def __main_loop(self):
       # -- -- report -- --
-      pub_channel: str = self.sec_ini["PUB_READS_CHANNEL"]
       _dict = {"boot_dts_utc": sysUtils.dts_utc(), "lan_ip": sysUtils.lan_ip()
-         , "hostname": sysUtils.HOST, "pub_reads_channel": pub_channel}
+         , "hostname": sysUtils.HOST, "pub_reads_channel": self.red_pub_channel}
       self.redops.update_diag_tag(self.diag_tag, mapdct=_dict, restart=True)
       # -- -- run -- --
       while True:
