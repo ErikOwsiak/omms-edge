@@ -95,19 +95,29 @@ if [ $START_MODBUS_BOT -eq 1 ]; then
   echo "PYFILE: $PYFILE"
   echo "- - -"
   $PYFILE >> /dev/null &
+else
+  echo ""
+  echo "NotStarting: $PYFILE"
+  echo ""
 fi
+
 
 # -------------------------------
 # 4. start mqtt bot
-PYFILE="bots/mqtt_redis_bot"
-# -- set x bit if not already --
-chmod +x $PYFILE
-# -- start bot --
-echo "- - -"
-echo "PYFILE: $PYFILE"
-echo "- - -"
-$PYFILE >> /dev/null &
-
+if [ $START_MQTT_BOT -eq 1 ]; then
+  PYFILE="bots/mqtt_redis_bot"
+  # -- set x bit if not already --
+  chmod +x $PYFILE
+  # -- start bot --
+  echo "- - -"
+  echo "PYFILE: $PYFILE"
+  echo "- - -"
+  $PYFILE >> /dev/null &
+else
+  echo ""
+  echo "NotStarting: $PYFILE"
+  echo ""
+fi
 
 
 
