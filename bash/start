@@ -55,6 +55,7 @@ echo "PYTHONPATH: $PYTHONPATH"
 echo ""
 
 # 2. run ttydev discovery
+killall -s KILL ttydevDiscoBot
 PYFILE="bots/ttydev_discovery_bot"
 # -- set x bit if not already --
 chmod +x $PYFILE
