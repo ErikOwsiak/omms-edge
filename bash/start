@@ -57,7 +57,8 @@ PYFILE="bots/ttydev_discovery_bot"
 # -- set x bit if not already --
 chmod +x $PYFILE
 # -- start bot --
-EXIT_CODE=$("$PYFILE")
+$PYFILE
+EXIT_CODE=$?
 
 echo ""
 echo "  -- [ EXIT_CODE: $EXIT_CODE ] --"
