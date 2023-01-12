@@ -1,0 +1,67 @@
+#!/bin/bash
+
+# author: owsiak, erik
+# date: 2023/01/12
+
+echo ""
+echo "  --[ START_START ]--"
+echo ""
+
+START_DIR=$(pwd)
+
+: ' ---------------------------------------------------------------------------
+  check: /etc/iotech for:
+    building  ->  holds build ID - geoloc unique
+    geoloc    ->  geolocation ex: gdn gda nyc waw
+    systag    ->  system tag for host; used to prefix some reporting info
+'
+ETC_IOTECH="/etc/iotech"
+CORE_FILES=("$ETC_IOTECH/building" "$ETC_IOTECH/geoloc" "$ETC_IOTECH/systag")
+for f in "${CORE_FILES[@]}"; do
+  if [ ! -f "$f" ]; then
+    echo "NotFound: $f"
+    exit 1
+  else
+    # shellcheck disable=SC2046
+    echo " -> $f": $(more "$f")
+  fi
+done
+
+: ' ---------------------------------------------------------------------------
+  run setup_env
+    1. create folder(s) /run/iotech/dev/
+'
+RUN_IOTECH="/run/iotech"
+RUN_FOLDERS=("$RUN_IOTECH/omms" "$RUN_IOTECH/dev")
+for d in "${RUN_FOLDERS[@]}"; do
+  if [ ! -d "$d" ]; then
+    echo "NotFound: $d"
+    exit 1
+  else
+    echo ""
+    echo "[ FolderListing: $d ]"
+    cd "$d" && ls "$d" -la
+  fi
+done
+
+
+# 1. setup PYTHONPATH
+cd "$START_DIR" && cd ..
+PPATH=$(pwd)
+export PYTHONPATH=$PPATH
+echo ""
+echo "PYTHONPATH: $PYTHONPATH"
+echo ""
+
+# 2. run ttydev discovery
+PYFILE="bots/ttydev_discovery_bot"
+# -- set x bit if not already --
+chmod +x $PYFILE
+# -- start bot --
+$PYFILE
+
+
+# -----------------------------------------------------------------------------
+echo ""
+echo "  --[ END_START ]--"
+echo ""

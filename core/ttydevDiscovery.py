@@ -68,7 +68,7 @@ class ttyUSBDeviceScanner(_th.Thread):
 
    def __create_dev_aliases(self):
       # -- -- -- -- -- -- -- --
-      dev_path = self.cp_system["CORE"]["OMMS_DEV_PATH"]
+      dev_path = self.cp_system["CORE"]["RUN_IOTECH_DEV"]
       if not os.path.exists(dev_path):
          print(f"PathNotFound: {dev_path}")
          return
