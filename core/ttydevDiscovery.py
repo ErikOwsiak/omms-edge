@@ -14,22 +14,17 @@ from modbus.pingResults import pingResults
 
 class ttyUSBDeviceScanner(_th.Thread):
 
-   def __init__(self, redops: redisOps
-         , system_cp: _cp.ConfigParser
-         , ttydev_disco_bot_cp: _cp.ConfigParser
-         , modbus_redis_bot_cp: _cp.ConfigParser
-         , ttydev_meters_arr):
+   def __init__(self, redops: redisOps, sys_ini: _cp.ConfigParser, ttydev_meters_arr):
       # -- -- -- run -- -- --
       super().__init__()
       self.redops: redisOps = redops
-      self.cp_system: _cp.ConfigParser = system_cp
-      self.cp_ttydev_disco_bot: _cp.ConfigParser = ttydev_disco_bot_cp
-      self.cp_modbus_redis_bot: _cp.ConfigParser = modbus_redis_bot_cp
+      self.sys_ini: _cp.ConfigParser = sys_ini
+      self.sec_ini = self.sys_ini["TTYDEV_DISCO"]
+      # -- -- -- --
+      self.diag_tag = self.sec_ini["DIAG_TAG"]
+      self.diag_tag = utils.set_systag(self.diag_tag)
+      # -- -- -- --
       self.ttydev_meters_arr: [ttydevMeters] = ttydev_meters_arr
-      # -- -- -- --
-      self.diag_tag = self.cp_ttydev_disco_bot["SYSINFO"]["DIAG_TAG"]
-      self.diag_tag = utils.diag_tag_prefix(self.diag_tag)
-      # -- -- -- --
       self.model_xmls: {} = {}
       self.meters: t.List[et.Element] = []
       self.usb_ser_ports: [] = None
@@ -68,7 +63,7 @@ class ttyUSBDeviceScanner(_th.Thread):
 
    def __create_dev_aliases(self):
       # -- -- -- -- -- -- -- --
-      dev_path = self.cp_system["CORE"]["RUN_IOTECH_DEV"]
+      dev_path = self.sys_ini["CORE"]["RUN_IOTECH_DEV"]
       if not os.path.exists(dev_path):
          print(f"PathNotFound: {dev_path}")
          return
@@ -118,7 +113,7 @@ class ttyUSBDeviceScanner(_th.Thread):
                pass
          return
       # -- -- -- --
-      THRESHOLD_LIMIT: int = int(self.cp_ttydev_disco_bot["SYSINFO"]["THRESHOLD_LIMIT"])
+      THRESHOLD_LIMIT: int = int(self.sec_ini["THRESHOLD_LIMIT"])
       for usb_ser_port in self.usb_ser_ports:
          if usb_ser_port not in self.located_ports:
             __on_usb_ser_port(usb_ser_port)

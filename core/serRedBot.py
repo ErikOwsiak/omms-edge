@@ -25,6 +25,7 @@ class serRedBot(th.Thread):
 
    def run(self):
       pub_channel: str = self.cp["REDIS"]["PUB_READS_CHANNEL"]
+      pub_channel = sysUtils.set_systag(pub_channel)
       _dict = {"boot_dts_utc": sysUtils.dts_utc(), "dev": self.dev
          , "lan_ip": sysUtils.lan_ip(), "hostname": sysUtils.HOST
          , "pub_reads_channel": pub_channel}

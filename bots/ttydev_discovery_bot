@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os, setproctitle
+import configobj as _co
 import configparser as _cp, time
 import xml.etree.ElementTree as _et
 # -- core --
@@ -14,30 +15,33 @@ from modbus.ttydevMeters import ttydevMeters
 from core.ttydevDiscovery import ttyUSBDeviceScanner
 
 
-SYSTEM_CP: _cp.ConfigParser = _cp.ConfigParser()
-loaded: [] = SYSTEM_CP.read("conf/system.ini")
+PSEC = "TTYDEV_DISCO"
+SYS_INI: _cp.ConfigParser = _cp.ConfigParser()
+loaded: [] = SYS_INI.read("conf/system.ini")
 if len(loaded) == 0:
    print("no ini files loaded")
    exit(1)
+# -- setup sec --
+SEC = SYS_INI[PSEC]
 
 # -- load config file for: modbus_redis_bot --
-modbus_redis_bot_cp: _cp = _cp.ConfigParser()
-loaded: [] = modbus_redis_bot_cp.read("conf/modbus_redis_bot.ini")
-if len(loaded) == 0:
-   print("no ini files loaded")
-   exit(1)
+# modbus_redis_bot_cp: _cp = _cp.ConfigParser()
+# loaded: [] = modbus_redis_bot_cp.read("conf/modbus_redis_bot.ini")
+# if len(loaded) == 0:
+#    print("no ini files loaded")
+#    exit(1)
 
-ttydev_disco_bot_cp: _cp = _cp.ConfigParser()
-loaded: [] = ttydev_disco_bot_cp.read("conf/ttydev_discovery.ini")
-if len(loaded) == 0:
-   print("no ini files loaded")
-   exit(1)
+# ttydev_disco_bot_cp: _cp = _cp.ConfigParser()
+# loaded: [] = ttydev_disco_bot_cp.read("conf/ttydev_discovery.ini")
+# if len(loaded) == 0:
+#    print("no ini files loaded")
+#    exit(1)
 
 # -- -- -- -- load redis object  -- -- -- --
 if debug.is_dev_box():
-   redops = redisOps(modbus_redis_bot_cp, CONN_SEC="DEV_REDIS_CONN")
+   redops = redisOps(SYS_INI, CONN_SEC="REDIS_DEV")
 else:
-   redops: redisOps = redisOps(modbus_redis_bot_cp)
+   redops: redisOps = redisOps(SYS_INI)
 # -- ping server --
 if not redops.red.ping():
    print("UnableToPingRedisServer")
@@ -50,7 +54,7 @@ if not redops.red.ping():
    MM_XML_PATH is file with ALL modbus meters in the building grouped by 
    EDGE (HOST) -> ttyUSBx device 
 """
-MM_XML_PATH: str = modbus_redis_bot_cp["METERS"]["MODBUS_METERS_XML"]
+MM_XML_PATH: str = SEC["MODBUS_METERS_XML"]
 if not os.path.exists(MM_XML_PATH):
    print(f"FileNotFound: {MM_XML_PATH}")
    exit(1)
@@ -61,21 +65,20 @@ ttydev_meters_arr: [ttydevMeters] = [ttydevMeters(n) for n in MM_XML.findall(xpa
 for item in ttydev_meters_arr:
    item.init()
 # -- -- -- -- -- --
-scannerTh: ttyUSBDeviceScanner = ttyUSBDeviceScanner(redops
-   , SYSTEM_CP, ttydev_disco_bot_cp, modbus_redis_bot_cp, ttydev_meters_arr)
-# -- -- -- -- -- --
+scannerTh: ttyUSBDeviceScanner = ttyUSBDeviceScanner(redops, SYS_INI, ttydev_meters_arr)
 scannerTh.init()
 scannerTh.start()
+# -- -- -- -- -- --
 
 
 def main():
    # -- -- -- --
-   diag_tag: str = ttydev_disco_bot_cp["SYSINFO"]["DIAG_TAG"]
-   diag_tag = utils.diag_tag_prefix(diag_tag)
+   diag_tag: str = SEC["DIAG_TAG"]
+   diag_tag = utils.set_systag(diag_tag)
    # -- -- -- --
-   proc_name = ttydev_disco_bot_cp["RUNNER"]["PROC_NAME"]
+   proc_name = SEC["PROC_NAME"]
    setproctitle.setproctitle(proc_name)
-   MAIN_LOOP_SECS = int(ttydev_disco_bot_cp["RUNNER"]["MAIN_LOOP_SECS"])
+   MAIN_LOOP_SECS = int(SYS_INI[PSEC]["MAIN_LOOP_SECS"])
    # -- MAIN LOOP --
    loop_cnt = 0
    while True:

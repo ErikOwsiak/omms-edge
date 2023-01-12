@@ -13,18 +13,19 @@ except:
 
 class redisOps(object):
 
-   def __init__(self, conf: cp.ConfigParser, CONN_SEC: str = "PROD_REDIS_CONN"):
-      self.cp = conf
-      self.CONN_SEC = CONN_SEC
-      self.host = self.cp[self.CONN_SEC]["HOST"]
-      self.port: int = int(self.cp[self.CONN_SEC]["PORT"])
-      self.pwd = self.cp["REDIS"]["PWD"]
+   def __init__(self, sys_ini: cp.ConfigParser, CONN_SEC: str = "REDIS_PROD"):
+      self.sys_ini = sys_ini
+      self.con_ini = self.sys_ini[CONN_SEC]
+      self.host = self.con_ini["HOST"]
+      self.port: int = int(self.con_ini["PORT"])
+      self.red_ini = self.sys_ini["REDIS_CORE"]
+      self.pwd = self.red_ini["PWD"]
       self.red: redis.Redis = redis.Redis(host=self.host, port=self.port, password=self.pwd)
-      self.host_ping: bool = self.__ping_host()
+      # self.host_ping: bool = self.__ping_host()
 
    def save_read(self, path: str, buff: str):
       try:
-         read_db_idx = int(self.cp["REDIS"]["DB_IDX_READS"])
+         read_db_idx = int(self.sys_ini["REDIS"]["DB_IDX_READS"])
          self.red.select(read_db_idx)
          md5 = hashlib.md5(bytearray(buff.encode("utf-8")))
          md5str = f"0x{md5.hexdigest().upper()}"
@@ -40,7 +41,7 @@ class redisOps(object):
    def save_meter_data(self, path: str, _dict: {}, delold: bool = False):
       try:
          rv0 = 0
-         read_db_idx = int(self.cp["REDIS"]["DB_IDX_READS"])
+         read_db_idx = int(self.sys_ini["REDIS"]["DB_IDX_READS"])
          self.red.select(read_db_idx)
          if delold:
             rv0 = self.red.delete(path)
@@ -51,7 +52,7 @@ class redisOps(object):
 
    def update_read(self, path: str, key: str, val: str):
       try:
-         read_db_idx = int(self.cp["REDIS"]["DB_IDX_READS"])
+         read_db_idx = int(self.sys_ini["REDIS"]["DB_IDX_READS"])
          self.red.select(read_db_idx)
          rv = self.red.hset(path, mapping={key: val})
          print(f"rv: {rv}")
@@ -59,19 +60,19 @@ class redisOps(object):
          logUtils.log_exp(e)
 
    def pub_diag_debug(self, buff: str):
-      channel: str = self.cp["REDIS"]["PUB_DIAG_DEBUG_CHANNEL"]
+      channel: str = self.sys_ini["REDIS"]["PUB_DIAG_DEBUG_CHANNEL"]
       rv = self.red.publish(channel, buff)
       print(f"rv: {rv}")
 
    def pub_read(self, buff: str):
-      channel: str = self.cp["REDIS"]["PUB_READS_CHANNEL"]
+      channel: str = self.sys_ini["REDIS"]["PUB_READS_CHANNEL"]
       rv = self.red.publish(channel, buff)
       print(f"rv: {rv}")
 
    def save_heartbeat(self, path: str, buff: str):
       try:
-         heartbeat_db_idx: int = int(self.cp["REDIS"]["DB_IDX_HEARTBEATS"])
-         heartbeat_ttl: int = int(self.cp["REDIS"]["HEARTBEAT_TTL"])
+         heartbeat_db_idx: int = int(self.sys_ini["REDIS"]["DB_IDX_HEARTBEATS"])
+         heartbeat_ttl: int = int(self.sys_ini["REDIS"]["HEARTBEAT_TTL"])
          self.red.select(heartbeat_db_idx)
          md5 = hashlib.md5(bytearray(buff.encode("utf-8")))
          md5str = f"0x{md5.hexdigest().upper()}"
@@ -87,7 +88,7 @@ class redisOps(object):
    def update_diag_tag(self, diag_tag: str, key: str = None
          , val: object = None, mapdct: {} = None, restart: bool = False):
       try:
-         diag_db_idx: int = int(self.cp["REDIS"]["DB_IDX_DIAG"])
+         diag_db_idx: int = int(self.sys_ini["REDIS_CORE"]["DB_IDX_DIAG"])
          self.red.select(diag_db_idx)
          if restart:
             self.red.delete(diag_tag)
@@ -98,9 +99,9 @@ class redisOps(object):
       except Exception as e:
          logUtils.log_exp(e)
 
-   def __ping_host(self) -> bool:
-      try:
-         return self.red.ping()
-      except Exception as e:
-         print(e)
-         return False
+   # def __ping_host(self) -> bool:
+   #    try:
+   #       return self.red.ping()
+   #    except Exception as e:
+   #       print(e)
+   #       return False

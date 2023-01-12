@@ -25,7 +25,7 @@ class mqttMeterReaderV1(object):
       self.system_cp: _cp.ConfigParser = sys_cp
       self.channel = str(self.xcp["SYSPATH"]["CHANNEL"])
       self.diag_tag: str = str(self.xcp["SYSINFO"]["DIAG_TAG"])
-      self.diag_tag = utils.diag_tag_prefix(self.diag_tag)
+      self.diag_tag = utils.set_systag(self.diag_tag)
       self.redops: redisOps = redops
       self.xmldoc: et.ElementTree = None
       self.meter_xml_nodes: t.List[et.Element] = None

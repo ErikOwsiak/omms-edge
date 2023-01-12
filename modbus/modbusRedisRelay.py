@@ -29,7 +29,7 @@ class modbusRedisRelay(_th.Thread):
       self.cp: _cp.ConfigParser = cp
       self.sys_cp: _cp.ConfigParser = sys_cp
       self.diag_tag: str = str(self.cp["SYSINFO"]["DIAG_TAG"])
-      self.diag_tag = sysUtils.diag_tag_prefix(self.diag_tag)
+      self.diag_tag = sysUtils.set_systag(self.diag_tag)
       self.run_iotech_dev: str = str(self.sys_cp["CORE"]["RUN_IOTECH_DEV"])
       self.redops: redisOps = redops
       self.sys_ports: ports = ports(self.cp)

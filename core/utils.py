@@ -7,19 +7,21 @@ import serial, typing as t
 
 class sysUtils(object):
 
-   GEOLOC = ""
-   BUILDING = ""
+   with open("/etc/hostname") as f:
+      GEOLOC = f.read().strip()
+   with open("/etc/hostname") as f:
+      BUILDING = f.read().strip()
    with open("/etc/hostname") as f:
       HOST = f.read().strip()
    with open("/etc/iotech/systag") as f:
-      PREFIX = f.read().strip()
+      SYSTAG = f.read().strip()
 
    def __init__(self):
       pass
 
    @staticmethod
-   def diag_tag_prefix(dtag: str):
-      return dtag.replace("?", sysUtils.PREFIX).strip()
+   def set_systag(buff: str, PATT="???"):
+      return buff.replace(PATT, sysUtils.SYSTAG).strip()
 
    @staticmethod
    def lan_ip():
@@ -44,7 +46,7 @@ class sysUtils(object):
       return f"{_t.hour:02d}:{_t.minute:02d}:{_t.second:02d}"
 
    @staticmethod
-   def syspath(channel: str, endpoint: str):
+   def syspath(channel: str, ep: str):
       try:
          if sysUtils.GEOLOC == "":
             with open("/etc/iotech/geoloc") as f:
@@ -56,7 +58,7 @@ class sysUtils(object):
             with open("/etc/hostname") as f:
                sysUtils.HOST = f.read().strip()
          # -- -- -- --
-         return f"/{sysUtils.GEOLOC}/{sysUtils.BUILDING}/{sysUtils.HOST}/{channel}/{endpoint}"
+         return f"/{sysUtils.GEOLOC}/{sysUtils.BUILDING}/{sysUtils.HOST}/{channel}/{ep}"
       except Exception as e:
          print(e)
          exit(1)
