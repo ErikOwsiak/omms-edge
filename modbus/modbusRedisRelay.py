@@ -64,42 +64,46 @@ class modbusRedisRelay(_th.Thread):
          # -- -- -- -- --
          try:
             # -- --
-            ttydev: ttydevMeters = _ttydev
-            if ttydev.dev == "auto":
-               full_dev_path = ports.alias_full_path(ttydev.alias)
+            if _ttydev.dev == "auto":
+               full_dev_path = ports.alias_full_path(_ttydev.alias)
             else:
-               full_dev_path = ttydev.dev
+               full_dev_path = _ttydev.dev
             # -- --
-            for meter_xml in ttydev.meters:
-               model_xml = meter_xml.attrib["modelXML"]
-               xml_path = f"brands/{model_xml}"
-               if xml_path not in self.model_xmls.keys():
-                  self.model_xmls[xml_path] = _et.parse(xml_path).getroot()
-               # -- -- -- --
-               xmlelm: _et.Element = self.model_xmls[xml_path]
-               bus_addr = meter_xml.attrib["busAddr"]
-               meter: modbusMeterV1 = modbusMeterV1(self.sys_ini, int(bus_addr), full_dev_path, xmlelm)
-               if meter.init():
-                  meter.set_syspath(sysUtils.syspath(self.channel, bus_addr))
-                  err, msg = meter.ping()
-                  if err != 0:
-                     print(f"PingError: {msg}")
-                     _d = {"dts_utc": sysUtils.dts_utc(), "InitPingError": msg}
-                     self.redops.save_meter_data(meter.syspath, _dict=_d)
-                     return False
+            for meter_xml in _ttydev.meters:
+               try:
+                  model_xml = meter_xml.attrib["modelXML"]
+                  xml_path = f"brands/{model_xml}"
+                  if xml_path not in self.model_xmls.keys():
+                     self.model_xmls[xml_path] = _et.parse(xml_path).getroot()
+                  # -- -- -- --
+                  xmlelm: _et.Element = self.model_xmls[xml_path]
+                  bus_addr = meter_xml.attrib["busAddr"]
+                  meter: modbusMeterV1 = modbusMeterV1(self.sys_ini, int(bus_addr), full_dev_path, xmlelm)
+                  if meter.init():
+                     meter.set_syspath(sysUtils.syspath(self.channel, bus_addr))
+                     err, msg = meter.ping()
+                     if err != 0:
+                        print(f"PingError: {msg}")
+                        _d = {"dts_utc": sysUtils.dts_utc(), "InitPingError": msg}
+                        self.redops.save_meter_data(meter.syspath, _dict=_d)
+                        return False
+                     else:
+                        print(f"InitPingOk: {bus_addr}")
+                        _d = {"dts_utc": sysUtils.dts_utc(), "InitPing: ": msg}
+                        self.redops.save_meter_data(meter.syspath, _dict=_d)
+                        return True
                   else:
-                     print(f"InitPingOk: {bus_addr}")
-                     _d = {"dts_utc": sysUtils.dts_utc(), "InitPing: ": msg}
-                     self.redops.save_meter_data(meter.syspath, _dict=_d)
-                     return True
-               else:
-                  print(f"MeterPingInitError: {bus_addr}")
-                  return False
-               # -- -- -- --
+                     print(f"MeterPingInitError: {bus_addr}")
+                     return False
+                  # -- -- -- --
+               except Exception as e:
+                  logUtils.log_exp(e)
+               # -- end: for loop --
          except Exception as e:
             logUtils.log_exp(e)
             return False
       # -- -- -- -- --
+      print("[ __on_init_ping_meters ]")
       for item in self.dev_meters_arr:
          rval: bool = __on_ttydev(item)
       # -- -- -- -- --
