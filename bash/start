@@ -1,7 +1,9 @@
 #!/bin/bash
 
+#
 # author: owsiak, erik
 # date: 2023/01/12
+#
 
 echo ""
 echo "  --[ START_START ]--"
@@ -63,6 +65,16 @@ EXIT_CODE=$?
 echo ""
 echo "  -- [ EXIT_CODE: $EXIT_CODE ] --"
 echo ""
+
+# 3. start modbus bot
+PYFILE="bots/modbus_redis_bot"
+# -- set x bit if not already --
+chmod +x $PYFILE
+# -- start bot --
+$PYFILE &
+EXIT_CODE=$?
+
+
 
 # -----------------------------------------------------------------------------
 echo ""
