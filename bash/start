@@ -45,11 +45,14 @@ for d in "${RUN_FOLDERS[@]}"; do
   fi
 done
 
+echo ""
+echo "[ RUN_FOLDERS ]"
+echo ""
 for d in "${RUN_FOLDERS[@]}"; do
   if [ -d "$d" ]; then
     echo "PathFound: $d"
   else
-    echo "PathNotFoundL $d"
+    echo "PathNotFound: $d"
   fi
 done
 
