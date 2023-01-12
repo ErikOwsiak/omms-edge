@@ -11,7 +11,7 @@ class sysUtils(object):
    BUILDING = ""
    with open("/etc/hostname") as f:
       HOST = f.read().strip()
-   with open("/etc/iotech/prefix") as f:
+   with open("/etc/iotech/systag") as f:
       PREFIX = f.read().strip()
 
    def __init__(self):
