@@ -71,8 +71,11 @@ PYFILE="bots/modbus_redis_bot"
 # -- set x bit if not already --
 chmod +x $PYFILE
 # -- start bot --
-$PYFILE &
-EXIT_CODE=$?
+echo "- - -"
+echo "PYFILE: $PYFILE"
+echo "- - -"
+$PYFILE >> /dev/null &
+
 
 
 
