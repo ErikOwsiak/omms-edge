@@ -35,8 +35,7 @@ RUN_IOTECH="/run/iotech"
 RUN_FOLDERS=("$RUN_IOTECH/omms" "$RUN_IOTECH/dev")
 for d in "${RUN_FOLDERS[@]}"; do
   if [ ! -d "$d" ]; then
-    echo "NotFound: $d"
-    exit 1
+    mkdir "$d"
   else
     echo ""
     echo "[ FolderListing: $d ]"
