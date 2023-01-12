@@ -86,8 +86,8 @@ echo ""
 
 # -------------------------------
 # 3. start modbus bot
+PYFILE="bots/modbus_redis_bot"
 if [ $START_MODBUS_BOT -eq 1 ]; then
-  PYFILE="bots/modbus_redis_bot"
   # -- set x bit if not already --
   chmod +x $PYFILE
   # -- start bot --
@@ -104,8 +104,13 @@ fi
 
 # -------------------------------
 # 4. start mqtt bot
+PYFILE="bots/mqtt_redis_bot"
 if [ $START_MQTT_BOT -eq 1 ]; then
-  PYFILE="bots/mqtt_redis_bot"
+  if [ ! -f $PYFILE ]; then
+      echo "FileNotFound: $PYFILE"
+      echo "Exiting..."
+      exit 1
+  fi
   # -- set x bit if not already --
   chmod +x $PYFILE
   # -- start bot --
