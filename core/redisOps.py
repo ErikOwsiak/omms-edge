@@ -41,7 +41,7 @@ class redisOps(object):
    def save_meter_data(self, path: str, _dict: {}, delold: bool = False):
       try:
          rv0 = 0
-         read_db_idx = int(self.sys_ini["REDIS"]["DB_IDX_READS"])
+         read_db_idx = int(self.sys_ini["REDIS_CORE"]["DB_IDX_READS"])
          self.red.select(read_db_idx)
          if delold:
             rv0 = self.red.delete(path)
