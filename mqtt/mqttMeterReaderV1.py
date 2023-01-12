@@ -16,9 +16,13 @@ from core.logutils import logUtils
 # noinspection PyTypeChecker
 class mqttMeterReaderV1(object):
 
-   def __init__(self, fullpath: str, cp: _cp, redops: redisOps):
+   def __init__(self, fullpath: str, cp: _cp
+         , sys_cp: _cp.ConfigParser
+         , redops: redisOps):
+      # -- -- -- -- -- -- -- -- -- -- -- --
       self.meters_xml_conf = fullpath
       self.xcp: _cp.ConfigParser = cp
+      self.system_cp: _cp.ConfigParser = sys_cp
       self.channel = str(self.xcp["SYSPATH"]["CHANNEL"])
       self.diag_tag: str = str(self.xcp["SYSINFO"]["DIAG_TAG"])
       self.diag_tag = utils.diag_tag_prefix(self.diag_tag)

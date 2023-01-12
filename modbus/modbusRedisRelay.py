@@ -19,14 +19,18 @@ from ommslib.shared.core.elecRegStream import elecRegStream
 
 class modbusRedisRelay(_th.Thread):
 
-   def __init__(self, cp: _cp.ConfigParser, redops: redisOps
-         , dev_meters: [ttydevMeters], reg_streams_xml: _et.ElementTree):
+   def __init__(self, cp: _cp.ConfigParser
+         , sys_cp: _cp.ConfigParser
+         , redops: redisOps
+         , dev_meters: [ttydevMeters]
+         , reg_streams_xml: _et.ElementTree):
       # -- -- -- -- -- -- -- --
       super().__init__()
       self.cp: _cp.ConfigParser = cp
+      self.sys_cp: _cp.ConfigParser = sys_cp
       self.diag_tag: str = str(self.cp["SYSINFO"]["DIAG_TAG"])
       self.diag_tag = sysUtils.diag_tag_prefix(self.diag_tag)
-      self.omms_dev_path: str = str(self.cp["SYSINFO"]["OMMS_DEV_PATH"])
+      self.run_iotech_dev: str = str(self.sys_cp["CORE"]["RUN_IOTECH_DEV"])
       self.redops: redisOps = redops
       self.sys_ports: ports = ports(self.cp)
       # -- edge modbus edge_meters --
@@ -48,9 +52,33 @@ class modbusRedisRelay(_th.Thread):
          logUtils.log_exp(e)
 
    def run(self) -> None:
+      self.__init_meter_pings()
       self.stream_thread: _th.Thread = self.stream_thread
       self.stream_thread.start()
       self.__main_loop()
+
+   def __init_meter_pings(self):
+      model_xmls: {} = {}
+      for ttydev in self.dev_meters_arr:
+         try:
+            ttydev: ttydevMeters = ttydev
+            alias = ttydev.alias
+
+            for meter_xml in ttydev.meters:
+               model_xml = meter_xml.attrib["modelXML"]
+               xml_path = f"brands/{model_xml}"
+               if model_xml not in model_xmls.keys():
+                  model_xmls[model_xml] = _et.parse(xml_path).getroot()
+               # -- -- -- --
+               xmlelm: _et.Element = model_xmls[model_xml]
+               meter: modbusMeterV1 = modbusMeterV1(self.cp, xmlelm)
+               meter.clear_reinit(meter.modbus_addr, meter.tty_dev,)
+               meter.set_syspath("")
+
+               err, msg = meter.ping()
+               # -- -- -- --
+         except Exception as e:
+            logUtils.log_exp(e)
 
    def __load_rs_xml(self) -> bool:
       xpath = "stream[@enabled='1']"
@@ -105,7 +133,7 @@ class modbusRedisRelay(_th.Thread):
       # -- -- do -- --
       for meter in dev_meters.meters:
          try:
-            alias_path = f"{self.omms_dev_path}/{dev_meters.alias}"
+            alias_path = f"{self.run_iotech_dev}/{dev_meters.alias}"
             tty_dev = ""
             # -- -- -- --
             meter.attrib["alias"] = alias_path if os.path.exists(alias_path) else ""

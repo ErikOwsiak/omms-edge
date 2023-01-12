@@ -24,6 +24,12 @@ from modbus.ttydevMeters import ttydevMeters
       7. if time is up ... run thread per stream
 """
 
+sys_cp: _cp = _cp.ConfigParser()
+loaded: [] = sys_cp.read("conf/system.ini")
+if len(loaded) == 0:
+   print("no ini files loaded")
+   exit(1)
+
 cp: _cp = _cp.ConfigParser()
 loaded: [] = cp.read("conf/modbus_redis_bot.ini")
 if len(loaded) == 0:
@@ -74,7 +80,7 @@ for item in ttydev_meters_arr:
    -- -- -- -- run relay thread -- -- -- --
 """
 time.sleep(2.0)
-modbusRedisRelayTh: modbusRedisRelay = modbusRedisRelay(cp, redops, ttydev_meters_arr, RS_XML)
+modbusRedisRelayTh: modbusRedisRelay = modbusRedisRelay(cp, sys_cp, redops, ttydev_meters_arr, RS_XML)
 modbusRedisRelayTh.init()
 modbusRedisRelayTh.start()
 

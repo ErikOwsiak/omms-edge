@@ -9,8 +9,14 @@ from core.redisOps import redisOps
 from core.debug import debug
 
 
-cp: _cp.ConfigParser = _cp.ConfigParser()
-loaded: [] = cp.read("conf/mqtt_redis_bot.ini")
+system_cp: _cp.ConfigParser = _cp.ConfigParser()
+loaded: [] = system_cp.read("conf/system.ini")
+if len(loaded) == 0:
+   print("NoLoadedConfFiles")
+   exit(1)
+
+mqtt_redis_cp: _cp.ConfigParser = _cp.ConfigParser()
+loaded: [] = mqtt_redis_cp.read("conf/mqtt_redis_bot.ini")
 if len(loaded) == 0:
    print("NoLoadedConfFiles")
    exit(1)
@@ -18,9 +24,9 @@ if len(loaded) == 0:
 # -- red ops --
 IS_DEBUG: bool = debug.is_dev_box()
 if IS_DEBUG:
-   redops: redisOps = redisOps(cp, "DEV_REDIS_CONN")
+   redops: redisOps = redisOps(mqtt_redis_cp, "DEV_REDIS_CONN")
 else:
-   redops: redisOps = redisOps(cp)
+   redops: redisOps = redisOps(mqtt_redis_cp)
 
 
 """
@@ -29,7 +35,10 @@ else:
 XML_METER_FILE = "conf/mqtt_meters.xml"
 if not os.path.exists(XML_METER_FILE):
    raise FileNotFoundError(XML_METER_FILE)
-mqttReaderV1: mqttMeterReaderV1 = mqttMeterReaderV1(XML_METER_FILE, cp, redops)
+# -- -- -- -- -- -- -- --
+mqttReaderV1: mqttMeterReaderV1 = \
+   mqttMeterReaderV1(XML_METER_FILE, mqtt_redis_cp, system_cp, redops)
+# -- -- -- -- -- -- -- --
 if not mqttReaderV1.load_xml_conf():
    exit(1)
 
@@ -46,11 +55,11 @@ if not mqttReaderV1.start():
    exit(1)
 
 # -- main loop --
-LOOP_SLEEP_SECS: float = float(cp["TIMING"]["LOOP_SLEEP_SECS"])
+LOOP_SLEEP_SECS: float = float(mqtt_redis_cp["TIMING"]["LOOP_SLEEP_SECS"])
 
 def main():
    setproctitle.setproctitle("mqttRedisBot")
-   diag_tag: str = cp["SYSINFO"]["DIAG_TAG"]
+   diag_tag: str = mqtt_redis_cp["SYSINFO"]["DIAG_TAG"]
    diag_tag = utils.diag_tag_prefix(diag_tag)
    while True:
       print("[ mqtt_redis_bot: main ]")
