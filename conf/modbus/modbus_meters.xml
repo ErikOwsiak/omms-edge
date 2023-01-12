@@ -8,13 +8,13 @@
    <edges>
       <edge hostname="omms-edge-a5" pubChannel="">
          <ttydev run="yes" tag="ModbusEdgeA5" alias="modbusPortA" dev="auto" modbusBugID="">
-            <meter busAddr="10" modelXML="orno516.xml" />
-            <meter busAddr="11" modelXML="orno516.xml" />
-            <meter busAddr="12" modelXML="orno516.xml" />
-            <meter busAddr="13" modelXML="orno516.xml" />
-            <meter busAddr="14" modelXML="orno504.xml" />
-            <meter busAddr="15" modelXML="orno516.xml" />
-            <meter busAddr="16" modelXML="orno504.xml" />
+            <meter busAddr="10" modelXML="orno/orno516.xml" />
+            <meter busAddr="11" modelXML="orno/orno516.xml" />
+            <meter busAddr="12" modelXML="orno/orno516.xml" />
+            <meter busAddr="13" modelXML="orno/orno516.xml" />
+            <meter busAddr="14" modelXML="orno/orno504.xml" />
+            <meter busAddr="15" modelXML="orno/orno516.xml" />
+            <meter busAddr="16" modelXML="orno/orno504.xml" />
          </ttydev>
       </edge>
       <edge hostname="omms-edge-b410" pubChannel="">
