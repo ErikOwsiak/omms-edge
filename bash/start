@@ -45,6 +45,14 @@ for d in "${RUN_FOLDERS[@]}"; do
   fi
 done
 
+for d in "${RUN_FOLDERS[@]}"; do
+  if [ -d "$d" ]; then
+    echo "PathFound: $d"
+  else
+    echo "PathNotFoundL $d"
+  fi
+done
+
 
 # 1. setup PYTHONPATH
 cd "$START_DIR" && cd ..
