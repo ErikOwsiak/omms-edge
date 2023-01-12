@@ -124,6 +124,7 @@ class modbusRedisRelay(_th.Thread):
          self.__on_init_ping_meters()
       except Exception as e:
          logUtils.log_exp(e)
+         exit(1)
       # -- -- -- -- -- -- -- --
       while True:
          try:
