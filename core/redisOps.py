@@ -69,6 +69,12 @@ class redisOps(object):
       rv = self.red.publish(channel, buff)
       print(f"rv: {rv}")
 
+   def pub_read_on_sec(self, ini_sec: str, buff: str):
+      pub_chnl: str = self.sys_ini[ini_sec]["REDIS_PUB_CHNL"]
+      pub_chnl = utils.set_systag(pub_chnl)
+      rv = self.red.publish(pub_chnl, buff)
+      print(f"\t-- [ rv: {rv}] --")
+
    def save_heartbeat(self, path: str, buff: str):
       try:
          heartbeat_db_idx: int = int(self.sys_ini["REDIS"]["DB_IDX_HEARTBEATS"])
@@ -98,10 +104,3 @@ class redisOps(object):
             rv = self.red.hset(diag_tag, mapping=mapdct)
       except Exception as e:
          logUtils.log_exp(e)
-
-   # def __ping_host(self) -> bool:
-   #    try:
-   #       return self.red.ping()
-   #    except Exception as e:
-   #       print(e)
-   #       return False

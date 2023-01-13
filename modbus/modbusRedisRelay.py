@@ -209,11 +209,16 @@ class modbusRedisRelay(_th.Thread):
             meter: modbusMeterV1 = meter
             meter.set_stream_regs(stream_regs)
             if meter.read_stream_regs():
-               buff: str = meter.reads_to_str()
+               strs_arr: [] = meter.reads_str_arr()
                rpt_key: str = f"#rpt_{stream_regs.name}"
-               d = {f"{rpt_key}_dts_utc": sysUtils.dts_utc(), rpt_key: buff}
+               s = "|".join(strs_arr)
+               d = {f"{rpt_key}_dts_utc": sysUtils.dts_utc(), rpt_key: f"[{s}]"}
                self.redops.save_meter_data(meter.syspath, _dict=d)
-               print(buff)
+               # -- publish to redis channel --
+               strs_arr.insert(0, "#RPT")
+               strs_arr.insert(2, f"DTSUTC:{sysUtils.dts_utc()}")
+               strs_arr.insert(3, f"PATH:{meter.syspath}")
+               self.redops.pub_read_on_sec("MODBUS", "|".join(strs_arr))
             else:
                pass
             # -- -- -- --

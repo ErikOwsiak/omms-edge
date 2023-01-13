@@ -19,19 +19,4 @@ class ttydevMeters(object):
       self.meters: [_et.Element] = None
 
    def init(self):
-      # -- -- -- -- -- -- -- --
       self.meters = self.xml_elm.findall("meter")
-      # -- -- -- -- -- -- -- --
-      # _ttydisc, _dev, _alias = self.__remap_ttydisc_dev_alias(tag, dev, alias)
-      for meter in self.meters:
-         try:
-            # m.attrib["ttydev"] = dev
-            # modbus_addr = m.attrib["busAddr"]
-            # syspath: str = utils.syspath("MODBUS", modbus_addr)
-            # m.attrib["syspath"] = syspath
-            # xdict: {} = {"init_dts_utc": utils.dts_utc(), "ttydev": dev, "bus_addr": modbus_addr}
-            # self.redops.save_meter_data(syspath, _dict=xdict, delold=True)
-            pass
-         except Exception as e:
-            logUtils.log_exp(e)
-      # -- -- -- -- -- -- -- --
