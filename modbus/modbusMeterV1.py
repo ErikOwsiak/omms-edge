@@ -110,7 +110,7 @@ class modbusMeterV1(object):
             # -- remap to meter stream --
             _regs = [mr for mr in self.model_regs if mr.type == reg.regtype]
             if len(_regs) != 1:
-               pass
+               raise Exception(f"RegisterNotFound: {reg.regtype}")
             meter_read: meterReading = self.__read_meter_reg(_regs[0])
             self.stream_reads.append(meter_read)
             time.sleep(0.048)

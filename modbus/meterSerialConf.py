@@ -6,7 +6,7 @@ import xml.etree.ElementTree as et
 class meterSerialConf(object):
 
    def __init__(self, serXml: et.Element):
-      print("[ c-tor: meterSerial ]")
+      print("[ c-tor: meterSerialConf ]")
       self.serXml = serXml
       self.parity: str = self.serXml.attrib["parity"]
       self.baudrate: int = int(self.serXml.attrib["baudrate"])

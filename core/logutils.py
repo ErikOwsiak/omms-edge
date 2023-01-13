@@ -12,4 +12,5 @@ class logUtils(object):
 
    @staticmethod
    def log_exp(ex):
+      ex: Exception = ex
       print(ex)

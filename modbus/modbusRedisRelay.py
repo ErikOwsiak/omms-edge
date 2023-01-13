@@ -41,7 +41,6 @@ class modbusRedisRelay(_th.Thread):
       self.stream_thread = None
       self.meter_model_xmls: {} = {}
       self.blank_meters: {} = {}
-      # self.model_xmls: {} = {}
 
    def init(self):
       try:
@@ -133,8 +132,7 @@ class modbusRedisRelay(_th.Thread):
       # -- -- -- --
       model_xmlelm: _et.Element = self.meter_model_xmls[model_xml_path]
       bus_addr = meter_xml.attrib["busAddr"]
-      meter: modbusMeterV1 = \
-         modbusMeterV1(self.sys_ini, int(bus_addr), dev_path, model_xmlelm)
+      meter: modbusMeterV1 = modbusMeterV1(self.sys_ini, int(bus_addr), dev_path, model_xmlelm)
       # -- build unique:constant syspath for this meter --
       meter.set_syspath(sysUtils.syspath(self.channel, bus_addr))
       # -- -- -- --

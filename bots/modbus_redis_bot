@@ -86,6 +86,7 @@ modbusRedisRelayTh.start()
 # -- main loop --
 MAIN_LOOP_SECS: float = float(SEC_INI["MAIN_LOOP_SECS"])
 
+
 def main():
    setproctitle.setproctitle("omms-modbus")
    diag_tag: str = SEC_INI["DIAG_TAG"]
