@@ -121,12 +121,17 @@ class modbusMeterV1(object):
       return True
 
    def reads_to_str(self):
+      # -- -- -- --
+      if len(self.stream_reads) == 0:
+         return "[]"
+      # -- -- -- --
       buff: [] = []
       for mr in self.stream_reads:
          mr: meterReading = mr
          buff.append(f"{mr.regName}:{mr.regVal}")
       s = "|".join(buff)
       return f"[{s}]"
+      # -- -- -- --
 
    """
       private ... kinda
