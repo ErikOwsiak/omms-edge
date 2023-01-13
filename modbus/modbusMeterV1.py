@@ -102,6 +102,7 @@ class modbusMeterV1(object):
       self.stream_regs = regs
 
    def read_stream_regs(self) -> bool:
+      NULL = "null"
       if self.stream_regs is None or len(self.stream_regs.reg_arr) == 0:
          pass
       # -- abstract stream regs --
@@ -109,10 +110,13 @@ class modbusMeterV1(object):
       for reg in self.stream_regs.reg_arr:
          try:
             _regs = [mr for mr in self.model_regs if mr.type == reg.regtype]
-            if len(_regs) != 1:
-               _err = f"\n[ RegisterNotFound: {reg.regtype} | regStream: {self.stream_regs.name} ]\n"
-               raise Exception(_err)
-            meter_read: meterReading = self.__read_meter_reg(_regs[0])
+            if len(_regs) == 1:
+               meter_read: meterReading = self.__read_meter_reg(_regs[0])
+            else:
+               # if reg not lised in the model xml ... set to default value
+               meter_read: meterReading = meterReading(regName=str(reg.regtype)
+                  , regVal=NULL, regValUnit="", formatterName="")
+            # -- -- -- --
             self.stream_reads.append(meter_read)
             time.sleep(0.048)
          except Exception as e:
