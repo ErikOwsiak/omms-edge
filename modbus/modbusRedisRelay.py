@@ -55,22 +55,30 @@ class modbusRedisRelay(_th.Thread):
          logUtils.log_exp(e)
 
    def run(self) -> None:
-      self.stream_thread: _th.Thread = self.stream_thread
-      self.stream_thread.start()
+      if self.__on_init_ping_meters():
+         self.stream_thread: _th.Thread = self.stream_thread
+         self.stream_thread.start()
+      # -- run main dumb loop --
       self.__main_loop()
 
-   def __on_init_ping_meters(self):
+   def __on_init_ping_meters(self) -> bool:
       # -- -- -- -- --
+      rval: bool = True
       print("[ __on_init_ping_meters ]")
-      for item in self.dev_meters_arr:
-         item: ttydevMeters = item
-         print(f"ttydevMeters:: tag: {item.tag}")
-         exp_counter, no_pong_counter, pong_counter = self.__on_ttydev(item)
-         msg = "exp_counter: %s, no_pong_counter: %s, pong_counter: %s" % \
-            (exp_counter, no_pong_counter, pong_counter)
-         print(msg)
-         time.sleep(2.0)
-      # -- -- -- -- --
+      try:
+         for item in self.dev_meters_arr:
+            item: ttydevMeters = item
+            print(f"\n[ ttydevMeters:: tag: {item.tag} ]")
+            exp_counter, no_pong_counter, pong_counter = self.__on_ttydev(item)
+            msg = "exp_counter: %s, no_pong_counter: %s, pong_counter: %s" % \
+               (exp_counter, no_pong_counter, pong_counter)
+            print(msg)
+            time.sleep(0.480)
+      except Exception as e:
+         logUtils.log_exp(e)
+         rval = False
+      finally:
+         return rval
 
    def __on_ttydev(self, _ttydev: ttydevMeters) -> (int, int, int):
       # -- --
@@ -89,6 +97,8 @@ class modbusRedisRelay(_th.Thread):
             err, meter = self.__create_modbus_meter(meter_xml)
             if err != 0:
                raise Exception(f"UnableToCreateMeter: {err}")
+            # -- update syspath to meter_xml --
+            meter_xml.attrib["syspath"] = meter.syspath
             # -- ping meter --
             err, msg = meter.ping()
             if err == 0:
