@@ -53,7 +53,10 @@ class modbusRedisRelay(_th.Thread):
 
    def run(self) -> None:
       if self.__on_init_ping_meters():
-         self.stream_thread.start()
+         if self.stream_thread is not None:
+            self.stream_thread.start()
+         else:
+            raise Exception("SteamThreadIsNone")
       # -- run main dumb loop --
       self.__main_loop()
 

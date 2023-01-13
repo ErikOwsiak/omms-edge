@@ -14,7 +14,7 @@
         <reg type="l3_kwh" lbl="L3_TotalActiveEnergy" default="null" />
     </stream>
     <!-- run to keep history of power consumption -->
-    <stream name="powerStats" enabled="1" runIndex="2m" runInterval="2m" dataTable="stream.power_stats">
+    <stream name="powerStats" enabled="1" runIndex="2" runInterval="2m" dataTable="stream.power_stats">
         <reg type="ModbusAddr" lbl="ModbusAddress" default="null" />
         <!-- volts -->
         <!-- <reg type="ln_v" lbl="Line_Volts" default="null" /> -->
