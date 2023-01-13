@@ -113,7 +113,7 @@ class modbusMeterV1(object):
                pass
             meter_read: meterReading = self.__read_meter_reg(_regs[0])
             self.stream_reads.append(meter_read)
-            time.sleep(0.80)
+            time.sleep(0.048)
          except Exception as e:
             logUtils.log_exp(e)
             continue
