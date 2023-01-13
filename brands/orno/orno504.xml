@@ -5,7 +5,7 @@
         <!-- mode="" -> defaults: register; unit="" -> defaults: no unit -->
         <reg type="ln_v" addr="0x0000" size="1" decpnt="1" mode="register" units="Volts" />
         <reg type="tl_a" addr="0x0001" size="1" decpnt="1" mode="" units="Amps" />
-        <reg type="GridFreqHz" addr="0x0002" size="1" decpnt="1" mode="" units="Hz" />
+        <reg type="grid_hz" addr="0x0002" size="1" decpnt="1" mode="" units="Hz" />
         <reg type="tl_w" addr="0x0003" size="1" decpnt="0" modes="" units="Watts" />
         <reg type="tl_var" addr="0x0004" size="1" decpnt="1" modes="" unit="VAr" />
         <reg type="tl_va" addr="0x0005" size="1" decpnt="1" modes="" units="VA" />
