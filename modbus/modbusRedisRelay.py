@@ -63,15 +63,25 @@ class modbusRedisRelay(_th.Thread):
       # -- -- -- -- --
       print("[ __on_init_ping_meters ]")
       for item in self.dev_meters_arr:
-         rval: bool = self.__on_ttydev(item)
+         item: ttydevMeters = item
+         print(f"ttydevMeters:: tag: {item.tag}")
+         exp_counter, no_pong_counter, pong_counter = self.__on_ttydev(item)
+         msg = "exp_counter: %s, no_pong_counter: %s, pong_counter: %s" % \
+            (exp_counter, no_pong_counter, pong_counter)
+         print(msg)
+         time.sleep(2.0)
       # -- -- -- -- --
 
-   def __on_ttydev(self, _ttydev: ttydevMeters) -> bool:
+   def __on_ttydev(self, _ttydev: ttydevMeters) -> (int, int, int):
       # -- --
       if _ttydev.dev == "auto":
          full_dev_path = ports.alias_full_path(_ttydev.alias)
       else:
          full_dev_path = _ttydev.dev
+      # -- --
+      pong_counter = 0
+      no_pong_counter = 0
+      exp_counter = 0
       # -- --
       for meter_xml in _ttydev.meters:
          try:
@@ -81,21 +91,25 @@ class modbusRedisRelay(_th.Thread):
                raise Exception(f"UnableToCreateMeter: {err}")
             # -- ping meter --
             err, msg = meter.ping()
-            if err != 0:
+            if err == 0:
+               print(f"InitPingOk: {meter.modbus_addr}")
+               _d = {"dts_utc": sysUtils.dts_utc(), "init_ping: ": msg}
+               self.redops.save_meter_data(meter.syspath, _dict=_d)
+               pong_counter += 1
+               continue
+            else:
                print(f"PingError: {msg}")
                _d = {"dts_utc": sysUtils.dts_utc(), "InitPingError": msg}
                self.redops.save_meter_data(meter.syspath, _dict=_d)
-               continue
-            else:
-               print(f"InitPingOk: {meter.modbus_addr}")
-               _d = {"dts_utc": sysUtils.dts_utc(), "InitPing: ": msg}
-               self.redops.save_meter_data(meter.syspath, _dict=_d)
+               no_pong_counter += 1
                continue
             # -- -- -- --
          except Exception as e:
             logUtils.log_exp(e)
+            exp_counter += 1
             continue
       # -- --
+      return exp_counter, no_pong_counter, pong_counter
 
    def __create_modbus_meter(self, meter_xml: _et.Element) -> (int, modbusMeterV1):
       # basic data
