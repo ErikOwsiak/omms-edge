@@ -216,6 +216,7 @@ class modbusRedisRelay(_th.Thread):
                self.redops.save_meter_data(meter.syspath, _dict=d)
                # -- publish to redis channel --
                strs_arr.insert(0, "#RPT")
+               strs_arr.insert(1, stream_regs.name)
                strs_arr.insert(2, f"DTSUTC:{sysUtils.dts_utc()}")
                strs_arr.insert(3, f"PATH:{meter.syspath}")
                self.redops.pub_read_on_sec("MODBUS", "|".join(strs_arr))
