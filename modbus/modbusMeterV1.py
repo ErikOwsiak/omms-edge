@@ -114,7 +114,7 @@ class modbusMeterV1(object):
                meter_read: meterReading = self.__read_meter_reg(_regs[0])
             else:
                # if reg not lised in the model xml ... set to default value
-               meter_read: meterReading = meterReading(regName=str(reg.regtype)
+               meter_read: meterReading = meterReading(regName=reg.regtype.name
                   , regVal=NULL, regValUnit="", formatterName="")
             # -- -- -- --
             self.stream_reads.append(meter_read)
