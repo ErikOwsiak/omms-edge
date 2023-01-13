@@ -53,7 +53,6 @@ class modbusRedisRelay(_th.Thread):
 
    def run(self) -> None:
       if self.__on_init_ping_meters():
-         self.stream_thread: _th.Thread = self.stream_thread
          self.stream_thread.start()
       # -- run main dumb loop --
       self.__main_loop()
