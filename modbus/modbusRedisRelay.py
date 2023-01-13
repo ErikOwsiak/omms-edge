@@ -8,10 +8,8 @@ import configparser as _cp
 from core.redisOps import redisOps
 from core.logutils import logUtils
 from core.utils import sysUtils
-from modbus.regDataMode import regDataMode
 from modbus.modbusMeterV1 import modbusMeterV1
 from modbus.ttydevMeters import ttydevMeters
-from modbus.modbusEdgeMeters import modbusEdgeMeters
 from system.ports import ports
 # -- shared --
 from ommslib.shared.core.elecRegStream import elecRegStream
@@ -159,11 +157,8 @@ class modbusRedisRelay(_th.Thread):
 
    def __stream_thread(self):
       # -- -- -- -- -- -- -- --
-      try:
-         self.__on_init_ping_meters()
-      except Exception as e:
-         logUtils.log_exp(e)
-         exit(1)
+      print("\n[ __stream_thread ]\n")
+      time.sleep(1.0)
       # -- -- -- -- -- -- -- --
       while True:
          try:
@@ -182,6 +177,7 @@ class modbusRedisRelay(_th.Thread):
             logUtils.log_exp(e)
 
    def __run_stream_frame(self, stream_regs: elecRegStream) -> bool:
+      print(f"[ __run_stream_frame: {stream_regs.name} ]")
       accu_buff: bool = True
       for meters in self.dev_meters_arr:
          accu_buff &= self.__run_ttydev_meters(stream_regs, meters)
