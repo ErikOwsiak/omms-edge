@@ -45,6 +45,7 @@ class modbusMeterV1(object):
       self.tty_dev_path: str = tty_dev_path
       self.model_xml: _et.Element = model_xml
       self.stream_regs: elecRegStream = elec_reg_stream
+      self.stream_reads: [meterReading] = []
       # -- set on init call --
       self.serial_info: meterSerialConf = None
       self.model_regs: {} = {}
@@ -103,7 +104,7 @@ class modbusMeterV1(object):
       if self.stream_regs is None or len(self.stream_regs.reg_arr) == 0:
          pass
       # -- abstract stream regs --
-      arr: []
+      self.stream_reads.clear()
       for reg in self.stream_regs.reg_arr:
          try:
             # -- remap to meter stream --
@@ -111,13 +112,21 @@ class modbusMeterV1(object):
             if len(_regs) != 1:
                pass
             meter_read: meterReading = self.__read_meter_reg(_regs[0])
-            print(meter_read)
-            time.sleep(0.200)
+            self.stream_reads.append(meter_read)
+            time.sleep(0.80)
          except Exception as e:
             logUtils.log_exp(e)
             continue
       # -- -- -- --
       return True
+
+   def reads_to_str(self):
+      buff: [] = []
+      for mr in self.stream_reads:
+         mr: meterReading = mr
+         buff.append(f"{mr.regName}:{mr.regVal}")
+      s = "|".join(buff)
+      return f"[MB: {self.modbus_addr}|{s}]"
 
    """
       private ... kinda

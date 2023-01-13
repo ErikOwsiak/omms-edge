@@ -211,7 +211,8 @@ class modbusRedisRelay(_th.Thread):
             meter: modbusMeterV1 = meter
             meter.set_stream_regs(stream_regs)
             if meter.read_stream_regs():
-               pass
+               buff: str = meter.reads_to_str()
+               print(buff)
             else:
                pass
             # -- -- -- --
