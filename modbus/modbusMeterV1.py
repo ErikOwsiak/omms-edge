@@ -126,7 +126,7 @@ class modbusMeterV1(object):
          mr: meterReading = mr
          buff.append(f"{mr.regName}:{mr.regVal}")
       s = "|".join(buff)
-      return f"[MB: {self.modbus_addr}|{s}]"
+      return f"[{s}]"
 
    """
       private ... kinda

@@ -212,6 +212,8 @@ class modbusRedisRelay(_th.Thread):
             meter.set_stream_regs(stream_regs)
             if meter.read_stream_regs():
                buff: str = meter.reads_to_str()
+               d = {"#rpt_dts_utc": sysUtils.dts_utc(), "#RPT": buff}
+               self.redops.save_meter_data(meter.syspath, _dict=d)
                print(buff)
             else:
                pass
