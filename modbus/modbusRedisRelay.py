@@ -104,13 +104,13 @@ class modbusRedisRelay(_th.Thread):
             if err == 0:
                print(f"InitPingOk: {meter.modbus_addr}")
                _d = {"dts_utc": sysUtils.dts_utc(), "init_ping: ": msg}
-               self.redops.save_meter_data(meter.syspath, _dict=_d)
+               self.redops.save_meter_data(meter.syspath, _dict=_d, delold=True)
                pong_counter += 1
                continue
             else:
                print(f"PingError: {msg}")
                _d = {"dts_utc": sysUtils.dts_utc(), "InitPingError": msg}
-               self.redops.save_meter_data(meter.syspath, _dict=_d)
+               self.redops.save_meter_data(meter.syspath, _dict=_d, delold=True)
                no_pong_counter += 1
                continue
             # -- -- -- --
