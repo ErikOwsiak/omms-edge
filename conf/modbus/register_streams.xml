@@ -17,7 +17,7 @@
     <stream name="powerStats" enabled="1" runIndex="2" runInterval="20" dataTable="stream.power_stats">
         <reg type="ModbusAddr" lbl="ModbusAddress" default="null" />
         <!-- volts -->
-        <reg type="ln_v" lbl="Line_Volts" default="null" />
+        <!-- <reg type="ln_v" lbl="Line_Volts" default="null" /> -->
         <reg type="l1_v" lbl="L1_Volts" default="null" />
         <reg type="l2_v" lbl="L2_Volts" default="null" />
         <reg type="l3_v" lbl="L3_Volts" default="null" />
@@ -27,7 +27,7 @@
         <reg type="l2_hz" lbl="L2_Hz" default="null" />
         <reg type="l3_hz" lbl="L3_Hz" default="null" /> -->
         <!-- amps -->
-        <reg type="tl_a" lbl="Total_Amps" default="null" />
+        <!-- <reg type="tl_a" lbl="Total_Amps" default="null" /> -->
         <reg type="l1_a" lbl="L1_Amps" default="null" />
         <reg type="l2_a" lbl="L2_Amps" default="null" />
         <reg type="l3_a" lbl="L3_Amps" default="null" />
