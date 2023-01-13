@@ -6,7 +6,7 @@
 -->
 <streams>
     <!-- definition to collect billable data -->
-    <stream name="kWhrs" enabled="1" runIndex="1" runInterval="40" dataTable="stream.kwhrs_raw">
+    <stream name="kWhrs" enabled="1" runIndex="1" runInterval="10m" dataTable="stream.kwhrs_raw">
         <reg type="ModbusAddr" lbl="ModbusAddress" default="null" />
         <reg type="tl_kwh" lbl="TotalActiveEnergy" default="null" />
         <reg type="l1_kwh" lbl="L1_TotalActiveEnergy" default="null" />
@@ -14,7 +14,7 @@
         <reg type="l3_kwh" lbl="L3_TotalActiveEnergy" default="null" />
     </stream>
     <!-- run to keep history of power consumption -->
-    <stream name="powerStats" enabled="1" runIndex="2" runInterval="20" dataTable="stream.power_stats">
+    <stream name="powerStats" enabled="1" runIndex="2m" runInterval="20" dataTable="stream.power_stats">
         <reg type="ModbusAddr" lbl="ModbusAddress" default="null" />
         <!-- volts -->
         <!-- <reg type="ln_v" lbl="Line_Volts" default="null" /> -->
