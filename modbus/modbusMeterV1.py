@@ -1,5 +1,6 @@
 
 import configparser as _cp
+import time
 import xml.etree.ElementTree as _et
 import minimalmodbus as _min_mbus
 # -- -- system -- --
@@ -43,7 +44,7 @@ class modbusMeterV1(object):
       self.modbus_addr: int = bus_addr
       self.tty_dev_path: str = tty_dev_path
       self.model_xml: _et.Element = model_xml
-      self.elec_reg_stream: elecRegStream = elec_reg_stream
+      self.stream_regs: elecRegStream = elec_reg_stream
       # -- set on init call --
       self.serial_info: meterSerialConf = None
       self.model_regs: {} = {}
@@ -84,7 +85,7 @@ class modbusMeterV1(object):
 
    def ping(self) -> (int, str):
       try:
-         rval = self.__checkModbusAddr()
+         rval = self.__check_modbus_addr()
          if not rval:
             print(f"\tPING {self.modbus_addr}: NoResponse!")
          else:
@@ -95,12 +96,35 @@ class modbusMeterV1(object):
          logUtils.log_exp(e)
          return 1, str(e)
 
+   def set_stream_regs(self, regs: elecRegStream):
+      self.stream_regs = regs
+
+   def read_stream_regs(self) -> bool:
+      if self.stream_regs is None or len(self.stream_regs.reg_arr) == 0:
+         pass
+      # -- abstract stream regs --
+      arr: []
+      for reg in self.stream_regs.reg_arr:
+         try:
+            # -- remap to meter stream --
+            _regs = [mr for mr in self.model_regs if mr.type == reg.regtype]
+            if len(_regs) != 1:
+               pass
+            meter_read: meterReading = self.__read_meter_reg(_regs[0])
+            print(meter_read)
+            time.sleep(0.200)
+         except Exception as e:
+            logUtils.log_exp(e)
+            continue
+      # -- -- -- --
+      return True
+
    """
       private ... kinda
    """
 
-   def __checkModbusAddr(self) -> bool:
-      print("_checkModbusAddr")
+   def __check_modbus_addr(self) -> bool:
+      print("__check_modbus_addr")
       if self.modbus_addr in [None, 0]:
          raise Exception(f"BadModbusAddress: {self.modbus_addr}")
       # -- -- -- run -- -- -- --

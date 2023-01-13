@@ -41,7 +41,7 @@ class modbusRedisRelay(_th.Thread):
       self.stream_thread = None
       self.meter_model_xmls: {} = {}
       self.blank_meters: {} = {}
-      self.model_xmls: {} = {}
+      # self.model_xmls: {} = {}
 
    def init(self):
       try:
@@ -122,17 +122,19 @@ class modbusRedisRelay(_th.Thread):
    def __create_modbus_meter(self, meter_xml: _et.Element) -> (int, modbusMeterV1):
       # basic data
       model_xml = meter_xml.attrib["modelXML"]
-      full_dev_path: str = meter_xml.attrib["full_dev_path"]
+      dev_path: str = meter_xml.attrib["full_dev_path"]
       # -- -- -- --
       model_xml_path = f"brands/{model_xml}"
-      if model_xml_path not in self.model_xmls.keys():
+      if model_xml_path not in self.meter_model_xmls.keys():
          if not os.path.exists(model_xml_path):
             raise FileNotFoundError(model_xml_path)
-         self.model_xmls[model_xml_path] = _et.parse(model_xml_path).getroot()
+         # -- add meter xml to cache --
+         self.meter_model_xmls[model_xml_path] = _et.parse(model_xml_path).getroot()
       # -- -- -- --
-      model_xmlelm: _et.Element = self.model_xmls[model_xml_path]
+      model_xmlelm: _et.Element = self.meter_model_xmls[model_xml_path]
       bus_addr = meter_xml.attrib["busAddr"]
-      meter: modbusMeterV1 = modbusMeterV1(self.sys_ini, int(bus_addr), full_dev_path, model_xmlelm)
+      meter: modbusMeterV1 = \
+         modbusMeterV1(self.sys_ini, int(bus_addr), dev_path, model_xmlelm)
       # -- build unique:constant syspath for this meter --
       meter.set_syspath(sysUtils.syspath(self.channel, bus_addr))
       # -- -- -- --
@@ -193,27 +195,29 @@ class modbusRedisRelay(_th.Thread):
          </ttydev>
       </edge>
    """
-   def __run_ttydev_meters(self, ers: elecRegStream, dev_meters: ttydevMeters) -> bool:
+   def __run_ttydev_meters(self, stream_regs: elecRegStream, dev_meters: ttydevMeters) -> bool:
       if dev_meters.run.lower() not in ["yes", "y", "1"]:
          return True
       # -- -- do -- --
-      for meter in dev_meters.meters:
+      for meter_xml in dev_meters.meters:
          try:
-            alias_path = f"{self.run_iotech_dev}/{dev_meters.alias}"
-            tty_dev = ""
+            full_dev_path = meter_xml.attrib["full_dev_path"]
+            if not os.path.exists(full_dev_path):
+               raise FileNotFoundError(full_dev_path)
             # -- -- -- --
-            meter.attrib["alias"] = alias_path if os.path.exists(alias_path) else ""
-            meter.attrib["ttydev"] = tty_dev if os.path.exists(tty_dev) else ""
-            # -- -- -- --
-            err_code, rpt_str = self.__read_meter_regs(ers=ers, _meter=meter)
-            if err_code == 0:
-               self.redops.pub_read(rpt_str)
-               self.redops.save_read(meter.attrib["syspath"], rpt_str)
-               self.redops.save_heartbeat(meter.attrib["syspath"], rpt_str)
+            err, meter = self.__create_modbus_meter(meter_xml=meter_xml)
+            if err != 0:
+               raise Exception(f"CreateModbusMeterNotZero: {err}")
+            meter: modbusMeterV1 = meter
+            meter.set_stream_regs(stream_regs)
+            if meter.read_stream_regs():
+               pass
             else:
-               print([err_code, rpt_str])
+               pass
+            # -- -- -- --
          except Exception as e:
             logUtils.log_exp(e)
+            continue
       # -- -- end -- --
       return True
 
@@ -222,29 +226,8 @@ class modbusRedisRelay(_th.Thread):
    """
    def __read_meter_regs(self, ers: elecRegStream, _meter: _et.Element) -> ():
       # -- -- -- -- --
-      modbus_addr: int = int(_meter.attrib["busAddr"])
-      modelxml: str = _meter.attrib["modelXML"]
-      ttydev: str = _meter.attrib["ttydev"]
-      # devalias: str = _meter.attrib["dev_alias"]
-      syspath: str = _meter.attrib["syspath"]
-      # -- if not found load xml file for this meter --
-      if modelxml not in self.meter_model_xmls.keys():
-         path = f"brands/{modelxml}"
-         if not os.path.exists(path):
-            return ""
-         self.meter_model_xmls[modelxml] = _et.parse(path).getroot()
-      # -- -- do -- --
-      model_xml = self.meter_model_xmls[modelxml]
-      mb_meter: modbusMeterV1 = modbusMeterV1(cp=self.sys_ini, modelxml=model_xml)
-      mb_meter.init()
-      # -- -- do -- --
-      error_code = 0
-      # model_xml: _et.Element = self.meter_model_xmls[modelxml]
-      meter: modbusMeterV1 = self.blank_meters[modelxml]
-      ttydev = devalias
-      if not meter.clear_reinit(modbus_addr, ttydev, ers=ers):
-         error_code = 2
-         return error_code, "UnableToReInitModbusMeter"
+      mb_meter: modbusMeterV1 = self.__create_modbus_meter(meter_xml=_meter)
+
       # -- -- -- -- -- -- -- --
       meter.set_syspath(syspath)
       # -- try pinging up to 3x --
