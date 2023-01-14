@@ -113,6 +113,7 @@ class modbusMeterV1(object):
       self.stream_reads.clear()
       for reg in self.stream_regs.reg_arr:
          try:
+            print(f"\treading reg: {reg.regtype}")
             _regs = [mr for mr in self.model_regs if mr.type == reg.regtype]
             if len(_regs) != 1:
                # if reg not listed in the model xml ... set to default value
@@ -128,6 +129,7 @@ class modbusMeterV1(object):
             else:
                # -- retry 2 more times --
                for i in range(0, 2):
+                  print(f"\t\tretrying reading reg: {reg.regtype}")
                   time.sleep(0.100)
                   meter_read: meterReading = self.__read_meter_reg(meter_reg)
                   if not meter_read.hasError:
@@ -184,9 +186,9 @@ class modbusMeterV1(object):
       else:
          return False
 
-   def __read_meter_reg(self, reg: meterReg) -> [None, meterReading]:
-      returnVal = None
+   def __read_meter_reg(self, reg: meterReg) -> meterReading:
       try:
+         returnVal = None
          self.modbusInst.serial.timeout = self.serial_info.timeout
          # -- -- -- -- -- -- -- --
          if reg.mode == regDataMode.register:
@@ -205,13 +207,14 @@ class modbusMeterV1(object):
             returnVal = self.modbusInst.read_long(reg.addr_dec)
          # -- meter was read -> create meter reading output --
          meterRead: meterReading = meterReading(regName=reg.mtype
-            , regVal=returnVal, regValUnit=reg.units, formatterName=reg.formatter)
+            , errorReading=False, regVal=returnVal, regValUnit=reg.units
+            , formatterName=reg.formatter)
          # -- -- -- -- -- -- -- --
          return meterRead
       except Exception as e:
          logUtils.log_exp(e)
          return meterReading(regName=reg.mtype, regVal=NULL
-            , regValUnit=reg.units, formatterName=reg.formatter, errorReading=True)
+            , regValUnit=reg.units, formatterName="", errorReading=True)
 
    def __createInstrument(self) -> _min_mbus.Instrument:
       # - - - - - - - - - -
