@@ -166,8 +166,13 @@ class modbusRedisRelay(_th.Thread):
          try:
             # -- -- -- -- -- --
             for stream in self.reg_streams:
-               if not stream.is_time_to_run():
+               # if not stream.is_time_to_run():
+               #   continue
+               diff: int = stream.time_to_run()
+               print(f"time to run next time: {diff} : {stream.name}")
+               if diff > 0:
                   continue
+               # -- run stream frame --
                if self.__run_stream_frame(stream):
                   stream.update_last_run()
                else:
