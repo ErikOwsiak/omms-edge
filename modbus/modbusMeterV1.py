@@ -114,21 +114,27 @@ class modbusMeterV1(object):
       for reg in self.stream_regs.reg_arr:
          try:
             _regs = [mr for mr in self.model_regs if mr.type == reg.regtype]
-            if len(_regs) == 1:
-               meter_reg: meterReg = _regs[0]
-               meter_read: meterReading = self.__read_meter_reg(meter_reg)
-               if meter_read.hasError:
-                  for i in range(0, 2):
-                     time.sleep(0.096)
-                     meter_read: meterReading = self.__read_meter_reg(meter_reg)
-                     if not meter_read.hasError:
-                        break
-            else:
-               # if reg not lised in the model xml ... set to default value
+            if len(_regs) != 1:
+               # if reg not listed in the model xml ... set to default value
                meter_read: meterReading = meterReading(regName=reg.regtype.name
                   , regVal=NULL, regValUnit="", formatterName="")
-            # -- -- -- --
-            self.stream_reads.append(meter_read)
+               self.stream_reads.append(meter_read)
+               continue
+            # -- -- run -- --
+            meter_reg: meterReg = _regs[0]
+            meter_read: meterReading = self.__read_meter_reg(meter_reg)
+            if not meter_read.hasError:
+               self.stream_reads.append(meter_read)
+            else:
+               # -- retry 2 more times --
+               for i in range(0, 2):
+                  time.sleep(0.100)
+                  meter_read: meterReading = self.__read_meter_reg(meter_reg)
+                  if not meter_read.hasError:
+                     break
+               # -- outside of for --
+               self.stream_reads.append(meter_read)
+            # -- small delay --
             time.sleep(0.048)
          except Exception as e:
             logUtils.log_exp(e)
