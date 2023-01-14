@@ -27,6 +27,10 @@ from ommslib.shared.core.elecRegStrEnums import elecRegStrEnumsShort
    9. clear meter 
 """
 
+
+NULL = "null"
+
+
 class modbusMeterV1(object):
    """
       meter needs:
@@ -102,7 +106,7 @@ class modbusMeterV1(object):
       self.stream_regs = regs
 
    def read_stream_regs(self) -> bool:
-      NULL = "null"
+      # -- do --
       if self.stream_regs is None or len(self.stream_regs.reg_arr) == 0:
          pass
       # -- abstract stream regs --
@@ -111,7 +115,8 @@ class modbusMeterV1(object):
          try:
             _regs = [mr for mr in self.model_regs if mr.type == reg.regtype]
             if len(_regs) == 1:
-               meter_read: meterReading = self.__read_meter_reg(_regs[0])
+               meter_reg: meterReg = _regs[0]
+               meter_read: meterReading = self.__read_meter_reg(meter_reg)
             else:
                # if reg not lised in the model xml ... set to default value
                meter_read: meterReading = meterReading(regName=reg.regtype.name
@@ -168,28 +173,33 @@ class modbusMeterV1(object):
          return False
 
    def __read_meter_reg(self, reg: meterReg) -> [None, meterReading]:
-      self.modbusInst.serial.timeout = self.serial_info.timeout
       returnVal = None
-      # -- -- -- -- -- -- -- --
-      if reg.mode == regDataMode.register:
-         if reg.size == 1:
-            returnVal = self.modbusInst.read_register(reg.addr_dec, reg.decpnt)
-         else:
-            returnVal = self.modbusInst.read_registers(reg.addr_dec, reg.size)
-      # read float
-      if reg.mode == regDataMode.float:
-         returnVal = self.modbusInst.read_float(reg.addr_dec, number_of_registers=reg.size)
-      # read string
-      if reg.mode == regDataMode.string:
-         returnVal = self.modbusInst.read_string(reg.addr_dec, number_of_registers=reg.size)
-      # read int
-      if reg.mode == regDataMode.int:
-         returnVal = self.modbusInst.read_long(reg.addr_dec)
-      # -- meter was read -> create meter reading output --
-      meterRead: meterReading = meterReading(regName=reg.mtype
-         , regVal=returnVal, regValUnit=reg.units, formatterName=reg.formatter)
-      # -- -- -- -- -- -- -- --
-      return meterRead
+      try:
+         self.modbusInst.serial.timeout = self.serial_info.timeout
+         # -- -- -- -- -- -- -- --
+         if reg.mode == regDataMode.register:
+            if reg.size == 1:
+               returnVal = self.modbusInst.read_register(reg.addr_dec, reg.decpnt)
+            else:
+               returnVal = self.modbusInst.read_registers(reg.addr_dec, reg.size)
+         # -- read float --
+         if reg.mode == regDataMode.float:
+            returnVal = self.modbusInst.read_float(reg.addr_dec, number_of_registers=reg.size)
+         # -- read string --
+         if reg.mode == regDataMode.string:
+            returnVal = self.modbusInst.read_string(reg.addr_dec, number_of_registers=reg.size)
+         # -- read int --
+         if reg.mode == regDataMode.int:
+            returnVal = self.modbusInst.read_long(reg.addr_dec)
+         # -- meter was read -> create meter reading output --
+         meterRead: meterReading = meterReading(regName=reg.mtype
+            , regVal=returnVal, regValUnit=reg.units, formatterName=reg.formatter)
+         # -- -- -- -- -- -- -- --
+         return meterRead
+      except Exception as e:
+         logUtils.log_exp(e)
+         return meterReading(regName=reg.mtype, regVal=NULL
+            , regValUnit=reg.units, formatterName=reg.formatter, errorReading=True)
 
    def __createInstrument(self) -> _min_mbus.Instrument:
       # - - - - - - - - - -

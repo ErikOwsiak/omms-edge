@@ -80,12 +80,12 @@ class modbusRedisRelay(_th.Thread):
          return rval
 
    def __on_ttydev(self, _ttydev: ttydevMeters) -> (int, int, int):
-      # -- --
+      # -- -- -- --
       if _ttydev.dev == "auto":
          full_dev_path = ports.alias_full_path(_ttydev.alias)
       else:
          full_dev_path = _ttydev.dev
-      # -- --
+      # -- -- -- --
       pong_counter = 0
       no_pong_counter = 0
       exp_counter = 0
