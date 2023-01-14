@@ -216,7 +216,7 @@ class modbusRedisRelay(_th.Thread):
             meter: modbusMeterV1 = meter
             meter.set_stream_regs(stream_regs)
             print(f"reading modbus addr: {meter.modbus_addr}")
-            if meter.read_stream_regs():
+            if meter.read_stream_frame_registers():
                strs_arr: [] = meter.reads_str_arr()
                rpt_key: str = f"#rpt_{stream_regs.name}"
                s = "|".join(strs_arr)
@@ -228,7 +228,6 @@ class modbusRedisRelay(_th.Thread):
                strs_arr.insert(2, f"PATH:{meter.syspath}")
                s = "|".join(strs_arr)
                self.redops.pub_read_on_sec("MODBUS", f"({s})")
-               # self.redops.save_heartbeat(meter.syspath, "")
             else:
                pass
             # -- -- -- --

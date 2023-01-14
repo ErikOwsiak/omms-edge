@@ -109,12 +109,15 @@ class modbusMeterV1(object):
    def set_stream_regs(self, regs: elecRegStream):
       self.stream_regs = regs
 
-   def read_stream_regs(self) -> bool:
+   def read_stream_frame_registers(self) -> bool:
       # -- do --
       if self.stream_regs is None or len(self.stream_regs.reg_arr) == 0:
-         pass
+         print(colored("NoStreamRegisters", "yellow"))
+         return False
       # -- abstract stream regs --
+      error_counter: int = 0
       self.stream_reads.clear()
+      # -- for each register in stream registers --
       for reg in self.stream_regs.reg_arr:
          try:
             print(f"\t[ reading reg: {reg.regtype.name}]")
@@ -132,12 +135,14 @@ class modbusMeterV1(object):
                self.stream_reads.append(meter_read)
             else:
                # -- retry 2 more times --
+               error_counter += 1
                for i in range(0, 2):
                   print(f"\t\t[ retrying reading reg: {reg.regtype.name} ]")
                   time.sleep(0.080)
                   meter_read: meterReading = self.__read_meter_reg(meter_reg)
                   if not meter_read.hasError:
                      break
+                  error_counter += 1
                # -- outside of for --
                self.stream_reads.append(meter_read)
             # -- small delay --
@@ -145,6 +150,9 @@ class modbusMeterV1(object):
          except Exception as e:
             logUtils.log_exp(e)
             continue
+      # -- -- end for reg in registers -- --
+      if error_counter == 0:
+         print(colored(f"\n\t[ GoodMeterRead: addr: {self.modbus_addr} ]\n", "green"))
       # -- -- -- --
       return True
 
