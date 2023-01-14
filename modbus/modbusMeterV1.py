@@ -117,6 +117,12 @@ class modbusMeterV1(object):
             if len(_regs) == 1:
                meter_reg: meterReg = _regs[0]
                meter_read: meterReading = self.__read_meter_reg(meter_reg)
+               if meter_read.hasError:
+                  for i in range(0, 2):
+                     time.sleep(0.096)
+                     meter_read: meterReading = self.__read_meter_reg(meter_reg)
+                     if not meter_read.hasError:
+                        break
             else:
                # if reg not lised in the model xml ... set to default value
                meter_read: meterReading = meterReading(regName=reg.regtype.name
@@ -160,7 +166,7 @@ class modbusMeterV1(object):
       reading: meterReading = None
       for i in range(0, 3):
          reading: meterReading = self.__read_meter_reg(reg)
-         if reading is not None:
+         if not reading.hasError:
             break
       # -- -- -- --
       if (reading is None) or (reading.regVal is None):
