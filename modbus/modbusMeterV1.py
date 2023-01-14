@@ -138,7 +138,7 @@ class modbusMeterV1(object):
                error_counter += 1
                for i in range(0, 2):
                   print(f"\t\t[ retrying reading reg: {reg.regtype.name} ]")
-                  time.sleep(0.080)
+                  time.sleep(0.040)
                   meter_read: meterReading = self.__read_meter_reg(meter_reg)
                   if not meter_read.hasError:
                      print(colored(f"\t\t -> GoodRetry: {reg.regtype.name}", "magenta"))
@@ -148,7 +148,7 @@ class modbusMeterV1(object):
                # -- outside of for --
                self.stream_reads.append(meter_read)
             # -- small delay --
-            time.sleep(0.048)
+            time.sleep(0.020)
          except Exception as e:
             logUtils.log_exp(e)
             continue
