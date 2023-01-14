@@ -27,6 +27,9 @@ else
   echo "will NOT start: $MQTT_START_FILE"
 fi
 
+echo ""
+echo ""
+# cd $START_DIR
 # just to read output
 sleep 8
 
