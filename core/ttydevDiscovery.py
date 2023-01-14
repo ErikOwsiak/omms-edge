@@ -4,6 +4,7 @@ import configparser as _cp
 import minimalmodbus as mm
 import os, time, typing as t
 import xml.etree.ElementTree as et
+from termcolor import colored
 # -- system --
 from system.ports import ports
 from core.redisOps import redisOps
@@ -164,10 +165,10 @@ class ttyUSBDeviceScanner(_th.Thread):
       modbus_inst: mm.Instrument = self.__get_inst__(usb_dev_port, com_xml, bus_addr)
       resp: pingResults = self.__do_ping(modbus_inst, bus_addr_reg_hex)
       if resp.err_code != 0:
-         print("NoPong!")
+         print(colored("NoPong!", "red"))
          return None, None
       else:
-         print("PingOK!")
+         print(colored("GotPong!", "green"))
          return meter, usb_dev_port
 
    def __do_ping(self, inst: mm.Instrument, bus_addr_reg_hex: str) -> pingResults:
