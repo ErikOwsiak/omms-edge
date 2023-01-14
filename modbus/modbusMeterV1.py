@@ -49,6 +49,7 @@ class modbusMeterV1(object):
       self.modbus_addr: int = bus_addr
       self.tty_dev_path: str = tty_dev_path
       self.model_xml: _et.Element = model_xml
+      self.model_phases: int = 0
       self.stream_regs: elecRegStream = elec_reg_stream
       self.stream_reads: [meterReading] = []
       # -- set on init call --
@@ -57,6 +58,7 @@ class modbusMeterV1(object):
       self.syspath: str = ""
       self.ports: sys_ports = sys_ports(self.sys_ini)
       self.modbusInst: _min_mbus.Instrument = None
+      self.read_error_count = 0
 
    """
       <comm type="serial" baudrate="9600" parity="E" stopbits="1" timeoutSecs="0.25" />
@@ -75,6 +77,7 @@ class modbusMeterV1(object):
          if len(regs) == 0:
             raise Exception("[ ModelRegsNotLoaded ]")
          # -- do --
+         self.model_phases = int(self.model_xml.attrib["phases"])
          self.model_regs = [meterReg(x) for x in regs]
          if len(self.model_regs) == 0:
             raise Exception("ModelRegsNotParsed")
@@ -129,8 +132,8 @@ class modbusMeterV1(object):
             else:
                # -- retry 2 more times --
                for i in range(0, 2):
-                  print(f"\t\tretrying reading reg: {reg.regtype}")
-                  time.sleep(0.100)
+                  print(f"\t\t[ retrying reading reg: {reg.regtype.name} ]")
+                  time.sleep(0.080)
                   meter_read: meterReading = self.__read_meter_reg(meter_reg)
                   if not meter_read.hasError:
                      break
@@ -212,6 +215,7 @@ class modbusMeterV1(object):
          # -- -- -- -- -- -- -- --
          return meterRead
       except Exception as e:
+         self.read_error_count += 1
          logUtils.log_exp(e)
          return meterReading(regName=reg.mtype, regVal=NULL
             , regValUnit=reg.units, formatterName="", errorReading=True)

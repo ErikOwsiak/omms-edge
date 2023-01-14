@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<meter type="electric" tag="orno504" brand="orno" model="orno504">
+<meter type="electric" phases="1" tag="orno504" brand="orno" model="orno504">
     <comm type="serial" baudrate="9600" parity="N" stopbits="1" timeoutSecs="0.25" />
     <regs>
         <!-- mode="" -> defaults: register; unit="" -> defaults: no unit -->
