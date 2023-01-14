@@ -216,7 +216,7 @@ class modbusMeterV1(object):
          return meterRead
       except Exception as e:
          self.read_error_count += 1
-         logUtils.log_exp(e)
+         logUtils.log_exp(f"\t\t\t{e}")
          return meterReading(regName=reg.mtype, regVal=NULL
             , regValUnit=reg.units, formatterName="", errorReading=True)
 
