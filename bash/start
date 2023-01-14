@@ -27,6 +27,9 @@ else
   echo "will NOT start: $MQTT_START_FILE"
 fi
 
+# just to read output
+sleep 8
+
 # START_MQTT_BOT=1
 # START_MODBUS_BOT=1
 : ' ---------------------------------------------------------------------------
