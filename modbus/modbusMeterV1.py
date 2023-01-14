@@ -116,7 +116,7 @@ class modbusMeterV1(object):
       self.stream_reads.clear()
       for reg in self.stream_regs.reg_arr:
          try:
-            print(f"\treading reg: {reg.regtype}")
+            print(f"\t[ reading reg: {reg.regtype.name}]")
             _regs = [mr for mr in self.model_regs if mr.type == reg.regtype]
             if len(_regs) != 1:
                # if reg not listed in the model xml ... set to default value
