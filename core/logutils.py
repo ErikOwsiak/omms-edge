@@ -14,4 +14,4 @@ class logUtils(object):
 
    @staticmethod
    def log_exp(ex):
-      print(colored(str(ex), "red"))
+      print(colored(str(ex), "light_red"))

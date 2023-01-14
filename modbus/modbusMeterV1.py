@@ -155,6 +155,8 @@ class modbusMeterV1(object):
       # -- -- end for reg in registers -- --
       if error_counter == 0:
          print(colored(f"\n\t[ GoodMeterRead: addr: {self.modbus_addr} ]\n", "green"))
+      else:
+         print(colored(f"\n\t[ BadMeterRead: addr: {self.modbus_addr} ]\n", "red"))
       # -- -- -- --
       return True
 
