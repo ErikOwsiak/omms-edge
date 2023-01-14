@@ -3,6 +3,7 @@ import configparser as _cp
 import time
 import xml.etree.ElementTree as _et
 import minimalmodbus as _min_mbus
+from termcolor import colored
 # -- -- system -- --
 from core.logutils import logUtils
 from core.utils import sysUtils as utils

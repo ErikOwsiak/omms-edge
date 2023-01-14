@@ -1,4 +1,6 @@
 
+from termcolor import colored
+
 
 class logUtils(object):
 
@@ -12,5 +14,4 @@ class logUtils(object):
 
    @staticmethod
    def log_exp(ex):
-      ex: Exception = ex
-      print(ex)
+      print(colored(str(ex), "red"))
