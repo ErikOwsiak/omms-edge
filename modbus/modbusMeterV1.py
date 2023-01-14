@@ -142,6 +142,7 @@ class modbusMeterV1(object):
                   meter_read: meterReading = self.__read_meter_reg(meter_reg)
                   if not meter_read.hasError:
                      print(colored(f"\t\t -> GoodRetry: {reg.regtype.name}", "magenta"))
+                     error_counter -= 1
                      break
                   error_counter += 1
                # -- outside of for --
