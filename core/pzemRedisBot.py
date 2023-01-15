@@ -65,7 +65,7 @@ class pzemRedisBot(th.Thread):
             self.redops.update_diag_tag(diag_tag=self.diag_tag, mapdct=__dict)
          # -- -- -- -- -- -- -- -- -- -- -- --
          print(buff)
-         self.redops.pub_diag_debug(buff)
+         # self.redops.pub_diag_debug(buff)
          if not buff.startswith("#RPT|PZEM:SS_"):
             return
          # -- -- -- -- -- -- -- -- -- -- -- --
