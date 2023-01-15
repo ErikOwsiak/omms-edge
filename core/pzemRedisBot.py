@@ -77,7 +77,7 @@ class pzemRedisBot(th.Thread):
          buff = "|".join(arr)
          # -- -- publish & set -- --
          self.redops.pub_read(buff)
-         self.redops.save_read(syspath, buff)
+         self.redops.pub_read_on_sec("PZEM", buff)
          # -- -- -- -- -- -- -- -- -- -- -- --
       except Exception as e:
          logUtils.log_exp(e)

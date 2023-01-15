@@ -48,7 +48,7 @@ class redisOps(object):
 
    def update_read(self, path: str, key: str, val: str):
       try:
-         read_db_idx = int(self.sys_ini["REDIS"]["DB_IDX_READS"])
+         read_db_idx = int(self.sys_ini["REDIS_CORE"]["DB_IDX_READS"])
          self.red.select(read_db_idx)
          rv = self.red.hset(path, mapping={key: val})
          print(f"rv: {rv}")
