@@ -63,18 +63,18 @@ class modbusMeterV1(object):
 
    """
       <comm type="serial" baudrate="9600" parity="E" stopbits="1" timeoutSecs="0.25" />
-      <regs>
+      <global_register_table>
         <!-- mode="" -> defaults: register; unit="" -> defaults: no unit -->
         <reg type="SerialNum" addr="0x0000" size="2" decpnt="1" mode="" unit="" />
         <reg type="ModbusAddr" addr="0x0002" size="1" decpnt="0" unit="" />
-      </regs>
+      </global_register_table>
    """
    def init(self):
       try:
          # -- setup serial info --
          elm: _et.Element = self.model_xml.find("comm[@type='serial']")
          self.serial_info = meterSerialConf(elm)
-         regs: [_et.Element] = self.model_xml.findall("regs/reg")
+         regs: [_et.Element] = self.model_xml.findall("global_register_table/reg")
          if len(regs) == 0:
             raise Exception("[ ModelRegsNotLoaded ]")
          # -- do --
@@ -114,7 +114,7 @@ class modbusMeterV1(object):
       if self.stream_regs is None or len(self.stream_regs.reg_arr) == 0:
          print(colored("NoStreamRegisters", "yellow"))
          return False
-      # -- abstract stream regs --
+      # -- abstract stream global_register_table --
       error_counter: int = 0
       self.stream_reads.clear()
       # -- for each register in stream registers --

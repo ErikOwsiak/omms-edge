@@ -2,6 +2,7 @@
 
 import configparser as _cp
 import os.path, time, setproctitle
+import xml.etree.ElementTree as _et
 # -- sys imports --
 from core.utils import sysUtils as utils
 from mqtt.mqttMeterReaderV1 import mqttMeterReaderV1
@@ -9,66 +10,87 @@ from core.redisOps import redisOps
 from core.debug import debug
 
 
-system_cp: _cp.ConfigParser = _cp.ConfigParser()
-loaded: [] = system_cp.read("conf/system.ini")
+""" ---------------------------------------------------------------------------
+   
+   README:
+      create all global object here and pass them around to diff. subsystems
+      
+--------------------------------------------------------------------------- """
+
+
+SYS_INI: _cp.ConfigParser = _cp.ConfigParser()
+loaded: [] = SYS_INI.read("conf/system.ini")
 if len(loaded) == 0:
    print("NoLoadedConfFiles")
    exit(1)
+# -- mqtt section --
+MQTT_INI = SYS_INI["MQTT_CORE"]
 
-mqtt_redis_cp: _cp.ConfigParser = _cp.ConfigParser()
-loaded: [] = mqtt_redis_cp.read("conf/mqtt_redis_bot.ini")
-if len(loaded) == 0:
-   print("NoLoadedConfFiles")
-   exit(1)
+# -- -- setup globals -- --
+PROC_NAME: str = MQTT_INI.get("PROC_NAME", "omms-mqtt-rly")
+LOOP_SLEEP_SECS: float = MQTT_INI.getfloat("MAIN_LOOP_SECS")
+DIAG_TAG: str = MQTT_INI.get("DIAG_TAG")
+DIAG_TAG = utils.set_systag(DIAG_TAG)
 
-# -- red ops --
-IS_DEBUG: bool = debug.is_dev_box()
-if IS_DEBUG:
-   redops: redisOps = redisOps(mqtt_redis_cp, "DEV_REDIS_CONN")
+if debug.is_dev_box():
+   MQTT_INFO_INI = SYS_INI["MQTT_DEV"]
 else:
-   redops: redisOps = redisOps(mqtt_redis_cp)
+   MQTT_INFO_INI = SYS_INI["MQTT_PROD"]
+# -- -- -- --
 
+# -- start redis setup --
+if debug.is_dev_box():
+   REDOPS: redisOps = redisOps(sys_ini=SYS_INI, CONN_SEC="REDIS_DEV")
+else:
+   REDOPS: redisOps = redisOps(sys_ini=SYS_INI)
+if not REDOPS.red.ping():
+   print("RedisServerNoPing")
+   exit(1)
+# -- end redis setup --
 
 """
    load mqtt meter_xml_nodes
 """
-XML_METER_FILE = "conf/mqtt_meters.xml"
+XML_METER_FILE = MQTT_INI["METER_XML"]
 if not os.path.exists(XML_METER_FILE):
    raise FileNotFoundError(XML_METER_FILE)
+MET_XML_ROOT = _et.parse(XML_METER_FILE).getroot()
 # -- -- -- -- -- -- -- --
 mqttReaderV1: mqttMeterReaderV1 = \
-   mqttMeterReaderV1(XML_METER_FILE, mqtt_redis_cp, system_cp, redops)
-# -- -- -- -- -- -- -- --
+   mqttMeterReaderV1(MET_XML_ROOT, SYS_INI, MQTT_INI, MQTT_INFO_INI, REDOPS)
+# -- load meter xml data --
 if not mqttReaderV1.load_xml_conf():
-   exit(1)
+   exit(2)
+# -- -- -- -- -- -- -- --
 
 """
    init mqtt code
 """
 if mqttReaderV1.mqtt_init() != 0:
-   exit(2)
+   exit(3)
 
 """
    start reader 
 """
 if not mqttReaderV1.start():
-   exit(1)
+   exit(4)
 
 # -- main loop --
-LOOP_SLEEP_SECS: float = float(mqtt_redis_cp["TIMING"]["LOOP_SLEEP_SECS"])
-
 def main():
-   setproctitle.setproctitle("mqttRedisBot")
-   diag_tag: str = mqtt_redis_cp["SYSINFO"]["DIAG_TAG"]
-   diag_tag = utils.set_systag(diag_tag)
+   # -- -- -- -- --
+   setproctitle.setproctitle(PROC_NAME)
+   dct: {} = {"init_bot_ping_dts_utc": utils.dts_utc(), "lan_ip":  utils.lan_ip()}
+   mqttReaderV1.redops.update_diag_tag(diag_tag=DIAG_TAG, mapdct=dct, restart=True)
+   # -- -- main loop -- --
    while True:
       print("[ mqtt_redis_bot: main ]")
       if mqttReaderV1.last_report:
          msg = "mqttReaderV1 TRUE"
-         dct: {} = {"dts_utc": utils.dts_utc(), "msg": msg}
-         mqttReaderV1.redops.update_diag_tag(diag_tag=diag_tag, mapdct=dct, restart=False)
+         dct: {} = {"bot_ping_dts_utc": utils.dts_utc(), "msg": msg}
+         mqttReaderV1.redops.update_diag_tag(diag_tag=DIAG_TAG, mapdct=dct)
       # -- -- -- --
       time.sleep(LOOP_SLEEP_SECS)
+   # -- -- -- -- --
 
 
 # -- start here --

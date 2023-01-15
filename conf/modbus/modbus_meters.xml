@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
    edge is a computer running at an electrical room or electrical-box
-   pubChannel -> if "" use pub channel from ini file for this bot
+   pubChannel -> if "" use pub syspath_channel from ini file for this bot
             else: use pubChannel to publish to redis
 -->
 <system>

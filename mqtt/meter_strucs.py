@@ -1,27 +1,20 @@
 
 import datetime
-from core.utils import sysUtils as utils
+from ommslib.shared.core.elecRegStrEnums import elecRegStrEnumsShort
 
 
 class regInfo(object):
 
-   def __init__(self):
-      self.regtype: str = ""
+   def __init__(self, rtype: str, mtag: str):
+      self.regtype: elecRegStrEnumsShort = elecRegStrEnumsShort[rtype]
+      self.meter_tag: str = mtag
       self.data: float = 0.0
-      self.dts: datetime.datetime = utils.min_dts()
-      self.syspath: str = ""
-      self.meter_tag: str = ""
-      # self.last_reading: datetime.datetime = utils.min_dts()
+      self.last_update_dts_utc: datetime.datetime = datetime.datetime.min
 
-   def to_str(self) -> str:
-      return f"syspath: {self.syspath} | rtype: {self.regtype} |" \
-         f" data: {self.data} | dts: {self.dts}"
+   def __str__(self) -> str:
+      return f"meter_tag: {self.meter_tag} | rtype: {self.regtype.name} |" \
+         f" data: {self.data} | last_update_dts_utc: {self.last_update_dts_utc}"
 
-
-# - - test - -
-if __name__ == "__main__":
-   mi: regInfo = regInfo()
-   mi.data = "xxx"
-   mi.regtype = "type"
-   mi.dts = "dta"
-   print(mi.to_str())
+   def update_data(self, d: str):
+      self.data = round(float(d), 3)
+      self.last_update_dts_utc = datetime.datetime.utcnow().replace(second=0, microsecond=0)

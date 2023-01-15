@@ -25,16 +25,13 @@ class redisOps(object):
 
    def save_read(self, path: str, buff: str):
       try:
-         read_db_idx = int(self.sys_ini["REDIS"]["DB_IDX_READS"])
+         read_db_idx = int(self.sys_ini["REDIS_CORE"]["DB_IDX_READS"])
          self.red.select(read_db_idx)
-         md5 = hashlib.md5(bytearray(buff.encode("utf-8")))
-         md5str = f"0x{md5.hexdigest().upper()}"
          last_msg_dtsutc = utils.dts_utc()
-         _dict = {"dts_utc": last_msg_dtsutc, "msg_md5": md5str, "#RPT": buff}
-         rv = self.red.delete(path)
-         print(f"rv: {rv}")
-         rv = self.red.hset(path, mapping=_dict)
-         print(f"rv: {rv}")
+         _dict = {"#rpt_kWhrs_dts_utc": last_msg_dtsutc, "#rpt_kWhrs": buff}
+         rv0 = self.red.delete(path)
+         rv1 = self.red.hset(path, mapping=_dict)
+         print(f"rv0: {rv0}; rv1: {rv1};")
       except Exception as e:
          logUtils.log_exp(e)
 

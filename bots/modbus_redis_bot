@@ -60,7 +60,7 @@ RS_XML = _et.parse(RS_XML_PATH)
    MM_XML_PATH is file with ALL modbus meters in the building grouped by 
    EDGE (HOST) -> ttyUSBx device 
 """
-MM_XML_PATH: str = SEC_INI["MODBUS_METERS_XML"]
+MM_XML_PATH: str = SEC_INI["METER_XML"]
 if not os.path.exists(MM_XML_PATH):
    print(f"FileNotFound: {MM_XML_PATH}")
    exit(1)

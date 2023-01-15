@@ -30,7 +30,7 @@ class mqttMeterReader(object):
       self_node: et.Element = ud_node
       sn = self_node.attrib["sn"]
       dbid = self_node.attrib["dbid"]
-      # -- subscribe all regs --
+      # -- subscribe all global_register_table --
       for reg in self_node.findall("reg"):
          reg_key = reg.attrib["name"]
          topic = f"{sn}/{reg_key}"

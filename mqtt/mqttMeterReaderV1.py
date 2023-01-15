@@ -1,70 +1,80 @@
-import datetime
-import os, time
-import threading
+
+import os, time, datetime
+import threading as _th
 import typing as t
 import configparser as _cp
 import xml.etree.ElementTree as et
 import paho.mqtt.client as mqtt
-import redis
-
+# -- -- system  -- --
 from core.utils import sysUtils as utils
 from core.redisOps import redisOps
 from mqtt.meter_strucs import regInfo
 from core.logutils import logUtils
+from core.datatypes import mqttMeterInfo
+from ommslib.shared.core.elecRegStrEnums import elecRegStrEnumsShort as _erses
 
+
+"""
+   [MQTT]
+   REDIS_PUB_CHNL: CK_READS_MQTT_???
+   DIAG_TAG: ???_MQTT_RELAY
+   PROC_NAME: omms-mqtt
+   MAIN_LOOP_SECS: 20
+   SYSPATH_CHANNEL: MQTT
+"""
 
 # noinspection PyTypeChecker
 class mqttMeterReaderV1(object):
 
-   def __init__(self, fullpath: str, cp: _cp
-         , sys_cp: _cp.ConfigParser
+   def __init__(self, xmldoc: et.Element
+         , sys_ini: _cp.ConfigParser
+         , mqtt_core_ini: _cp.SectionProxy
+         , mqtt_info_ini: _cp.SectionProxy
          , redops: redisOps):
       # -- -- -- -- -- -- -- -- -- -- -- --
-      self.meters_xml_conf = fullpath
-      self.xcp: _cp.ConfigParser = cp
-      self.system_cp: _cp.ConfigParser = sys_cp
-      self.channel = str(self.xcp["SYSPATH"]["CHANNEL"])
-      self.diag_tag: str = str(self.xcp["SYSINFO"]["DIAG_TAG"])
+      self.meters_xml: et.Element = xmldoc
+      self.sys_ini: _cp.ConfigParser = sys_ini
+      self.mqtt_core_ini: _cp.SectionProxy = mqtt_core_ini
+      self.mqtt_info_ini: _cp.SectionProxy = mqtt_info_ini
+      # -- -- -- --
+      self.syspath_channel = self.mqtt_core_ini.get("SYSPATH_CHANNEL")
+      # REDIS_PUB_CHNL
+      tmp: str = self.mqtt_core_ini.get("REDIS_PUB_CHNL")
+      self.reads_pub_channel = utils.set_systag(tmp)
+      # -- -- -- --
+      self.diag_tag: str = str(self.mqtt_core_ini["DIAG_TAG"])
       self.diag_tag = utils.set_systag(self.diag_tag)
       self.redops: redisOps = redops
-      self.xmldoc: et.ElementTree = None
-      self.meter_xml_nodes: t.List[et.Element] = None
-      self.regs: t.List[et.Element] = None
-      self.report_thread = \
-         threading.Thread(target=self.__report_thread__, args=(None,))
+      self.kwh_report_interval: int = self.mqtt_core_ini.getint("KWH_REPORT_INTERVAL", 120)
+      self.report_loop_intv: float = self.mqtt_core_ini.getfloat("LOOP_SLEEP_SECS", 4)
+      # self.meter_xml_nodes: t.List[et.Element] = None
+      self.running_meters: [et.Element] = []
+      self.global_register_table: {str, mqttMeterInfo} = {}
+      self.report_thread = _th.Thread(target=self.__report_thread__, args=(None,))
       self.clt: mqtt.Client = mqtt.Client()
-      self.host: str = ""
-      self.port: int = 0
-      self.pwd: str = ""
-      self.meter_regs_topics: {} = {}
-      self.on_msg_lock: threading.Lock = threading.Lock()
+      self.host: str = self.mqtt_info_ini.get("HOST", "")
+      self.port: int = self.mqtt_info_ini.getint("PORT", 0)
+      self.pwd: str = self.mqtt_info_ini.get("PWD", "")
+      # self.meter_regs_topics: {str, mqttMeterInfo} = {}
+      self.on_msg_lock: _th.Lock = _th.Lock()
       self.last_report: int = 0
-      self.report_interval = 120
 
    def on_connect(self, clt, ud, flags, rc):
       print("\t[ on_connect ]")
       this: mqttMeterReaderV1 = ud
-      topics = this.meter_regs_topics.keys()
+      topics = this.global_register_table.keys()
       for topic in topics:
          this.clt.subscribe(topic=topic)
 
    def on_msg(self, _, ud, msg: mqtt.MQTTMessage):
       this: mqttMeterReaderV1 = ud
       try:
-         # - - - - - - - -
          this.on_msg_lock.acquire()
-         print("-- [on_msg] --")
-         print(f"\ttopic: {msg.topic}\n\tpayload: {msg.payload}")
-         # - - - - - - - -
-         reg_info: regInfo = this.meter_regs_topics[msg.topic]
-         reg_info.data = round(float(msg.payload), 2)
-         reg_info.dts = datetime.datetime.utcnow()
-         print(f"\t\tmeter_tag: {reg_info.meter_tag}"
-            f"\n\t\treg_type: {reg_info.regtype}\n\t\treading: {reg_info.data}")
-         this.meter_regs_topics[msg.topic] = reg_info
-         # - - - - - - - -
+         reg: regInfo = this.global_register_table[msg.topic]
+         reg.update_data(msg.payload)
+         print(reg)
       except Exception as e:
-         print(e)
+         logUtils.log_exp(e)
       finally:
          this.on_msg_lock.release()
 
@@ -75,11 +85,11 @@ class mqttMeterReaderV1(object):
          # -- set user data --
          self.clt.user_data_set(self)
          self.clt.connect(self.host, self.port)
-         pub_channel: str = self.xcp["REDIS"]["PUB_READS_CHANNEL"]
-         _dict = {"boot_dts_utc": utils.dts_utc(), "dev": "n/a"
+         # -- -- report to redis -- --
+         _dict = {"mqtt_reader_dts_utc": utils.dts_utc()
             , "lan_ip": utils.lan_ip(), "hostname": utils.HOST
-            , "pub_reads_channel": pub_channel}
-         self.redops.update_diag_tag(self.diag_tag, mapdct=_dict, restart=True)
+            , "pub_reads_channel": self.reads_pub_channel}
+         self.redops.update_diag_tag(self.diag_tag, mapdct=_dict)
          return 0
       except ConnectionRefusedError as e:
          print("Check Redis connection info: host/port")
@@ -90,18 +100,10 @@ class mqttMeterReaderV1(object):
 
    def load_xml_conf(self) -> bool:
       try:
-         # -- -- -- --
-         if not os.path.exists(self.meters_xml_conf):
-            print(f"FileNotFound: {self.meters_xml_conf}")
-            exit(1)
-         # -- hp --
-         self.xmldoc: et.ElementTree = et.parse(self.meters_xml_conf)
-         self.__init_xml_conf__()
-         self.__init_meter_tbl__()
-         # -- return --
+         self.__build_global_register_table__()
          return True
       except Exception as e:
-         print(e)
+         logUtils.log_exp(e)
          return False
 
    def start(self) -> bool:
@@ -120,7 +122,7 @@ class mqttMeterReaderV1(object):
    def __create_meter__(self, m: et.Element):
       # - - - - - - - - - - - - - - - - - - - -
       def get_type(typ: str) -> [str, None]:
-         for r in self.regs:
+         for r in self.global_register_table:
             if r.attrib["type"] == typ:
                return r
          # -- end --
@@ -142,68 +144,91 @@ class mqttMeterReaderV1(object):
          topic = tmpl.format(mid=mid, tpath=tpath)
          # events come in per register; so register are stored in reg table with
          # each reg has meter syspath as attribute
-         # reginfo.syspath = utils.syspath(self.channel, meter_tag)
+         # reginfo.syspath = utils.syspath(self.syspath_channel, meter_tag)
          # use meter_tag later to group readings per meter
          reginfo.meter_tag = meter_tag
          self.meter_regs_topics[topic] = reginfo
 
-   def __init_xml_conf__(self):
-      root = self.xmldoc.getroot()
-      self.host = root.attrib["host"]
-      self.port = int(root.attrib["port"])
-      self.pwd = root.attrib["pwd"]
-      self.meter_xml_nodes: t.List[et.Element] = root.findall("edge_meters/meter")
-      # -- add syspath to meter node xml --
-      for node in self.meter_xml_nodes:
-         node.attrib["syspath"] = utils.syspath(self.channel, node.attrib["tag"])
-      self.regs: t.List[et.Element] = root.findall("regtable/reg")
+   def __build_global_register_table__(self):
+      # -- load register table --
+      self.regtable: et.Element = self.meters_xml.find("regtable")
+      if len(self.regtable.findall("reg")) == 0:
+         raise Exception("NoRegLookUpTableFound")
+      # -- -- -- -- -- --
+      xpath = f"omms_edge[@hostname='{utils.HOST}']/meter"
+      host_meters: [et.Element] = self.meters_xml.findall(xpath)
+      # -- -- -- -- -- --
+      def __per_reg(mmi: mqttMeterInfo, met: et.Element, reg: et.Element):
+         try:
+            mid = met.attrib["mid"].strip("/")
+            reg_type = reg.attrib["type"]
+            # -- -- -- --
+            reg_xml: et.Element = self.regtable.find(f"reg[@type='{reg_type}']")
+            if reg_xml is None:
+               raise Exception("RegXmlIsNone")
+            # -- -- -- --
+            key = reg_xml.attrib["key"]
+            topic_templ = reg.attrib["topic_template"]
+            topic = topic_templ.replace("$mid", mid).replace("$key", key)
+            reg_info: regInfo = regInfo(reg_type, mmi.tag)
+            self.global_register_table[topic] = reg_info
+            print(reg_info)
+         except Exception as e:
+            logUtils.log_exp(e)
+      # -- -- -- -- -- --
+      def __per_meter(meter: et.Element) -> mqttMeterInfo:
+         met_tag = meter.attrib["tag"]
+         syspath: str = utils.syspath(self.syspath_channel, met_tag)
+         meter_info: mqttMeterInfo = mqttMeterInfo(met_tag, syspath)
+         regs = meter.findall("reg")
+         for reg_item in regs:
+            __per_reg(meter_info, meter, reg_item)
+         return meter_info
+      # -- -- -- -- -- --
+      for meter_item in host_meters:
+         mi: mqttMeterInfo = __per_meter(meter_item)
+         self.running_meters.append(mi)
+      # -- -- -- -- -- --
 
    def __report__(self):
       try:
          # - - - - - - - - - - - - - - - -
          self.on_msg_lock.acquire()
-         for m in self.meter_xml_nodes:
-            meter_tag = m.attrib["tag"]
-            # - - - - - - - - - - - -
-            meter_registers: [] = []
+         for m in self.running_meters:
+            # met_tag = m.attrib["tag"]
+            m: mqttMeterInfo = m
             # -- select meter registers --
-            for topic in self.meter_regs_topics.keys():
-               reginfo: regInfo = self.meter_regs_topics[topic]
-               if reginfo.meter_tag == meter_tag:
-                  meter_registers.append(reginfo)
+            meter_regs = [v for v in self.global_register_table.values() if v.meter_tag == m.tag]
             # -- check timestamps; must be within 30 seconds --
-            meter_registers.sort(key=lambda r: r.dts)
-            # -- here regs should be selected from regs table --
-            syspath = m.attrib["syspath"]
-            reg_tkwh: regInfo = [r for r in meter_registers if r.regtype == "total_kwh"][0]
-            reg_l1_tkwh: regInfo = [r for r in meter_registers if r.regtype == "l1_total_kwh"][0]
-            reg_l2_tkwh: regInfo = [r for r in meter_registers if r.regtype == "l2_total_kwh"][0]
-            reg_l3_tkwh: regInfo = [r for r in meter_registers if r.regtype == "l3_total_kwh"][0]
+            # -- here global_register_table should be selected from global_register_table table --
+            reg_tkwh: regInfo = [r for r in meter_regs if r.regtype == _erses.tl_kwh][0]
+            reg_l1_tkwh: regInfo = [r for r in meter_regs if r.regtype == _erses.l1_kwh][0]
+            reg_l2_tkwh: regInfo = [r for r in meter_regs if r.regtype == _erses.l2_kwh][0]
+            reg_l3_tkwh: regInfo = [r for r in meter_regs if r.regtype == _erses.l3_kwh][0]
             # -- build RPT data buffer --
-            # #RPT|DTSUTC:2023-01-07T01:12:50|PATH:/gdn/ck/omms-edge-roof/PZEM6/SS_1
-            #     |PZEM:SS_1|F:50.00|V:227.80|A:0.88|W:197.60|kWh:81.87!
-            buff = f"#RPT|DTSUTC:{utils.dts_utc()}|PATH:{syspath}|METER_TAG:{meter_tag}|TkWh: {reg_tkwh.data}" \
-               f"|L1kWh:{reg_l1_tkwh.data}|L2kWh:{reg_l2_tkwh.data}|L3kWh:{reg_l3_tkwh.data}!"
+            buff = f"#RPT:kWhrs|DTSUTC:{utils.dts_utc()}|PATH:{m.syspath}|METER_TAG:{m.tag}" \
+               f"|tl_kwh: {reg_tkwh.data}|l1_kwh:{reg_l1_tkwh.data}|l2_kwh:{reg_l2_tkwh.data}" \
+               f"|l3_kwh:{reg_l3_tkwh.data}"
             print(buff)
             # -- push to redis --
-            self.redops.pub_read(buff)
-            self.redops.save_read(syspath, buff)
-            self.redops.save_heartbeat(syspath, buff)
+            self.redops.pub_read_on_sec("MQTT_CORE", f"({buff})")
+            _d: {} = {"#rpt_kWhrs_dts_utc": utils.dts_utc(), "#rpt_kWhrs": f"[{buff}]"}
+            self.redops.save_meter_data(m.syspath, _dict=_d)
+            # self.redops.save_heartbeat(m.syspath, buff)
          # - - - - - - - - - - - - - - - -
       except Exception as e:
-         print(e)
+         logUtils.log_exp(e)
       finally:
          self.on_msg_lock.release()
 
    def __report_thread__(self, args):
-      self.mqtt_init()
-      LOOP_SLEEP_SECS: float = float(self.xcp["TIMING"]["LOOP_SLEEP_SECS"])
-      KWH_REPORT_INTERVAL: int = int(self.xcp["TIMING"]["KWH_REPORT_INTERVAL"])
-      # -- hp --
       while True:
-         time.sleep(LOOP_SLEEP_SECS)
-         epoch_time = int(time.time())
-         if (epoch_time - self.last_report) > KWH_REPORT_INTERVAL:
-            self.__report__()
-            self.last_report = int(time.time())
-      # -- end of while --
+         try:
+            time.sleep(self.report_loop_intv)
+            epoch_time = int(time.time())
+            if (epoch_time - self.last_report) > self.kwh_report_interval:
+               self.__report__()
+               self.last_report = int(time.time())
+         # -- end of while --
+         except Exception as e:
+            logUtils.log_exp(e)

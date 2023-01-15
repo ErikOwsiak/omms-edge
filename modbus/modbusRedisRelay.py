@@ -222,7 +222,7 @@ class modbusRedisRelay(_th.Thread):
                s = "|".join(strs_arr)
                d = {f"{rpt_key}_dts_utc": sysUtils.dts_utc(), rpt_key: f"[{s}]"}
                self.redops.save_meter_data(meter.syspath, _dict=d)
-               # -- publish to redis channel --
+               # -- publish to redis syspath_channel --
                strs_arr.insert(0, f"#RPT:{stream_regs.name}")
                strs_arr.insert(1, f"DTSUTC:{sysUtils.dts_utc()}")
                strs_arr.insert(2, f"PATH:{meter.syspath}")
