@@ -140,7 +140,7 @@ class ttyUSBDeviceScanner(_th.Thread):
       # <comm type="serial" baudrate="9600" parity="E" stopbits="1" timeoutSecs="0.25" />
       model_xmldoc: et.Element = self.model_xmls[path]
       comm_xml: et.Element = model_xmldoc.find("comm[@type='serial']")
-      reg_xml: et.Element = model_xmldoc.find("global_register_table/reg[@type='ModbusAddr']")
+      reg_xml: et.Element = model_xmldoc.find("regs/reg[@type='ModbusAddr']")
       if reg_xml is None:
          pass
       meter.attrib["modbus_addr_reg"] = reg_xml.attrib["addr"]
