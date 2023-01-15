@@ -115,40 +115,6 @@ class mqttMeterReaderV1(object):
          logUtils.log_exp(e)
          return False
 
-   def __init_meter_tbl__(self):
-      for meter in self.meter_xml_nodes:
-         self.__create_meter__(meter)
-
-   def __create_meter__(self, m: et.Element):
-      # - - - - - - - - - - - - - - - - - - - -
-      def get_type(typ: str) -> [str, None]:
-         for r in self.global_register_table:
-            if r.attrib["type"] == typ:
-               return r
-         # -- end --
-         return None
-      # - - - - - - - - - - - - - - - - - - - -
-      meter_tag = m.attrib["tag"]
-      mid = m.attrib["id"]
-      # dbid = m.attrib["dbid"]
-      regs: t.List[et.Element] = m.findall("reg")
-      # - - - - - - - - - - - - - - - - - - - -
-      for reg in regs:
-         reginfo: regInfo = regInfo()
-         reginfo.dts = utils.ts_utc()
-         reginfo.regtype = reg.attrib["type"]
-         # - - - - - - - - - - - - - - -
-         treg = get_type(reginfo.regtype)
-         tpath = treg.attrib["path"]
-         tmpl = reg.attrib["tmpl"]
-         topic = tmpl.format(mid=mid, tpath=tpath)
-         # events come in per register; so register are stored in reg table with
-         # each reg has meter syspath as attribute
-         # reginfo.syspath = utils.syspath(self.syspath_channel, meter_tag)
-         # use meter_tag later to group readings per meter
-         reginfo.meter_tag = meter_tag
-         self.meter_regs_topics[topic] = reginfo
-
    def __build_global_register_table__(self):
       # -- load register table --
       self.regtable: et.Element = self.meters_xml.find("regtable")

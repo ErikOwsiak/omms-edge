@@ -7,6 +7,7 @@ from core.redisOps import redisOps
 from core.serRedBot import serRedBot
 from core.debug import debug
 from core.utils import sysUtils as utils
+from system.bot import bot
 
 
 conf: configparser.ConfigParser = configparser.ConfigParser()
@@ -26,6 +27,11 @@ serRedBotProxyThread.start()
 
 # -- block on main file --
 def main():
+   # -- -- --
+   _bot: bot = bot(sec=MQTT_INI)
+   _bot.clear_previous_prox()
+   _bot.set_process_name()
+   # -- -- --
    diag_tag: str = conf["RUNNER"]["DIAG_TAG"]
    while True:
       print("[ serial_redis_runner: main ]")

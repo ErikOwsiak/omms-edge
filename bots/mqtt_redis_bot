@@ -8,6 +8,7 @@ from core.utils import sysUtils as utils
 from mqtt.mqttMeterReaderV1 import mqttMeterReaderV1
 from core.redisOps import redisOps
 from core.debug import debug
+from system.bot import bot
 
 
 """ ---------------------------------------------------------------------------
@@ -77,8 +78,11 @@ if not mqttReaderV1.start():
 
 # -- main loop --
 def main():
-   # -- -- -- -- --
-   setproctitle.setproctitle(PROC_NAME)
+   # -- -- --
+   _bot: bot = bot(sec=MQTT_INI)
+   _bot.clear_previous_prox()
+   _bot.set_process_name()
+   # -- -- --
    dct: {} = {"init_bot_ping_dts_utc": utils.dts_utc(), "lan_ip":  utils.lan_ip()}
    mqttReaderV1.redops.update_diag_tag(diag_tag=DIAG_TAG, mapdct=dct, restart=True)
    # -- -- main loop -- --

@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 
-import os, setproctitle
+import os
 import configparser as _cp, time
 import xml.etree.ElementTree as _et
 # -- core --
 from core.debug import debug
 from core.utils import sysUtils as utils
 from core.redisOps import redisOps
-from core.logutils import logUtils
-from modbus.modbusRedisRelay import modbusRedisRelay
-from modbus.modbusEdgeMeters import modbusEdgeMeters
 from modbus.ttydevMeters import ttydevMeters
 from core.ttydevDiscovery import ttyUSBDeviceScanner
+from system.bot import bot
 
 
 PSEC = "TTYDEV_DISCO"
@@ -60,27 +58,24 @@ scannerTh.start()
 
 
 def main():
-   # -- -- -- --
+   # -- -- --
+   _bot: bot = bot(sec=SEC)
+   _bot.clear_previous_prox()
+   _bot.set_process_name()
+   # -- -- --
    diag_tag: str = SEC["DIAG_TAG"]
    diag_tag = utils.set_systag(diag_tag)
    # -- -- -- --
-   proc_name = SEC["PROC_NAME"]
-   setproctitle.setproctitle(proc_name)
    MAIN_LOOP_SECS = int(SYS_INI[PSEC]["MAIN_LOOP_SECS"])
    # -- MAIN LOOP --
-   loop_cnt = 0
    while True:
       # -- -- -- --
       if scannerTh.is_done:
          print("\texit...\n\n")
          exit(0)
       # -- -- -- --
-      print(f"[ {proc_name}: main ]")
-      msg = f"ttydev_discovery_bot TICK {loop_cnt}"
-      dct: {} = {"bot_dts_utc": utils.dts_utc(), "msg": msg}
+      dct: {} = {"bot_dts_utc": utils.dts_utc()}
       scannerTh.redops.update_diag_tag(diag_tag=diag_tag, mapdct=dct, restart=False)
-      # -- -- -- --
-      loop_cnt += 1
       time.sleep(MAIN_LOOP_SECS)
 
 
