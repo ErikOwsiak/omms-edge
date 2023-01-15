@@ -40,5 +40,5 @@ def main():
 
 # -- -- start here -- --
 if __name__ == "__main__":
-   setproctitle.setproctitle("serRedBot")
+   setproctitle.setproctitle("omms-pzem-rly")
    main()

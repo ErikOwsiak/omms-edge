@@ -10,6 +10,7 @@ from core.redisOps import redisOps
 from core.logutils import logUtils
 from modbus.modbusRedisRelay import modbusRedisRelay
 from modbus.ttydevMeters import ttydevMeters
+from system.bot import bot
 
 
 """
@@ -88,9 +89,14 @@ MAIN_LOOP_SECS: float = float(SEC_INI["MAIN_LOOP_SECS"])
 
 
 def main():
-   setproctitle.setproctitle("omms-modbus")
+   # -- -- --
+   _bot: bot = bot(sec=SEC_INI)
+   _bot.clear_previous_prox()
+   _bot.set_process_name()
+   # -- -- --
    diag_tag: str = SEC_INI["DIAG_TAG"]
    diag_tag = utils.set_systag(diag_tag)
+   # -- -- --
    while True:
       try:
          print("[ modbus_redis_bot: main ]")
