@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os, setproctitle
+import os
 import configparser as _cp, time
 import xml.etree.ElementTree as _et
 # -- core --
