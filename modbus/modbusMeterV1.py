@@ -74,7 +74,7 @@ class modbusMeterV1(object):
          # -- setup serial info --
          elm: _et.Element = self.model_xml.find("comm[@type='serial']")
          self.serial_info = meterSerialConf(elm)
-         regs: [_et.Element] = self.model_xml.findall("global_register_table/reg")
+         regs: [_et.Element] = self.model_xml.findall("regs/reg")
          if len(regs) == 0:
             raise Exception("[ ModelRegsNotLoaded ]")
          # -- do --
