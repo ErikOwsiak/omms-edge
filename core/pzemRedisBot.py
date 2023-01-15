@@ -9,22 +9,24 @@ from core.redisOps import redisOps
 from core.logutils import logUtils
 
 
-class serRedBot(th.Thread):
+class pzemRedisBot(th.Thread):
 
-   def __init__(self, _cp: cp.ConfigParser, redops: redisOps):
+   def __init__(self, SYS_INI: cp.ConfigParser, redops: redisOps):
       super().__init__()
-      self.cp = _cp
-      self.dev: str = str(self.cp["SERIAL"]["DEV"])
-      self.baudrate: int = int(self.cp["SERIAL"]["BAUDRATE"])
-      self.channel = str(self.cp["SYSPATH"]["CHANNEL"])
-      self.diag_tag: str = str(self.cp["SYSINFO"]["DIAG_TAG"])
+      self.sys_ini: cp.ConfigParser = SYS_INI
+      self.sec: cp.SectionProxy = self.sys_ini["PZEM"]
+      self.dev: str = self.sec.get("SERIAL_DEV", "/dev/ttyUSB0")
+      self.baudrate: int = self.sec.getint("SERIAL_BAUDRATE", 19200)
+      self.syspath_channel = self.sec.get("SYSPATH_CHANNEL")
+      tmp: str = self.sec.get("DIAG_TAG")
+      self.diag_tag = sysUtils.set_systag(tmp)
       self.ser: serial.Serial = serial.Serial(port=self.dev, baudrate=self.baudrate)
       self.redops: redisOps = redops
       self.start_dts_dts_utc = sysUtils.dts_utc()
       self.last_msg_dts_utc = ""
 
    def run(self):
-      pub_channel: str = self.cp["REDIS"]["PUB_READS_CHANNEL"]
+      pub_channel: str = self.sec.get("REDIS_PUB_CHNL")
       pub_channel = sysUtils.set_systag(pub_channel)
       _dict = {"boot_dts_utc": sysUtils.dts_utc(), "dev": self.dev
          , "lan_ip": sysUtils.lan_ip(), "hostname": sysUtils.HOST
@@ -70,7 +72,7 @@ class serRedBot(th.Thread):
          arr: [] = buff.split("|")
          pzem_ss = arr[1].split(":")[1]
          arr.insert(1, f"DTSUTC:{sysUtils.dts_utc()}")
-         syspath: str = sysUtils.syspath(self.channel, pzem_ss)
+         syspath: str = sysUtils.syspath(self.syspath_channel, pzem_ss)
          arr.insert(2, f"PATH:{syspath}")
          buff = "|".join(arr)
          # -- -- publish & set -- --

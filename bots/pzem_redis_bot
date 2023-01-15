@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+
+import time, configparser as _cp
+# -- app --
+from core.redisOps import redisOps
+from core.pzemRedisBot import pzemRedisBot
+from core.debug import debug
+from core.utils import sysUtils as utils
+from system.bot import bot
+
+
+SYS_INI: _cp.ConfigParser = _cp.ConfigParser()
+loaded: [] = SYS_INI.read("conf/system.ini")
+if len(loaded) == 0:
+   exit(1)
+PZEM_INI: _cp.SectionProxy = SYS_INI["PZEM"]
+
+
+IS_DEBUG: bool = debug.is_dev_box()
+if IS_DEBUG:
+   redops: redisOps = redisOps(SYS_INI, "REDIS_DEV")
+else:
+   redops: redisOps = redisOps(SYS_INI)
+# -- -- -- -- -- -- -- --
+if not redops.red.ping():
+   exit(1)
+# -- -- -- -- -- -- -- --
+# -- worker thread --
+serRedBotProxyThread: pzemRedisBot = pzemRedisBot(SYS_INI, redops)
+serRedBotProxyThread.start()
+
+
+# -- block on main file --
+def main():
+   # -- -- --
+   _bot: bot = bot(sec=PZEM_INI)
+   _bot.clear_previous_prox()
+   _bot.set_process_name()
+   # -- -- --
+   diag_tag = PZEM_INI.get("DIAG_TAG")
+   diag_tag = utils.set_systag(diag_tag)
+   while True:
+      print("[ serial_redis_runner: main ]")
+      if serRedBotProxyThread.is_alive():
+         print("serRedBotProxyThread.is_alive TRUE")
+         dct: {} = {"bot_tick_dts_utc": utils.dts_utc()}
+         redops.update_diag_tag(diag_tag=diag_tag, mapdct=dct)
+      # -- -- -- --
+      time.sleep(16.0)
+
+
+# -- -- start here -- --
+if __name__ == "__main__":
+   main()

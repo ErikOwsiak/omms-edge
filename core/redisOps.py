@@ -19,9 +19,8 @@ class redisOps(object):
       self.host = self.con_ini["HOST"]
       self.port: int = int(self.con_ini["PORT"])
       self.red_ini = self.sys_ini["REDIS_CORE"]
-      self.pwd = self.red_ini["PWD"]
+      self.pwd: str = self.red_ini["PWD"]
       self.red: redis.Redis = redis.Redis(host=self.host, port=self.port, password=self.pwd)
-      # self.host_ping: bool = self.__ping_host()
 
    def save_read(self, path: str, buff: str):
       try:
