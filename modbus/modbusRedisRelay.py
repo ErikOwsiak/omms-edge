@@ -4,6 +4,7 @@ import typing as _t
 import time, threading as _th
 import xml.etree.ElementTree as _et
 import configparser as _cp
+from termcolor import colored
 # -- system --
 from core.redisOps import redisOps
 from core.logutils import logUtils
@@ -101,13 +102,13 @@ class modbusRedisRelay(_th.Thread):
             # -- ping meter --
             err, msg = meter.ping()
             if err == 0:
-               print(f"InitPingOk: {meter.modbus_addr}")
+               print(colored(f"InitPingOk: {meter.modbus_addr}"), "green")
                _d = {"init_dts_utc": sysUtils.dts_utc(), "init_ping: ": msg}
                self.redops.save_meter_data(meter.syspath, _dict=_d, delold=True)
                pong_counter += 1
                continue
             else:
-               print(f"PingError: {msg}")
+               print(colored(f"PingError: {msg}", "red"))
                _d = {"init_dts_utc": sysUtils.dts_utc(), "init_ping_err": msg}
                self.redops.save_meter_data(meter.syspath, _dict=_d, delold=True)
                no_pong_counter += 1
