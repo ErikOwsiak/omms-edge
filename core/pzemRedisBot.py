@@ -76,7 +76,8 @@ class pzemRedisBot(th.Thread):
          arr.insert(2, f"PATH:{syspath}")
          buff = "|".join(arr)
          # -- -- publish & set -- --
-         self.redops.pub_read(buff)
+         _d: {} = {"#rpt_kWhrs_dts_utc": sysUtils.dts_utc(), "#rpt_kWhrs": buff}
+         self.redops.save_meter_data(syspath, _dict=_d)
          self.redops.pub_read_on_sec("PZEM", buff)
          # -- -- -- -- -- -- -- -- -- -- -- --
       except Exception as e:
