@@ -97,9 +97,9 @@ class modbusMeterV1(object):
       try:
          rval = self.__check_modbus_addr()
          if not rval:
-            print(f"\tPING {self.modbus_addr}: NoResponse!")
+            print(colored(f"\tPING {self.modbus_addr}: NoResponse!", "light_red"))
          else:
-            print(f"\tPING {self.modbus_addr}: PONG OK!")
+            print(colored(f"\tPING {self.modbus_addr}: PONG OK!", "light_green"))
          # -- -- -- --
          return 0, "OK"
       except Exception as e:
