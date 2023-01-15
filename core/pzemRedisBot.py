@@ -70,13 +70,14 @@ class pzemRedisBot(th.Thread):
             return
          # -- -- -- -- -- -- -- -- -- -- -- --
          arr: [] = buff.split("|")
+         arr[0] = "#RPT:kWhrs"
          pzem_ss = arr[1].split(":")[1]
          arr.insert(1, f"DTSUTC:{sysUtils.dts_utc()}")
          syspath: str = sysUtils.syspath(self.syspath_channel, pzem_ss)
          arr.insert(2, f"PATH:{syspath}")
          buff = "|".join(arr)
          # -- -- publish & set -- --
-         _d: {} = {"#rpt_kWhrs_dts_utc": sysUtils.dts_utc(), "#rpt_kWhrs": buff}
+         _d: {} = {"#rpt_kWhrs_dts_utc": sysUtils.dts_utc(), "#rpt_kWhrs": f"({buff[-1]})"}
          self.redops.save_meter_data(syspath, _dict=_d)
          self.redops.pub_read_on_sec("PZEM", buff)
          # -- -- -- -- -- -- -- -- -- -- -- --
