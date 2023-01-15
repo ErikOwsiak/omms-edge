@@ -25,7 +25,8 @@ else:
 if not redops.red.ping():
    exit(1)
 # -- -- -- -- -- -- -- --
-# -- worker thread --
+
+# -- start worker thread --
 serRedBotProxyThread: pzemRedisBot = pzemRedisBot(SYS_INI, redops)
 serRedBotProxyThread.start()
 
