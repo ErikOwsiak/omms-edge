@@ -78,7 +78,6 @@ class pzemRedisBot(th.Thread):
          # -- -- publish & set -- --
          self.redops.pub_read(buff)
          self.redops.save_read(syspath, buff)
-         self.redops.save_heartbeat(syspath, buff)
          # -- -- -- -- -- -- -- -- -- -- -- --
       except Exception as e:
          logUtils.log_exp(e)
