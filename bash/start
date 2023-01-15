@@ -13,19 +13,30 @@ echo ""
 START_DIR=$(pwd)
 MODBUS_START_FILE=conf/starts/modbus_redis_bot
 MQTT_START_FILE=conf/starts/mqtt_redis_bot
+PZEM_START_FILE=conf/starts/pzem_redis_bot
 
 cd ..
-if [ -f $MODBUS_START_FILE ]; then
-  echo "will start: $MODBUS_START_FILE"
-else
-  echo "will NOT start: $MODBUS_START_FILE"
-fi
+START_FILES=("$MODBUS_START_FILE" "$MQTT_START_FILE" "$PZEM_START_FILE")
+for f in "${START_FILES[@]}"; do
+  if [ -f "$f" ]; then
+    echo "WillStart: $f"
+  else
+    echo "WillNotStart: $f"
+  fi
+done
 
-if [ -f $MQTT_START_FILE ]; then
-  echo "will start: $MQTT_START_FILE"
-else
-  echo "will NOT start: $MQTT_START_FILE"
-fi
+#cd ..
+#if [ -f $MODBUS_START_FILE ]; then
+#  echo "will start: $MODBUS_START_FILE"
+#else
+#  echo "will NOT start: $MODBUS_START_FILE"
+#fi
+#
+#if [ -f $MQTT_START_FILE ]; then
+#  echo "will start: $MQTT_START_FILE"
+#else
+#  echo "will NOT start: $MQTT_START_FILE"
+#fi
 
 echo ""
 echo ""
@@ -143,6 +154,28 @@ else
   echo ""
 fi
 
+
+# -------------------------------
+# 5. start mqtt bot
+PYFILE="bots/pzem_redis_bot"
+if [ -f $PZEM_START_FILE ]; then
+  if [ ! -f $PYFILE ]; then
+      echo "FileNotFound: $PYFILE"
+      echo "Exiting..."
+      exit 1
+  fi
+  # -- set x bit if not already --
+  chmod +x $PYFILE
+  # -- start bot --
+  echo "- - -"
+  echo "RUNNING PYFILE: $PYFILE"
+  echo "- - -"
+  $PYFILE >> /dev/null &
+else
+  echo ""
+  echo "NotStarting: $PYFILE"
+  echo ""
+fi
 
 # -----------------------------------------------------------------------------
 echo ""
