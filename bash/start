@@ -111,7 +111,7 @@ if [ -f $MODBUS_START_FILE ]; then
   chmod +x $PYFILE
   # -- start bot --
   echo "- - -"
-  # echo "PYFILE: $PYFILE"
+  echo "RUNNING PYFILE: $PYFILE"
   echo "- - -"
   $PYFILE >> /dev/null &
 else
@@ -134,7 +134,7 @@ if [ -f $MQTT_START_FILE ]; then
   chmod +x $PYFILE
   # -- start bot --
   echo "- - -"
-  # echo "PYFILE: $PYFILE"
+  echo "RUNNING PYFILE: $PYFILE"
   echo "- - -"
   $PYFILE >> /dev/null &
 else
