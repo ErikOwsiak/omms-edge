@@ -65,7 +65,6 @@ class pzemRedisBot(th.Thread):
             self.redops.update_diag_tag(diag_tag=self.diag_tag, mapdct=__dict)
          # -- -- -- -- -- -- -- -- -- -- -- --
          print(buff)
-         # self.redops.pub_diag_debug(buff)
          if not buff.startswith("#RPT|PZEM:SS_"):
             return
          # -- -- -- -- -- -- -- -- -- -- -- --
@@ -77,7 +76,9 @@ class pzemRedisBot(th.Thread):
          arr.insert(2, f"PATH:{syspath}")
          buff = "|".join(arr)
          # -- -- publish & set -- --
-         _d: {} = {"#rpt_kWhrs_dts_utc": sysUtils.dts_utc(), "#rpt_kWhrs": f"[{buff[:-1]}]"}
+         m_info: str = f"brand: Peacefair; model: PZEM-004T AC 100A; phases: 1"
+         _d: {} = {"#RPT_kWhrs_dts_utc": sysUtils.dts_utc(), "#RPT_kWhrs": f"[{buff[:-1]}]",
+            "meter_info": m_info}
          self.redops.save_meter_data(syspath, _dict=_d)
          self.redops.pub_read_on_sec("PZEM", f"({buff[:-1]})")
          # -- -- -- -- -- -- -- -- -- -- -- --
@@ -85,5 +86,5 @@ class pzemRedisBot(th.Thread):
          logUtils.log_exp(e)
          time.sleep(2.0)
 
-   def __monitor_thread(self):
-      pass
+   # def __monitor_thread(self):
+   #    pass
