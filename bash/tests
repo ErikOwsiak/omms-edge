@@ -1,0 +1,22 @@
+#!/bin/bash
+
+HOSTS="3cp0 some_host other_host"
+
+MODBUS_PROG=./
+
+for h in $HOSTS; do
+  echo "$h"
+done
+
+
+function start_prog () {
+  echo "calling start_prog"
+  echo "arg: $1"
+}
+
+
+if [ "$(hostname)" == "3cpo" ]; then
+  echo "good host"
+  start_prog "some_string"
+fi
+

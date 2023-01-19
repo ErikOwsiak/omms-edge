@@ -5,15 +5,21 @@
 # date: 2023/01/12
 #
 
-
 echo ""
 echo "  --[ START_START ]--"
 echo ""
 
 START_DIR=$(pwd)
+# -- modbus program --
 MODBUS_START_FILE=conf/starts/modbus_redis_bot
+MODBUS_PROG=bots/mqtt_redis_bot
+# -- mqtt program --
 MQTT_START_FILE=conf/starts/mqtt_redis_bot
+MQTT_PROG=bots/mqtt_redis_bot
+# -- pzem program --
 PZEM_START_FILE=conf/starts/pzem_redis_bot
+PZEM_PROG=bots/pzem_redis_bot
+
 
 cd ..
 START_FILES=("$MODBUS_START_FILE" "$MQTT_START_FILE" "$PZEM_START_FILE")
@@ -97,71 +103,56 @@ echo ""
 echo "  -- [ EXIT_CODE: $EXIT_CODE FOR: $PYFILE ] --"
 echo ""
 
-
-# -------------------------------
-# 3. start modbus bot
-PYFILE="bots/modbus_redis_bot"
-if [ -f $MODBUS_START_FILE ]; then
-  # -- set x bit if not already --
-  chmod +x $PYFILE
-  # -- start bot --
-  echo "- - -"
-  echo "RUNNING PYFILE: $PYFILE"
-  echo "- - -"
-  $PYFILE >> /dev/null &
-else
-  echo ""
-  echo "NotStarting: $PYFILE"
-  echo ""
-fi
-
-
-# -------------------------------
-# 4. start mqtt bot
-PYFILE="bots/mqtt_redis_bot"
-if [ -f $MQTT_START_FILE ]; then
-  if [ ! -f $PYFILE ]; then
-      echo "FileNotFound: $PYFILE"
-      echo "Exiting..."
-      exit 1
+function start_prog () {
+  echo "=== start program call ==="
+  echo "  prog: $1"
+  # -- check path --
+  if [ ! -f "$1" ]; then
+    echo "FileNotFound: $1"
+    exit 1
   fi
-  # -- set x bit if not already --
-  chmod +x $PYFILE
-  # -- start bot --
-  echo "- - -"
-  echo "RUNNING PYFILE: $PYFILE"
-  echo "- - -"
-  $PYFILE >> /dev/null &
-else
-  echo ""
-  echo "NotStarting: $PYFILE"
-  echo ""
+  # -- start --
+  chmod +x "$1"
+  $1 >> /dev/null &
+}
+
+#
+# system edge hosts:
+#     omms-edge-p16 ; omms-edge-b410 ;
+#     omms-edge-a5 ; omms-edge-p7 ; omms-edge-roof
+#
+
+if [ "$(hostname)" == "omms-edge-p16" ]; then
+  killall -s KILL omms-modbus
+  start_prog $MODBUS_PROG
+  killall -s KILL omms-mqtt
+  start_prog $MQTT_PROG
 fi
 
-
-# -------------------------------
-# 5. start mqtt bot
-PYFILE="bots/pzem_redis_bot"
-if [ -f $PZEM_START_FILE ]; then
-  if [ ! -f $PYFILE ]; then
-      echo "FileNotFound: $PYFILE"
-      echo "Exiting..."
-      exit 1
-  fi
-  # -- set x bit if not already --
-  chmod +x $PYFILE
-  # -- start bot --
-  echo "- - -"
-  echo "RUNNING PYFILE: $PYFILE"
-  echo "- - -"
-  $PYFILE >> /dev/null &
-else
-  echo ""
-  echo "NotStarting: $PYFILE"
-  echo ""
+if [ "$(hostname)" == "omms-edge-b410" ]; then
+  killall -s KILL omms-modbus
+  start_prog $MODBUS_PROG
 fi
+
+if [ "$(hostname)" == "omms-edge-a5" ]; then
+  killall -s KILL omms-modbus
+  start_prog $MODBUS_PROG
+fi
+
+if [ "$(hostname)" == "omms-edge-p7" ]; then
+  killall -s KILL omms-modbus
+  start_prog $MODBUS_PROG
+fi
+
+if [ "$(hostname)" == "omms-edge-roof" ]; then
+  killall -s KILL omms-pzem
+  start_prog $PZEM_PROG
+fi
+
 
 # -----------------------------------------------------------------------------
 echo ""
 echo "  --[ END_START ]--"
 echo ""
+
+exit 0
