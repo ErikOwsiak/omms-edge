@@ -91,7 +91,7 @@ echo "PYTHONPATH: $PYTHONPATH"
 echo ""
 
 # 2. run ttydev discovery
-killall -s KILL ttydevDiscoBot
+killall -s KILL "omms-disco"
 PYFILE="bots/ttydev_discovery_bot"
 # -- set x bit if not already --
 chmod +x $PYFILE
@@ -123,29 +123,29 @@ function start_prog () {
 #
 
 if [ "$(hostname)" == "omms-edge-p16" ]; then
-  killall -s KILL omms-modbus
+  killall -s KILL "omms-mbus-rly"
   start_prog $MODBUS_PROG
-  killall -s KILL omms-mqtt
+  killall -s KILL "omms-mqtt-rly"
   start_prog $MQTT_PROG
 fi
 
 if [ "$(hostname)" == "omms-edge-b410" ]; then
-  killall -s KILL omms-modbus
+  killall -s KILL "omms-modbus-rly"
   start_prog $MODBUS_PROG
 fi
 
 if [ "$(hostname)" == "omms-edge-a5" ]; then
-  killall -s KILL omms-modbus
+  killall -s KILL "omms-modbus-rly"
   start_prog $MODBUS_PROG
 fi
 
 if [ "$(hostname)" == "omms-edge-p7" ]; then
-  killall -s KILL omms-modbus
+  killall -s KILL "omms-modbus-rly"
   start_prog $MODBUS_PROG
 fi
 
 if [ "$(hostname)" == "omms-edge-roof" ]; then
-  killall -s KILL omms-pzem
+  killall -s KILL "omms-pzem-rly"
   start_prog $PZEM_PROG
 fi
 
