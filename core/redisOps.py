@@ -22,6 +22,24 @@ class redisOps(object):
       self.pwd: str = self.red_ini["PWD"]
       self.red: redis.Redis = redis.Redis(host=self.host, port=self.port, password=self.pwd)
 
+   def update_sys_diag_debug(self, key: str, _d: {}, del_prev: bool = False):
+      """
+         :param key: hostname, process name & etc
+         :param _d:
+         :param del_prev: if True remove old key
+         :return:
+      """
+      try:
+         rv0 = 0
+         db_idx: int = int(self.sys_ini["REDIS_CORE"]["DB_IDX_DIAG"])
+         self.red.select(db_idx)
+         if del_prev:
+            rv0 = self.red.delete(key)
+         rv1 = self.red.hset(key, mapping=_d)
+         print(f"rv0: {rv0}; rv1: {rv1};")
+      except Exception as e:
+         logUtils.log_exp(e)
+
    def save_read(self, path: str, buff: str):
       try:
          read_db_idx = int(self.sys_ini["REDIS_CORE"]["DB_IDX_READS"])
@@ -87,8 +105,11 @@ class redisOps(object):
       except Exception as e:
          logUtils.log_exp(e)
 
-   def update_diag_tag(self, diag_tag: str, key: str = None
-         , val: object = None, mapdct: {} = None, restart: bool = False):
+   def update_diag_tag(self, diag_tag: str
+         , key: str = None
+         , val: object = None
+         , mapdct: {} = None
+         , restart: bool = False):
       try:
          diag_db_idx: int = int(self.sys_ini["REDIS_CORE"]["DB_IDX_DIAG"])
          self.red.select(diag_db_idx)

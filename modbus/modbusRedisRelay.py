@@ -100,18 +100,19 @@ class modbusRedisRelay(_th.Thread):
             # -- update syspath to meter_xml --
             meter_xml.attrib["syspath"] = meter.syspath
             # -- ping meter --
+            meter: modbusMeterV1 = meter
             err, msg = meter.ping()
             if err == 0:
-               _d = {"init_dts_utc": sysUtils.dts_utc(), "init_ping: ": msg}
-               self.redops.save_meter_data(meter.syspath, _dict=_d, delold=True)
                pong_counter += 1
-               continue
             else:
-               _d = {"init_dts_utc": sysUtils.dts_utc(), "init_ping_err": msg}
-               self.redops.save_meter_data(meter.syspath, _dict=_d, delold=True)
                no_pong_counter += 1
-               continue
-            # -- -- -- --
+            # -- -- -- -- -- -- -- --
+            m_info: str = f"brand: {meter.model_brand}; " \
+               f"model: {meter.model_model}; phases: {meter.model_phases}"
+            _d = {"init_dts_utc": sysUtils.dts_utc(), "init_ping: ": msg,
+               "meter_info": m_info}
+            self.redops.save_meter_data(meter.syspath, _dict=_d, delold=True)
+            # -- -- -- -- -- -- -- --
          except Exception as e:
             logUtils.log_exp(e)
             exp_counter += 1
@@ -165,8 +166,6 @@ class modbusRedisRelay(_th.Thread):
          try:
             # -- -- -- -- -- --
             for stream in self.reg_streams:
-               # if not stream.is_time_to_run():
-               #   continue
                diff: int = stream.time_to_run()
                print(f"next run in: {diff}s : {stream.name}")
                if diff > 0:
@@ -217,7 +216,7 @@ class modbusRedisRelay(_th.Thread):
             print(f"reading modbus addr: {meter.modbus_addr}")
             if meter.read_stream_frame_registers():
                strs_arr: [] = meter.reads_str_arr()
-               rpt_key: str = f"#rpt_{stream_regs.name}"
+               rpt_key: str = f"#RPT_{stream_regs.name}"
                s = "|".join(strs_arr)
                d = {f"{rpt_key}_dts_utc": sysUtils.dts_utc(), rpt_key: f"[{s}]"}
                self.redops.save_meter_data(meter.syspath, _dict=d)

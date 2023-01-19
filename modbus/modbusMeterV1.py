@@ -49,8 +49,11 @@ class modbusMeterV1(object):
       self.sys_ini: _cp.ConfigParser = sys_ini
       self.modbus_addr: int = bus_addr
       self.tty_dev_path: str = tty_dev_path
+      # <meter type="electric" phases="3" tag="orno516" brand="orno" model="orno516">
       self.model_xml: _et.Element = model_xml
-      self.model_phases: int = 0
+      self.model_brand: str = self.model_xml.attrib["brand"]
+      self.model_model: str = self.model_xml.attrib["model"]
+      self.model_phases: int = int(self.model_xml.attrib["phases"])
       self.stream_regs: elecRegStream = elec_reg_stream
       self.stream_reads: [meterReading] = []
       # -- set on init call --

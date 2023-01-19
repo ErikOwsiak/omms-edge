@@ -14,7 +14,8 @@ from system.bot import bot
 """ ---------------------------------------------------------------------------
    
    README:
-      create all global object here and pass them around to diff. subsystems
+      create all global object here and pass them around 
+      to diff. subsystems
       
 --------------------------------------------------------------------------- """
 
@@ -33,6 +34,7 @@ LOOP_SLEEP_SECS: float = MQTT_INI.getfloat("MAIN_LOOP_SECS")
 DIAG_TAG: str = MQTT_INI.get("DIAG_TAG")
 DIAG_TAG = utils.set_systag(DIAG_TAG)
 
+# -- -- -- --
 if debug.is_dev_box():
    MQTT_INFO_INI = SYS_INI["MQTT_DEV"]
 else:

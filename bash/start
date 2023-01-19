@@ -25,27 +25,11 @@ for f in "${START_FILES[@]}"; do
   fi
 done
 
-#cd ..
-#if [ -f $MODBUS_START_FILE ]; then
-#  echo "will start: $MODBUS_START_FILE"
-#else
-#  echo "will NOT start: $MODBUS_START_FILE"
-#fi
-#
-#if [ -f $MQTT_START_FILE ]; then
-#  echo "will start: $MQTT_START_FILE"
-#else
-#  echo "will NOT start: $MQTT_START_FILE"
-#fi
-
 echo ""
 echo ""
-# cd $START_DIR
-# just to read output
-sleep 8
+sleep 4
+echo ""
 
-# START_MQTT_BOT=1
-# START_MODBUS_BOT=1
 : ' ---------------------------------------------------------------------------
   check: /etc/iotech for:
     building  ->  holds build ID - geoloc unique
@@ -110,7 +94,7 @@ $PYFILE
 EXIT_CODE=$?
 
 echo ""
-echo "  -- [ EXIT_CODE: $EXIT_CODE ] --"
+echo "  -- [ EXIT_CODE: $EXIT_CODE FOR: $PYFILE ] --"
 echo ""
 
 

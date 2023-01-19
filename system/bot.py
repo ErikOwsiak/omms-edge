@@ -13,10 +13,11 @@ class bot(object):
       bot.PROC_NAME = self.sec_ini["PROC_NAME"]
 
    def clear_previous_prox(self):
+      # -- -- -- --
       def __on_proc(pr: psutil.Process):
          try:
             if pr.name() == bot.PROC_NAME:
-               print(F"PreviousProcFound | PID: {pr.pid}\n\tkilling...")
+               print(f"[ PreviousProcFound | PID: {pr.pid}\n\tkilling... ]")
                pr.kill()
          except Exception as ex:
             print(ex)
