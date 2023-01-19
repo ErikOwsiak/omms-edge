@@ -11,25 +11,25 @@ echo ""
 
 START_DIR=$(pwd)
 # -- modbus program --
-MODBUS_START_FILE=conf/starts/modbus_redis_bot
+#MODBUS_START_FILE=conf/starts/modbus_redis_bot
 MODBUS_PROG=bots/mqtt_redis_bot
 # -- mqtt program --
-MQTT_START_FILE=conf/starts/mqtt_redis_bot
+#MQTT_START_FILE=conf/starts/mqtt_redis_bot
 MQTT_PROG=bots/mqtt_redis_bot
 # -- pzem program --
-PZEM_START_FILE=conf/starts/pzem_redis_bot
+#PZEM_START_FILE=conf/starts/pzem_redis_bot
 PZEM_PROG=bots/pzem_redis_bot
 
 
 cd ..
-START_FILES=("$MODBUS_START_FILE" "$MQTT_START_FILE" "$PZEM_START_FILE")
-for f in "${START_FILES[@]}"; do
-  if [ -f "$f" ]; then
-    echo "WillStart: $f"
-  else
-    echo "WillNotStart: $f"
-  fi
-done
+#START_FILES=("$MODBUS_START_FILE" "$MQTT_START_FILE" "$PZEM_START_FILE")
+#for f in "${START_FILES[@]}"; do
+#  if [ -f "$f" ]; then
+#    echo "WillStart: $f"
+#  else
+#    echo "WillNotStart: $f"
+#  fi
+#done
 
 echo ""
 echo ""
