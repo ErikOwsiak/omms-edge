@@ -151,6 +151,12 @@ if [ "$(hostname)" == "omms-edge-roof" ]; then
   start_prog $PZEM_PROG
 fi
 
+# -- list omms-* procs --
+echo ""
+echo "-- ps omms-* --"
+echo ""
+ps -A | grep omms-
+
 
 # -----------------------------------------------------------------------------
 echo ""
