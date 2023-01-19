@@ -32,7 +32,6 @@ cd ..
 #done
 
 echo ""
-echo ""
 sleep 4
 echo ""
 
@@ -104,8 +103,10 @@ echo "  -- [ EXIT_CODE: $EXIT_CODE FOR: $PYFILE ] --"
 echo ""
 
 function start_prog () {
+  echo ""
   echo "=== start program call ==="
   echo "  prog: $1"
+  echo ""
   # -- check path --
   if [ ! -f "$1" ]; then
     echo "FileNotFound: $1"
@@ -114,7 +115,7 @@ function start_prog () {
   # -- start --
   chmod +x "$1"
   $1 >> /dev/null &
-  echo "start_exit_code: $?"
+  echo "  -> start_exit_code: $?"
   sleep 2
 }
 
