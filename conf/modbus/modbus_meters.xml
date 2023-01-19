@@ -18,11 +18,11 @@
          </ttydev>
       </edge>
       <edge hostname="omms-edge-b410" pubChannel="">
-         <ttydev run="yes" tag="ModbusAddrs_10_22" alias="modbusPortA" dev="auto" modbusBugID="">
+         <ttydev run="yes" tag="ModbusAddrs_10_40" alias="modbusPortA" dev="auto" modbusBugID="">
             <meter busAddr="10" modelXML="orno/orno516.xml" />
-            <!-- <meter busAddress="11" modelXML="orno516.xml" />
-            <meter busAddress="12" modelXML="orno516.xml" />
-            <meter busAddress="13" modelXML="orno516.xml" /> -->
+            <!-- <meter busAddr="11" modelXML="orno/orno516.xml" />
+            <meter busAddr="12" modelXML="orno/orno516.xml" />
+            <meter busAddr="13" modelXML="orno/orno516.xml" /> -->
             <meter busAddr="14" modelXML="orno/orno516.xml" />
             <meter busAddr="15" modelXML="orno/orno516.xml" />
             <meter busAddr="16" modelXML="orno/orno516.xml" />
@@ -32,6 +32,19 @@
             <meter busAddr="20" modelXML="orno/orno516.xml" />
             <meter busAddr="21" modelXML="orno/orno516.xml" />
             <meter busAddr="22" modelXML="orno/orno516.xml" />
+            <meter busAddr="23" modelXML="orno/orno516.xml" />
+            <meter busAddr="24" modelXML="orno/orno516.xml" />
+            <meter busAddr="25" modelXML="orno/orno516.xml" />
+            <meter busAddr="27" modelXML="orno/orno516.xml" />
+            <meter busAddr="28" modelXML="orno/orno516.xml" />
+            <meter busAddr="30" modelXML="orno/orno516.xml" />
+            <meter busAddr="31" modelXML="orno/orno516.xml" />
+            <meter busAddr="32" modelXML="orno/orno516.xml" />
+            <meter busAddr="33" modelXML="orno/orno516.xml" />
+            <meter busAddr="34" modelXML="orno/orno516.xml" />
+            <meter busAddr="35" modelXML="orno/orno516.xml" />
+            <meter busAddr="37" modelXML="orno/orno516.xml" />
+            <meter busAddr="38" modelXML="orno/orno516.xml" />
          </ttydev>
       </edge>
       <edge hostname="omms-edge-p16" pubChannel="">
