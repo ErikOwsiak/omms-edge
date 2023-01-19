@@ -114,6 +114,8 @@ function start_prog () {
   # -- start --
   chmod +x "$1"
   $1 >> /dev/null &
+  echo "start_exit_code: $?"
+  sleep 2
 }
 
 #
