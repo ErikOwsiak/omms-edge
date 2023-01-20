@@ -25,7 +25,8 @@ class pzemRedisBot(th.Thread):
       self.redops: redisOps = redops
       self.start_dts_dts_utc = sysUtils.dts_utc()
       self.last_msg_dts_utc = ""
-      self.m_info: meterInfoData = meterInfoData("e1", "Peacefair", "PZEM-004T AC 100A")
+      self.m_info: meterInfoData = \
+         meterInfoData("e1", "Peacefair", "PZEM-004T AC 100A")
 
    def run(self):
       pub_channel: str = self.sec.get("REDIS_PUB_CHNL")
@@ -78,8 +79,8 @@ class pzemRedisBot(th.Thread):
          arr.insert(2, f"PATH:{syspath}")
          buff = "|".join(arr)
          # -- -- publish & set -- --
-         _d: {} = {"#RPT_kWhrs_dts_utc": sysUtils.dts_utc(), "#RPT_kWhrs": f"[{buff[:-1]}]",
-            self.m_info.red_key: self.m_info}
+         _d: {} = {"#RPT_kWhrs_dts_utc": sysUtils.dts_utc()
+            , "#RPT_kWhrs": f"[{buff[:-1]}]", self.m_info.red_key: str(self.m_info)}
          # -- -- -- -- -- -- -- --
          self.redops.save_meter_data(syspath, _dict=_d)
          self.redops.pub_read_on_sec("PZEM", f"({buff[:-1]})")
