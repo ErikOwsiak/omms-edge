@@ -42,6 +42,7 @@ class redisOps(object):
 
    def save_read(self, path: str, buff: str):
       try:
+         path = path.lower()
          read_db_idx = int(self.sys_ini["REDIS_CORE"]["DB_IDX_READS"])
          self.red.select(read_db_idx)
          last_msg_dtsutc = utils.dts_utc()
@@ -55,6 +56,7 @@ class redisOps(object):
    def save_meter_data(self, path: str, _dict: {}, delold: bool = False):
       try:
          rv0 = 0
+         path = path.lower()
          read_db_idx = int(self.sys_ini["REDIS_CORE"]["DB_IDX_READS"])
          self.red.select(read_db_idx)
          if delold:
@@ -66,6 +68,7 @@ class redisOps(object):
 
    def update_read(self, path: str, key: str, val: str):
       try:
+         path = path.lower()
          read_db_idx = int(self.sys_ini["REDIS_CORE"]["DB_IDX_READS"])
          self.red.select(read_db_idx)
          rv = self.red.hset(path, mapping={key: val})
@@ -91,6 +94,7 @@ class redisOps(object):
 
    def save_heartbeat(self, path: str, buff: str):
       try:
+         path = path.lower()
          heartbeat_db_idx: int = int(self.sys_ini["REDIS"]["DB_IDX_HEARTBEATS"])
          heartbeat_ttl: int = int(self.sys_ini["REDIS"]["HEARTBEAT_TTL"])
          self.red.select(heartbeat_db_idx)
