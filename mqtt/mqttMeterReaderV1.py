@@ -11,6 +11,7 @@ from core.redisOps import redisOps
 from mqtt.meter_strucs import regInfo
 from core.logutils import logUtils
 from core.datatypes import mqttMeterInfo
+from core.meterInfoData import meterInfoData
 from ommslib.shared.core.elecRegStrEnums import elecRegStrEnumsShort as _erses
 
 
@@ -47,7 +48,6 @@ class mqttMeterReaderV1(object):
       self.redops: redisOps = redops
       self.kwh_report_interval: int = self.mqtt_core_ini.getint("KWH_REPORT_INTERVAL", 120)
       self.report_loop_intv: float = self.mqtt_core_ini.getfloat("LOOP_SLEEP_SECS", 4)
-      # self.meter_xml_nodes: t.List[et.Element] = None
       self.running_meters: [et.Element] = []
       self.global_register_table: {str, mqttMeterInfo} = {}
       self.report_thread = _th.Thread(target=self.__report_thread__, args=(None,))
@@ -55,9 +55,9 @@ class mqttMeterReaderV1(object):
       self.host: str = self.mqtt_info_ini.get("HOST", "")
       self.port: int = self.mqtt_info_ini.getint("PORT", 0)
       self.pwd: str = self.mqtt_info_ini.get("PWD", "")
-      # self.meter_regs_topics: {str, mqttMeterInfo} = {}
       self.on_msg_lock: _th.Lock = _th.Lock()
       self.last_report: int = 0
+      self.m_info: meterInfoData = meterInfoData("e3", "ZAMEL", "MEW1")
 
    def on_connect(self, clt, ud, flags, rc):
       print("\t[ on_connect ]")
@@ -172,15 +172,17 @@ class mqttMeterReaderV1(object):
             reg_l2_tkwh: regInfo = [r for r in meter_regs if r.regtype == _erses.l2_kwh][0]
             reg_l3_tkwh: regInfo = [r for r in meter_regs if r.regtype == _erses.l3_kwh][0]
             # -- build RPT data buffer --
-            buff = f"#RPT:kWhrs|DTSUTC:{utils.dts_utc()}|PATH:{m.syspath}|METER_TAG:{m.tag}" \
+            hdr = "#RPT"; rpt = "kWhrs"
+            buff = f"{hdr}:{rpt}|DTSUTC:{utils.dts_utc()}|PATH:{m.syspath}|METER_TAG:{m.tag}" \
                f"|tl_kwh: {reg_tkwh.data}|l1_kwh:{reg_l1_tkwh.data}|l2_kwh:{reg_l2_tkwh.data}" \
                f"|l3_kwh:{reg_l3_tkwh.data}"
-            print(buff)
-            # -- push to redis --
+            # -- publish to redis --
             self.redops.pub_read_on_sec("MQTT_CORE", f"({buff})")
-            _d: {} = {"#rpt_kWhrs_dts_utc": utils.dts_utc(), "#rpt_kWhrs": f"[{buff}]"}
+            # -- -- -- save -- -- --
+            _d: {} = {f"{hdr}_{rpt}_dts_utc": utils.dts_utc()
+               , self.m_info.red_key: str(self.m_info)
+               , f"{hdr}_{rpt}": f"[{buff}]"}
             self.redops.save_meter_data(m.syspath, _dict=_d)
-            # self.redops.save_heartbeat(m.syspath, buff)
          # - - - - - - - - - - - - - - - -
       except Exception as e:
          logUtils.log_exp(e)
