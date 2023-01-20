@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<meter type="electric" phases="1" tag="orno504" brand="orno" model="orno504">
+<!--
+    electric meter type strings:
+        e1 => single-phase
+        e3 => three-phase
+-->
+<meter type="e1" tag="orno504 / single phase" brand="orno" model="orno504">
     <comm type="serial" baudrate="9600" parity="N" stopbits="1" timeoutSecs="0.25" />
     <regs>
         <!-- mode="" -> defaults: register; unit="" -> defaults: no unit -->

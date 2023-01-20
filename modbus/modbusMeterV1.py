@@ -14,6 +14,7 @@ from modbus.meterReading import meterReading
 from system.ports import ports as sys_ports
 from ommslib.shared.core.elecRegStream import elecRegStream
 from ommslib.shared.core.elecRegStrEnums import elecRegStrEnumsShort
+from core.meterInfoData import meterInfoData
 
 
 """
@@ -49,11 +50,18 @@ class modbusMeterV1(object):
       self.sys_ini: _cp.ConfigParser = sys_ini
       self.modbus_addr: int = bus_addr
       self.tty_dev_path: str = tty_dev_path
-      # <meter type="electric" phases="3" tag="orno516" brand="orno" model="orno516">
+      # <meter type="e1" tag="orno504 / single phase" brand="orno" model="orno504">
+      # <meter type="e3" tag="orno516 / 3 phase" brand="orno" model="orno516">
       self.model_xml: _et.Element = model_xml
+      self.mtype = self.model_xml.attrib["type"]
       self.model_brand: str = self.model_xml.attrib["brand"]
       self.model_model: str = self.model_xml.attrib["model"]
-      self.model_phases: int = int(self.model_xml.attrib["phases"])
+      self.model_tag: str = self.model_xml.attrib["tag"]
+      # -- -- -- --
+      self.m_info: meterInfoData \
+         = meterInfoData(self.mtype, brand=self.model_brand
+            , model=self.model_model, tag=self.model_tag)
+      # -- -- -- --
       self.stream_regs: elecRegStream = elec_reg_stream
       self.stream_reads: [meterReading] = []
       # -- set on init call --
@@ -81,7 +89,6 @@ class modbusMeterV1(object):
          if len(regs) == 0:
             raise Exception("[ ModelRegsNotLoaded ]")
          # -- do --
-         self.model_phases = int(self.model_xml.attrib["phases"])
          self.model_regs = [meterReg(x) for x in regs]
          if len(self.model_regs) == 0:
             raise Exception("ModelRegsNotParsed")

@@ -7,6 +7,7 @@ import configparser as cp
 from core.utils import sysUtils
 from core.redisOps import redisOps
 from core.logutils import logUtils
+from core.meterInfoData import meterInfoData
 
 
 class pzemRedisBot(th.Thread):
@@ -24,6 +25,7 @@ class pzemRedisBot(th.Thread):
       self.redops: redisOps = redops
       self.start_dts_dts_utc = sysUtils.dts_utc()
       self.last_msg_dts_utc = ""
+      self.m_info: meterInfoData = meterInfoData("e1", "Peacefair", "PZEM-004T AC 100A")
 
    def run(self):
       pub_channel: str = self.sec.get("REDIS_PUB_CHNL")
@@ -76,15 +78,12 @@ class pzemRedisBot(th.Thread):
          arr.insert(2, f"PATH:{syspath}")
          buff = "|".join(arr)
          # -- -- publish & set -- --
-         m_info: str = f"brand: Peacefair; model: PZEM-004T AC 100A; phases: 1"
          _d: {} = {"#RPT_kWhrs_dts_utc": sysUtils.dts_utc(), "#RPT_kWhrs": f"[{buff[:-1]}]",
-            "meter_info": m_info}
+            self.m_info.red_key: self.m_info}
+         # -- -- -- -- -- -- -- --
          self.redops.save_meter_data(syspath, _dict=_d)
          self.redops.pub_read_on_sec("PZEM", f"({buff[:-1]})")
          # -- -- -- -- -- -- -- -- -- -- -- --
       except Exception as e:
          logUtils.log_exp(e)
          time.sleep(2.0)
-
-   # def __monitor_thread(self):
-   #    pass

@@ -58,7 +58,8 @@ class sysUtils(object):
             with open("/etc/hostname") as f:
                sysUtils.HOST = f.read().strip()
          # -- -- -- --
-         return f"/{sysUtils.GEOLOC}/{sysUtils.BUILDING}/{sysUtils.HOST}/{channel}/{ep}"
+         syspath: str = f"/{sysUtils.GEOLOC}/{sysUtils.BUILDING}/{sysUtils.HOST}/{channel}/{ep}"
+         return syspath.lower()
       except Exception as e:
          print(e)
          exit(1)

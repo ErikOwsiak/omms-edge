@@ -10,6 +10,7 @@ from core.redisOps import redisOps
 from core.logutils import logUtils
 from core.utils import sysUtils
 from modbus.modbusMeterV1 import modbusMeterV1
+from core.meterInfoData import meterInfoData
 from modbus.ttydevMeters import ttydevMeters
 from system.ports import ports
 # -- shared --
@@ -107,10 +108,8 @@ class modbusRedisRelay(_th.Thread):
             else:
                no_pong_counter += 1
             # -- -- -- -- -- -- -- --
-            m_info: str = f"brand: {meter.model_brand}; " \
-               f"model: {meter.model_model}; phases: {meter.model_phases}"
             _d = {"init_dts_utc": sysUtils.dts_utc(), "init_ping: ": msg,
-               "meter_info": m_info}
+               meter.m_info.red_key: meter.m_info}
             self.redops.save_meter_data(meter.syspath, _dict=_d, delold=True)
             # -- -- -- -- -- -- -- --
          except Exception as e:
@@ -234,31 +233,6 @@ class modbusRedisRelay(_th.Thread):
             continue
       # -- -- end -- --
       return True
-
-   """
-      <meter busAddr="10" modelXML="orno/orno516.xml" />
-   """
-   def __read_meter_regs(self, ers: elecRegStream, _meter: _et.Element) -> ():
-      # -- -- -- -- --
-      mb_meter: modbusMeterV1 = self.__create_modbus_meter(meter_xml=_meter)
-
-      # -- -- -- -- -- -- -- --
-      meter.set_syspath(syspath)
-      # -- try pinging up to 3x --
-      for idx in range(0, 3):
-         err, msg = meter.ping()
-         if err != 0:
-            self.redops.pub_diag_debug(f"UnableToPingModbusMeterAddr: {modbus_addr}")
-            xdict: {} = {f"Ping_{idx}": msg}
-            self.redops.save_meter_data(meter.syspath, _dict=xdict)
-            time.sleep(0.480)
-            error_code += 1
-            continue
-         else:
-            self.redops.save_read(meter.syspath, f"PingOK: {modbus_addr}")
-            return msg
-      # -- return rpt string --
-      return error_code, "temp_string"
 
    def __main_loop(self):
       # -- -- report -- --
