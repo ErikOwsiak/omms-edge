@@ -24,7 +24,8 @@ class redisOps(object):
       self.port: int = int(self.con_ini["PORT"])
       self.red_ini = self.sys_ini["REDIS_CORE"]
       self.pwd: str = self.red_ini["PWD"]
-      self.red: redis.Redis = redis.Redis(host=self.host, port=self.port, password=self.pwd)
+      self.red: redis.Redis = \
+         redis.Redis(host=self.host, port=self.port, password=self.pwd)
 
    # def update_edge_diag(self, key: str, _d: {}, del_prev: bool = False):
    #    """
@@ -62,7 +63,7 @@ class redisOps(object):
       try:
          rv0 = 0
          path = path.lower()
-         self.red.select(redisDBIdx.DB_IDX_READS)
+         self.red.select(redisDBIdx.DB_IDX_READS.value)
          if delold:
             rv0 = self.red.delete(path)
          rv1 = self.red.hset(path, mapping=_dict)
@@ -117,7 +118,7 @@ class redisOps(object):
          , mapdct: {} = None
          , restart: bool = False):
       try:
-         self.red.select(redisDBIdx.DB_IDX_EDGE_DIAG)
+         self.red.select(redisDBIdx.DB_IDX_EDGE_DIAG.value)
          if restart:
             self.red.delete(diag_tag)
          if mapdct is None:
@@ -133,7 +134,7 @@ class redisOps(object):
          , mapdct: {} = None
          , restart: bool = False):
       try:
-         self.red.select(redisDBIdx.DB_IDX_ONPREM_DIAG)
+         self.red.select(redisDBIdx.DB_IDX_ONPREM_DIAG.value)
          if restart:
             self.red.delete(diag_tag)
          if mapdct is None:
