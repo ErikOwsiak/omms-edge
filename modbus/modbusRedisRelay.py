@@ -108,8 +108,9 @@ class modbusRedisRelay(_th.Thread):
             else:
                no_pong_counter += 1
             # -- -- -- -- -- -- -- --
+            minfo: str = str(meter.m_info)
             _d = {"init_dts_utc": sysUtils.dts_utc(), "init_ping: ": msg,
-               meter.m_info.red_key: meter.m_info}
+               meter.m_info.red_key: minfo}
             self.redops.save_meter_data(meter.syspath, _dict=_d, delold=True)
             # -- -- -- -- -- -- -- --
          except Exception as e:
