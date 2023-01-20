@@ -10,5 +10,5 @@ class meterInfoData(object):
       self.tag = tag
 
    def __str__(self):
-      return f"type: {self.mtype}; brand: {self.brand}; " \
-         f"model: {self.model}; tag: {self.tag}"
+      return f"type: {self.mtype} | brand: {self.brand} | " \
+         f"model: {self.model} | tag: {self.tag}"

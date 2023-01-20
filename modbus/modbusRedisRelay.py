@@ -10,7 +10,6 @@ from core.redisOps import redisOps
 from core.logutils import logUtils
 from core.utils import sysUtils
 from modbus.modbusMeterV1 import modbusMeterV1
-from core.meterInfoData import meterInfoData
 from modbus.ttydevMeters import ttydevMeters
 from system.ports import ports
 # -- shared --
