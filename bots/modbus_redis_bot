@@ -103,7 +103,7 @@ def main():
          if True:
             msg = "modbusRedisRelay TRUE"
             dct: {} = {"bot_dts_utc": utils.dts_utc(), "msg": msg}
-            modbusRedisRelayTh.redops.update_edge_diag_tag(diag_tag=diag_tag, mapdct=dct, restart=False)
+            modbusRedisRelayTh.redops.update_edge_diag(diag_tag=diag_tag, mapdct=dct, restart=False)
          # -- -- -- --
          time.sleep(MAIN_LOOP_SECS)
       except Exception as e:

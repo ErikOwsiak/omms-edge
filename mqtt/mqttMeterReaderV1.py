@@ -88,7 +88,7 @@ class mqttMeterReaderV1(object):
          _dict = {"mqtt_reader_dts_utc": utils.dts_utc()
             , "lan_ip": utils.lan_ip(), "hostname": utils.HOST
             , "pub_reads_channel": self.reads_pub_channel}
-         self.redops.update_edge_diag_tag(self.diag_tag, mapdct=_dict)
+         self.redops.update_edge_diag(self.diag_tag, mapdct=_dict)
          return 0
       except ConnectionRefusedError as e:
          print("Check Redis connection info: host/port")

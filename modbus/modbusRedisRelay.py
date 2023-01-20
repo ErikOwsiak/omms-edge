@@ -238,7 +238,7 @@ class modbusRedisRelay(_th.Thread):
       # -- -- report -- --
       _dict = {"boot_dts_utc": sysUtils.dts_utc(), "lan_ip": sysUtils.lan_ip()
          , "hostname": sysUtils.HOST, "pub_reads_channel": self.red_pub_channel}
-      self.redops.update_edge_diag_tag(self.diag_tag, mapdct=_dict, restart=True)
+      self.redops.update_edge_diag(self.diag_tag, mapdct=_dict, restart=True)
       # -- -- run -- --
       while True:
          try:
