@@ -34,7 +34,7 @@ class pzemRedisBot(th.Thread):
       _dict = {"boot_dts_utc": sysUtils.dts_utc(), "dev": self.dev
          , "lan_ip": sysUtils.lan_ip(), "hostname": sysUtils.HOST
          , "pub_reads_channel": pub_channel}
-      self.redops.update_diag_tag(self.diag_tag, mapdct=_dict, restart=True)
+      self.redops.update_edge_diag_tag(self.diag_tag, mapdct=_dict, restart=True)
       while True:
          self.__run_loop()
 
@@ -65,7 +65,7 @@ class pzemRedisBot(th.Thread):
          # -- -- -- -- -- -- -- -- -- -- -- --
          if buff.startswith("#") and buff.endswith("!"):
             __dict = {"last_msg_dts_utc": sysUtils.dts_utc(), "last_msg": buff}
-            self.redops.update_diag_tag(diag_tag=self.diag_tag, mapdct=__dict)
+            self.redops.update_edge_diag_tag(diag_tag=self.diag_tag, mapdct=__dict)
          # -- -- -- -- -- -- -- -- -- -- -- --
          print(buff)
          if not buff.startswith("#RPT|PZEM:SS_"):

@@ -1,7 +1,6 @@
 
-import os, time, datetime
+import time
 import threading as _th
-import typing as t
 import configparser as _cp
 import xml.etree.ElementTree as et
 import paho.mqtt.client as mqtt
@@ -10,7 +9,7 @@ from core.utils import sysUtils as utils
 from core.redisOps import redisOps
 from mqtt.meter_strucs import regInfo
 from core.logutils import logUtils
-from core.datatypes import mqttMeterInfo
+from ommslib.shared.core.datatypes import mqttMeterInfo
 from core.meterInfoData import meterInfoData
 from ommslib.shared.core.elecRegStrEnums import elecRegStrEnumsShort as _erses
 
@@ -89,7 +88,7 @@ class mqttMeterReaderV1(object):
          _dict = {"mqtt_reader_dts_utc": utils.dts_utc()
             , "lan_ip": utils.lan_ip(), "hostname": utils.HOST
             , "pub_reads_channel": self.reads_pub_channel}
-         self.redops.update_diag_tag(self.diag_tag, mapdct=_dict)
+         self.redops.update_edge_diag_tag(self.diag_tag, mapdct=_dict)
          return 0
       except ConnectionRefusedError as e:
          print("Check Redis connection info: host/port")

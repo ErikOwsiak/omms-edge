@@ -75,7 +75,7 @@ def main():
          exit(0)
       # -- -- -- --
       dct: {} = {"bot_dts_utc": utils.dts_utc()}
-      scannerTh.redops.update_diag_tag(diag_tag=diag_tag, mapdct=dct, restart=False)
+      scannerTh.redops.update_edge_diag_tag(diag_tag=diag_tag, mapdct=dct, restart=False)
       time.sleep(MAIN_LOOP_SECS)
 
 
