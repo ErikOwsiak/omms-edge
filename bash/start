@@ -22,14 +22,6 @@ PZEM_PROG="bots/pzem_redis_bot"
 
 
 cd ..
-#START_FILES=("$MODBUS_START_FILE" "$MQTT_START_FILE" "$PZEM_START_FILE")
-#for f in "${START_FILES[@]}"; do
-#  if [ -f "$f" ]; then
-#    echo "WillStart: $f"
-#  else
-#    echo "WillNotStart: $f"
-#  fi
-#done
 
 echo ""
 sleep 4
