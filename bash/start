@@ -6,7 +6,7 @@
 #
 
 echo ""
-echo "  --[ START_START ]--"
+echo "  --[ OMMS_BASH_START ]--"
 echo ""
 
 START_DIR=$(pwd)
