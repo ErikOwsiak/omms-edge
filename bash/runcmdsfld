@@ -1,0 +1,26 @@
+#!/bin/bash
+
+
+: ' ---------------------------------------------------------------------------
+  1. look for .cmds folder
+  2. run files in alpha order
+  3. delete each file after running
+'
+
+CMD_DIR=".cmds"
+if [ ! -d $CMD_DIR ]; then
+  echo "FolderNotFound: $CMD_DIR"
+  exit 0
+fi
+
+cd $CMD_DIR || exit 1
+echo "CWD: $(pwd)"
+ls -la
+
+FLS=(*)
+for f in ${FLS[*]}
+do
+  echo "File: $f"
+  chmod +x "$f"
+  /bin/bash "$f"
+done
