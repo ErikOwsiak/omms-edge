@@ -200,6 +200,22 @@ class modbusRedisRelay(_th.Thread):
    def __run_ttydev_meters(self, stream_regs: elecRegStream, dev_meters: ttydevMeters) -> bool:
       if dev_meters.run.lower() not in ["yes", "y", "1"]:
          return True
+      # -- publish to redis channel --
+      def redis_publish(stream_name: str, _arr: []):
+         INI_SEC = "MODBUS"
+         _arr.insert(0, f"#RPT:{stream_name}")
+         _arr.insert(1, f"DTSUTC:{sysUtils.dts_utc()}")
+         _arr.insert(2, f"EPOCH: {sysUtils.dts_epoch()}")
+         _arr.insert(3, f"PATH:{meter.syspath}")
+         self.redops.pub_read_on_sec(INI_SEC, _arr)
+      # -- save to redis as a lost data read --
+      def redis_save(stream_name, _arr: []):
+         rpt_key: str = f"#RPT_{stream_name}"
+         s = "|".join(strs_arr)
+         d = {rpt_key: f"[{s}]"
+            , f"{rpt_key}_dts_utc": sysUtils.dts_utc()
+            , f"{rpt_key}_epoch": sysUtils.dts_epoch()}
+         self.redops.save_meter_data(meter.syspath, _dict=d)
       # -- -- do -- --
       for meter_xml in dev_meters.meters:
          try:
@@ -215,17 +231,10 @@ class modbusRedisRelay(_th.Thread):
             print(f"reading modbus addr: {meter.modbus_addr}")
             if meter.read_stream_frame_registers():
                strs_arr: [] = meter.reads_str_arr()
-               rpt_key: str = f"#RPT_{stream_regs.name}"
-               s = "|".join(strs_arr)
-               d = {f"{rpt_key}_dts_utc": sysUtils.dts_utc(), rpt_key: f"[{s}]"}
-               self.redops.save_meter_data(meter.syspath, _dict=d)
+               # -- save to redis --
+               redis_save(stream_regs.name, strs_arr)
                # -- publish to redis syspath_channel --
-               strs_arr.insert(0, f"#RPT:{stream_regs.name}")
-               strs_arr.insert(1, f"DTSUTC:{sysUtils.dts_utc()}")
-               strs_arr.insert(2, f"EPOCH: {sysUtils.dts_epoch()}")
-               strs_arr.insert(3, f"PATH:{meter.syspath}")
-               s = "|".join(strs_arr)
-               self.redops.pub_read_on_sec("MODBUS", f"({s})")
+               redis_publish(stream_regs.name, strs_arr)
             else:
                pass
             # -- -- -- --

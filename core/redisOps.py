@@ -40,10 +40,11 @@ class redisOps(object):
       except Exception as e:
          logUtils.log_exp(e)
 
-   def pub_read_on_sec(self, ini_sec: str, buff: str):
+   def pub_read_on_sec(self, ini_sec: str, _arr: []):
       pub_chnl: str = self.sys_ini[ini_sec]["REDIS_PUB_CHNL"]
       pub_chnl = utils.set_systag(pub_chnl)
-      rv = self.red.publish(pub_chnl, buff)
+      msg = "|".join(_arr)
+      rv = self.red.publish(pub_chnl, f"({msg})")
       print(f"\t-- [ rv: {rv}] --")
 
    def update_edge_diag(self, diag_tag: str
