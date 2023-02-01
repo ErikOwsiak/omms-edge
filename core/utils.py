@@ -46,6 +46,10 @@ class sysUtils(object):
       return f"{_t.hour:02d}:{_t.minute:02d}:{_t.second:02d}"
 
    @staticmethod
+   def dts_epoch():
+     return int(time.time())
+
+   @staticmethod
    def syspath(channel: str, ep: str):
       try:
          if sysUtils.GEOLOC == "":

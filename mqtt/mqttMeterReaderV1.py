@@ -172,7 +172,8 @@ class mqttMeterReaderV1(object):
             reg_l3_tkwh: regInfo = [r for r in meter_regs if r.regtype == _erses.l3_kwh][0]
             # -- build RPT data buffer --
             hdr = "#RPT"; rpt = "kWhrs"
-            buff = f"{hdr}:{rpt}|DTSUTC:{utils.dts_utc()}|PATH:{m.syspath}|METER_TAG:{m.tag}" \
+            buff = f"{hdr}:{rpt}|DTSUTC:{utils.dts_utc()}|EPOCH:{utils.dts_epoch()}" \
+               f"|PATH:{m.syspath}|METER_TAG:{m.tag}" \
                f"|tl_kwh: {reg_tkwh.data}|l1_kwh:{reg_l1_tkwh.data}|l2_kwh:{reg_l2_tkwh.data}" \
                f"|l3_kwh:{reg_l3_tkwh.data}"
             # -- publish to redis --

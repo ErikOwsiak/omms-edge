@@ -75,8 +75,9 @@ class pzemRedisBot(th.Thread):
          arr[0] = "#RPT:kWhrs"
          pzem_ss = arr[1].split(":")[1]
          arr.insert(1, f"DTSUTC:{sysUtils.dts_utc()}")
+         arr.insert(2, f"EPOCH: {sysUtils.dts_epoch()}")
          syspath: str = sysUtils.syspath(self.syspath_channel, pzem_ss)
-         arr.insert(2, f"PATH:{syspath}")
+         arr.insert(3, f"PATH:{syspath}")
          buff = "|".join(arr)
          # -- -- publish & set -- --
          _d: {} = {"#RPT_kWhrs_dts_utc": sysUtils.dts_utc()
