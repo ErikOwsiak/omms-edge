@@ -159,8 +159,17 @@ class mqttMeterReaderV1(object):
       try:
          # - - - - - - - - - - - - - - - -
          self.on_msg_lock.acquire()
+         # -- redis save --
+         def redis_save(syspath: str, s_name: str, _buff: str):
+            CHNL_TYPE = "MQTT"
+            rpt_key: str = f"#RPT_{s_name}"
+            dts_key = f"{rpt_key}_dtsutc_epoch"
+            dtsutc_epoch = f"{utils.dts_utc()} | {utils.dts_epoch()}"
+            d = {rpt_key: f"[{_buff}]", dts_key: dtsutc_epoch, "CHANNEL_TYPE": CHNL_TYPE}
+            self.redops.save_meter_data(syspath, _dict=d)
+         # -- -- -- -- -- -- -- --
+         stream_name = "kWhrs"
          for m in self.running_meters:
-            # met_tag = m.attrib["tag"]
             m: mqttMeterInfo = m
             # -- select meter registers --
             meter_regs = [v for v in self.global_register_table.values() if v.meter_tag == m.tag]
@@ -171,18 +180,14 @@ class mqttMeterReaderV1(object):
             reg_l2_tkwh: regInfo = [r for r in meter_regs if r.regtype == _erses.l2_kwh][0]
             reg_l3_tkwh: regInfo = [r for r in meter_regs if r.regtype == _erses.l3_kwh][0]
             # -- build RPT data buffer --
-            hdr = "#RPT"; rpt = "kWhrs"
-            buff = f"{hdr}:{rpt}|DTSUTC:{utils.dts_utc()}|EPOCH:{utils.dts_epoch()}" \
+            buff = f"#RPT:{stream_name}|DTSUTC:{utils.dts_utc()}|EPOCH:{utils.dts_epoch()}" \
                f"|PATH:{m.syspath}|METER_TAG:{m.tag}" \
-               f"|tl_kwh: {reg_tkwh.data}|l1_kwh:{reg_l1_tkwh.data}|l2_kwh:{reg_l2_tkwh.data}" \
-               f"|l3_kwh:{reg_l3_tkwh.data}"
+               f"|tl_kwh: {reg_tkwh.data}|l1_kwh:{reg_l1_tkwh.data}|" \
+               f"|l2_kwh:{reg_l2_tkwh.data}|l3_kwh:{reg_l3_tkwh.data}"
             # -- publish to redis --
             self.redops.pub_read_on_sec("MQTT_CORE", f"({buff})")
             # -- -- -- save -- -- --
-            _d: {} = {f"{hdr}_{rpt}_dts_utc": utils.dts_utc()
-               , self.m_info.red_key: str(self.m_info)
-               , f"{hdr}_{rpt}": f"[{buff}]"}
-            self.redops.save_meter_data(m.syspath, _dict=_d)
+            redis_save(m.syspath, stream_name, buff)
          # - - - - - - - - - - - - - - - -
       except Exception as e:
          logUtils.log_exp(e)
