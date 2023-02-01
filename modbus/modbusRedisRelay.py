@@ -212,9 +212,8 @@ class modbusRedisRelay(_th.Thread):
       def redis_save(stream_name, _arr: []):
          rpt_key: str = f"#RPT_{stream_name}"
          s = "|".join(strs_arr)
-         d = {rpt_key: f"[{s}]"
-            , f"{rpt_key}_dts_utc": sysUtils.dts_utc()
-            , f"{rpt_key}_epoch": sysUtils.dts_epoch()}
+         dtsutc_epoch = f"{sysUtils.dts_utc()} | {sysUtils.dts_epoch()}"
+         d = {rpt_key: f"[{s}]", f"{rpt_key}_dtsutc_epoch": dtsutc_epoch}
          self.redops.save_meter_data(meter.syspath, _dict=d)
       # -- -- do -- --
       for meter_xml in dev_meters.meters:
