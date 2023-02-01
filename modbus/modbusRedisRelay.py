@@ -207,14 +207,14 @@ class modbusRedisRelay(_th.Thread):
          _arr.insert(1, f"DTSUTC:{sysUtils.dts_utc()}")
          _arr.insert(2, f"EPOCH:{sysUtils.dts_epoch()}")
          _arr.insert(3, f"PATH:{meter.syspath}")
-         self.redops.pub_read_on_sec(INI_SEC, _arr)
+         self.redops.pub_read_on_sec(INI_SEC, _arr=_arr)
       # -- save to redis as a lost data read --
       def redis_save(stream_name, _arr: []):
          CHNL_TYPE = "MODBUS"
          rpt_key: str = f"#RPT_{stream_name}"
          s = "|".join(strs_arr)
          dts_key = f"{rpt_key}_dtsutc_epoch"
-         dtsutc_epoch = f"{sysUtils.dts_utc()} | {sysUtils.dts_epoch()}"
+         dtsutc_epoch = sysUtils.dtsutc_epoch()
          d = {rpt_key: f"[{s}]", dts_key: dtsutc_epoch, "CHANNEL_TYPE": CHNL_TYPE}
          self.redops.save_meter_data(meter.syspath, _dict=d)
       # -- -- do -- --

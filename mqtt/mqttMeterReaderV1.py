@@ -164,7 +164,7 @@ class mqttMeterReaderV1(object):
             CHNL_TYPE = "MQTT"
             rpt_key: str = f"#RPT_{s_name}"
             dts_key = f"{rpt_key}_dtsutc_epoch"
-            dtsutc_epoch = f"{utils.dts_utc()} | {utils.dts_epoch()}"
+            dtsutc_epoch = utils.dtsutc_epoch()
             d = {rpt_key: f"[{_buff}]", dts_key: dtsutc_epoch, "CHANNEL_TYPE": CHNL_TYPE}
             self.redops.save_meter_data(syspath, _dict=d)
          # -- -- -- -- -- -- -- --
@@ -185,7 +185,7 @@ class mqttMeterReaderV1(object):
                f"|tl_kwh: {reg_tkwh.data}|l1_kwh:{reg_l1_tkwh.data}|" \
                f"|l2_kwh:{reg_l2_tkwh.data}|l3_kwh:{reg_l3_tkwh.data}"
             # -- publish to redis --
-            self.redops.pub_read_on_sec("MQTT_CORE", f"({buff})")
+            self.redops.pub_read_on_sec("MQTT_CORE", _buff=f"({buff})")
             # -- -- -- save -- -- --
             redis_save(m.syspath, stream_name, buff)
          # - - - - - - - - - - - - - - - -

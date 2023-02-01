@@ -46,8 +46,14 @@ class sysUtils(object):
       return f"{_t.hour:02d}:{_t.minute:02d}:{_t.second:02d}"
 
    @staticmethod
-   def dts_epoch():
+   def dts_epoch() -> int:
      return int(time.time())
+
+   @staticmethod
+   def dtsutc_epoch() -> str:
+      d = sysUtils.dts_utc()
+      e = sysUtils.dts_epoch()
+      return f"{d} | {e}"
 
    @staticmethod
    def syspath(channel: str, ep: str):
