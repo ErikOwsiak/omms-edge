@@ -203,7 +203,6 @@ class modbusRedisRelay(_th.Thread):
       # -- publish to redis channel --
       def redis_publish(stream_name: str, _arr: []):
          INI_SEC = "MODBUS"
-         _arr.insert(0, f"#RPT:{stream_name}")
          _arr.insert(1, f"DTSUTC:{sysUtils.dts_utc()}")
          _arr.insert(2, f"EPOCH:{sysUtils.dts_epoch()}")
          _arr.insert(3, f"PATH:{meter.syspath}")
@@ -212,7 +211,7 @@ class modbusRedisRelay(_th.Thread):
       def redis_save(stream_name, _arr: []):
          CHNL_TYPE = "MODBUS"
          rpt_key: str = f"#RPT_{stream_name}"
-         s = "|".join(strs_arr)
+         s = "|".join(_arr)
          dts_key = f"{rpt_key}_dtsutc_epoch"
          dtsutc_epoch = sysUtils.dtsutc_epoch()
          d = {rpt_key: f"[{s}]", dts_key: dtsutc_epoch, "CHANNEL_TYPE": CHNL_TYPE}
@@ -231,11 +230,10 @@ class modbusRedisRelay(_th.Thread):
             meter.set_stream_regs(stream_regs)
             print(f"reading modbus addr: {meter.modbus_addr}")
             if meter.read_stream_frame_registers():
-               strs_arr: [] = meter.reads_str_arr()
-               # -- save to redis --
-               redis_save(stream_regs.name, strs_arr)
-               # -- publish to redis syspath_channel --
-               redis_publish(stream_regs.name, strs_arr)
+               arr: [] = meter.reads_str_arr()
+               arr.insert(0, f"#RPT:{stream_regs.name}")
+               redis_save(stream_regs.name, arr)
+               redis_publish(stream_regs.name, arr)
             else:
                pass
             # -- -- -- --

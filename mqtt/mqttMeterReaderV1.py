@@ -182,7 +182,7 @@ class mqttMeterReaderV1(object):
             # -- build RPT data buffer --
             buff = f"#RPT:{stream_name}|DTSUTC:{utils.dts_utc()}|EPOCH:{utils.dts_epoch()}" \
                f"|PATH:{m.syspath}|METER_TAG:{m.tag}" \
-               f"|tl_kwh: {reg_tkwh.data}|l1_kwh:{reg_l1_tkwh.data}|" \
+               f"|tl_kwh:{reg_tkwh.data}|l1_kwh:{reg_l1_tkwh.data}|" \
                f"|l2_kwh:{reg_l2_tkwh.data}|l3_kwh:{reg_l3_tkwh.data}"
             # -- publish to redis --
             self.redops.pub_read_on_sec("MQTT_CORE", _buff=f"({buff})")
