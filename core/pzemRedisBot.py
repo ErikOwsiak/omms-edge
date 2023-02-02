@@ -8,6 +8,7 @@ from core.utils import sysUtils
 from core.redisOps import redisOps
 from core.logutils import logUtils
 from core.meterInfoData import meterInfoData
+from ommslib.shared.core.datatypes import redisDBIdx
 
 
 class pzemRedisBot(th.Thread):
@@ -27,6 +28,7 @@ class pzemRedisBot(th.Thread):
       self.last_msg_dts_utc = ""
       self.m_info: meterInfoData = \
          meterInfoData("e1", "Peacefair", "PZEM-004T AC 100A")
+      self.first_reads: [] = []
 
    def run(self):
       pub_channel: str = self.sec.get("REDIS_PUB_CHNL")
@@ -81,7 +83,13 @@ class pzemRedisBot(th.Thread):
          buff = "|".join(arr)
          # -- -- publish & set -- --
          _d: {} = {"#RPT_kWhrs_dtsutc_epoch": sysUtils.dtsutc_epoch()
-            , "#RPT_kWhrs": f"[{buff[:-1]}]", self.m_info.red_key: str(self.m_info)}
+            , "#RPT_kWhrs": f"[{buff[:-1]}]", "CHANNEL_TYPE": "PZEM"
+            , self.m_info.red_key: str(self.m_info)}
+         # -- -- -- -- -- -- -- --
+         if syspath not in self.first_reads:
+            self.redops.red.select(redisDBIdx.DB_IDX_READS.value)
+            self.redops.red.delete(syspath)
+            self.first_reads.append(syspath)
          # -- -- -- -- -- -- -- --
          self.redops.save_meter_data(syspath, _dict=_d)
          self.redops.pub_read_on_sec("PZEM", _buff=f"({buff[:-1]})")
