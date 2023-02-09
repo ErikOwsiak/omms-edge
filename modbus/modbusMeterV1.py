@@ -82,6 +82,7 @@ class modbusMeterV1(object):
    """
    def init(self):
       try:
+         print(f"\n\t[ MB: {self.modbus_addr} ]")
          # -- setup serial info --
          elm: _et.Element = self.model_xml.find("comm[@type='serial']")
          self.serial_info = meterSerialConf(elm)
