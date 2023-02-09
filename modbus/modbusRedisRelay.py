@@ -108,7 +108,7 @@ class modbusRedisRelay(_th.Thread):
                no_pong_counter += 1
             # -- -- -- -- -- -- -- --
             minfo: str = str(meter.m_info)
-            _d = {"init_dts_utc": sysUtils.dts_utc(), "init_ping: ": msg,
+            _d = {"init_dts_utc": sysUtils.dts_utc(), "INIT_PING: ": msg,
                meter.m_info.red_key: minfo}
             self.redops.save_meter_data(meter.syspath, _dict=_d, delold=True)
             # -- -- -- -- -- -- -- --
@@ -237,7 +237,7 @@ class modbusRedisRelay(_th.Thread):
                redis_save(stream_regs.name, arr)
                redis_publish(stream_regs.name, arr)
             else:
-               arr = [f"#ERROR: Unable to read stream frame|ModbusAdr: {meter.modbus_addr}"]
+               arr = [f"#ERROR:UnableToReadStreamFrame|ModbusAddr:{meter.modbus_addr}"]
                redis_save(stream_regs.name, arr)
                redis_publish(stream_regs.name, arr)
             # -- -- -- --

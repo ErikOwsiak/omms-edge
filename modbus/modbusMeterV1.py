@@ -112,14 +112,14 @@ class modbusMeterV1(object):
          if not rval:
             print(colored(f"\n\t[ PING {self.modbus_addr}: NoResponse! ]", "light_red"))
             time.sleep(1.0)
+            return 1, "NO_PONG"
          else:
             print(colored(f"\n\t[ PING {self.modbus_addr}: PONG OK! ]", "light_green"))
             time.sleep(0.48)
-         # -- -- -- --
-         return 0, "OK"
+            return 0, "PONG_OK"
       except Exception as e:
          logUtils.log_exp(e)
-         return 1, str(e)
+         return 2, str(e)
 
    def set_stream_regs(self, regs: elecRegStream):
       self.stream_regs = regs
