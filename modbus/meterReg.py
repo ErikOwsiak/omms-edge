@@ -32,6 +32,6 @@ class meterReg(object):
          if "formatter" in elm.attrib.keys():
             self.formatter: str = elm.attrib["formatter"]
       except Exception as e:
-         logUtils.log_exp(["meterReg", e])
+         logUtils.log_exp(["meterReg", self.mtype, e])
       finally:
          pass
