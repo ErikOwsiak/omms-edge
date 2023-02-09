@@ -237,7 +237,9 @@ class modbusRedisRelay(_th.Thread):
                redis_save(stream_regs.name, arr)
                redis_publish(stream_regs.name, arr)
             else:
-               pass
+               arr = ["ERROR: Unable to read stream frame|"]
+               redis_save(stream_regs.name, arr)
+               redis_publish(stream_regs.name, arr)
             # -- -- -- --
          except Exception as e:
             logUtils.log_exp(e)

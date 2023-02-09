@@ -82,7 +82,7 @@ class modbusMeterV1(object):
    """
    def init(self):
       try:
-         print(f"\n[ MB: {self.modbus_addr} | {self.model_model}]")
+         print(f"\n[ MB: {self.modbus_addr} | {self.model_model} ]")
          # -- setup serial info --
          elm: _et.Element = self.model_xml.find("comm[@type='serial']")
          self.serial_info = meterSerialConf(elm)
@@ -168,12 +168,14 @@ class modbusMeterV1(object):
             logUtils.log_exp(e)
             continue
       # -- -- end for reg in registers -- --
+      ret_val: bool = True
       if error_counter == 0:
          print(colored(f"\n\t[ GoodMeterRead: addr: {self.modbus_addr} ]\n", "green"))
       else:
          print(colored(f"\n\t[ BadMeterRead: addr: {self.modbus_addr} ]\n", "red"))
+         ret_val = False
       # -- -- -- --
-      return True
+      return ret_val
 
    def reads_str_arr(self) -> []:
       # -- -- -- --
