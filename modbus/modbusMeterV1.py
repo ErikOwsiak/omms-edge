@@ -82,7 +82,7 @@ class modbusMeterV1(object):
    """
    def init(self):
       try:
-         print(f"\n\t[ MB: {self.modbus_addr} ]")
+         print(f"\n[ MB: {self.modbus_addr} | {self.model_model}]")
          # -- setup serial info --
          elm: _et.Element = self.model_xml.find("comm[@type='serial']")
          self.serial_info = meterSerialConf(elm)
