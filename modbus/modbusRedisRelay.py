@@ -87,9 +87,9 @@ class modbusRedisRelay(_th.Thread):
       else:
          full_dev_path = _ttydev.dev
       # -- -- -- --
+      exp_counter = 0
       pong_counter = 0
       no_pong_counter = 0
-      exp_counter = 0
       # -- --
       for meter_xml in _ttydev.meters:
          try:
@@ -237,7 +237,7 @@ class modbusRedisRelay(_th.Thread):
                redis_save(stream_regs.name, arr)
                redis_publish(stream_regs.name, arr)
             else:
-               arr = [f"#ERROR:UnableToReadStreamFrame|ModbusAddr:{meter.modbus_addr}"]
+               arr = [f"#RPT:ERROR|MSG:UnableToReadStreamFrame|ModbusAddr:{meter.modbus_addr}"]
                redis_save(stream_regs.name, arr)
                redis_publish(stream_regs.name, arr)
             # -- -- -- --
