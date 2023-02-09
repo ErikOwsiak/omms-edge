@@ -31,9 +31,9 @@
       <edge hostname="omms-edge-b410" pubChannel="">
          <ttydev run="yes" tag="ModbusAddrs_10_40" alias="modbusPortA" dev="auto" modbusBugID="">
             <meter busAddr="10" modelXML="orno/orno516.xml" />
-            <!-- <meter busAddr="11" modelXML="orno/orno516.xml" />
+            <meter busAddr="11" modelXML="orno/orno516.xml" />
             <meter busAddr="12" modelXML="orno/orno516.xml" />
-            <meter busAddr="13" modelXML="orno/orno516.xml" /> -->
+            <meter busAddr="13" modelXML="orno/orno516.xml" />
             <meter busAddr="14" modelXML="orno/orno516.xml" />
             <meter busAddr="15" modelXML="orno/orno516.xml" />
             <meter busAddr="16" modelXML="orno/orno516.xml" />
