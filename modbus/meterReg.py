@@ -15,7 +15,7 @@ class meterReg(object):
          _hex: int = 16
          self.mtype = elm.attrib["type"]
          self.type: elecRegStrEnumsShort = elecRegStrEnumsShort[self.mtype]
-         self.addr_hex: str =  elm.attrib["addr"]
+         self.addr_hex: str = elm.attrib["addr"]
          self.addr_dec: int = int(self.addr_hex, _hex)
          self.size: int = int(elm.attrib["size"])
          self.decpnt: int = int(elm.attrib["decpnt"])
