@@ -28,7 +28,8 @@ class redisOps(object):
          redis.Redis(host=self.host, port=self.port, password=self.pwd)
 
    def save_meter_data(self, path: str
-         , _dict: {}, delold: bool = False):
+         , _dict: {}
+         , delold: bool = False):
       try:
          rv0 = 0
          path = path.lower()

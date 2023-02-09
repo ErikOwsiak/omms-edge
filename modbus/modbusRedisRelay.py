@@ -179,6 +179,7 @@ class modbusRedisRelay(_th.Thread):
             print("stream_thread")
          except Exception as e:
             logUtils.log_exp(e)
+            time.sleep(8.0)
 
    def __run_stream_frame(self, stream_regs: elecRegStream) -> bool:
       print(f"[ __run_stream_frame: {stream_regs.name} ]")
