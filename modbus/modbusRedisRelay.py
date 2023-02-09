@@ -138,6 +138,7 @@ class modbusRedisRelay(_th.Thread):
       meter.set_syspath(sysUtils.syspath(self.channel, bus_addr))
       # -- -- -- --
       if meter.init():
+         print(f"UnableToInitMeter: {model_xml}")
          return 0, meter
       else:
          return 1, meter

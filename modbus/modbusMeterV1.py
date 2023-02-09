@@ -98,7 +98,8 @@ class modbusMeterV1(object):
          self.modbusInst: _min_mbus.Instrument = self.__createInstrument()
          return True
       except Exception as e:
-         logUtils.log_exp(e)
+         logUtils.log_exp(["modbusMeterV.init", e])
+         return False
 
    def set_syspath(self, syspath: str):
       self.syspath = syspath
