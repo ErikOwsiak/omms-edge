@@ -89,6 +89,7 @@ class modbusMeterV1(object):
          if len(regs) == 0:
             raise Exception("[ ModelRegsNotLoaded ]")
          # -- do --
+         print(["loading regs:", regs])
          self.model_regs = [meterReg(x) for x in regs]
          if len(self.model_regs) == 0:
             raise Exception("ModelRegsNotParsed")
