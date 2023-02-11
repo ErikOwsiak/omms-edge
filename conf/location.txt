@@ -1,0 +1,7 @@
+location:=Gdynia
+lat:=54.519824
+lng:=18.538092
+# -- timezones --
+# "Europe/London", "Europe/Warsaw", CET
+TZ:=Europe/Warsaw
+region:=Poland

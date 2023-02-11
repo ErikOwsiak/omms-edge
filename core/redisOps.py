@@ -34,8 +34,11 @@ class redisOps(object):
          rv0 = 0
          path = path.lower()
          self.red.select(redisDBIdx.DB_IDX_READS.value)
+         # -- -- -- --
          if delold:
             rv0 = self.red.delete(path)
+         # -- -- -- --
+         _dict["LAST_READ"] = utils.dts_utc()
          rv1 = self.red.hset(path, mapping=_dict)
          print(f"[ del: {rv0}; hset: {rv1}; ]")
       except Exception as e:
