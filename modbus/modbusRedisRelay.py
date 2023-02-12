@@ -217,8 +217,7 @@ class modbusRedisRelay(_th.Thread):
          dts_key = f"{rpt_key}_dtsutc_epoch"
          dtsutc_epoch = sysUtils.dtsutc_epoch()
          d = {rpt_key: f"[{s}]", dts_key: dtsutc_epoch, "CHANNEL_TYPE": CHNL_TYPE
-            , "LAST_READ_DTS": sysUtils.dts_utc(with_tz=True)
-            , "LAST_READ": f"{rpt_key} : {read_status}"}
+            , "LAST_READ": f"{rpt_key} | {read_status} | {sysUtils.dts_utc(with_tz=True)}"}
          self.redops.save_meter_data(meter.syspath, _dict=d)
       # -- -- do -- --
       for meter_xml in dev_meters.meters:

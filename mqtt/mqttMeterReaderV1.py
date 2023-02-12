@@ -158,9 +158,8 @@ class mqttMeterReaderV1(object):
             dts_key = f"{rpt_key}_dtsutc_epoch"
             dtsutc_epoch = utils.dtsutc_epoch()
             d = {rpt_key: f"[{_buff}]", dts_key: dtsutc_epoch
-               , "LAST_READ": f"{rpt_key} : {readStatus.READ_OK}"
-               , "CHANNEL_TYPE": CHNL_TYPE
-               , "LAST_READ_DTS": utils.dts_utc(with_tz=True)}
+               , "LAST_READ": f"{rpt_key} | {readStatus.READ_OK} | {utils.dts_utc(with_tz=True)}"
+               , "CHANNEL_TYPE": CHNL_TYPE}
             self.redops.save_meter_data(syspath, _dict=d)
          # -- -- -- -- -- -- -- --
          stream_name = "kWhrs"
