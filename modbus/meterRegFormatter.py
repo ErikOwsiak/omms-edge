@@ -16,6 +16,10 @@ class meterRegFormatter(object):
       return round((num / 1000), 4)
 
    @staticmethod
+   def div100r2(num):
+      return round((num / 100), 2)
+
+   @staticmethod
    def round2(num):
       return round(num, 2)
 
