@@ -12,7 +12,7 @@
             <meter busAddr="11" modelXML="orno/orno516.xml" />
             <meter busAddr="12" modelXML="orno/orno516.xml" />
             <meter busAddr="13" modelXML="orno/orno516.xml" />
-            <meter busAddr="14" modelXML="orno/orno504.xml" />
+            <meter busAddr="14" modelXML="fif/fifLE_01mr.xml" />
             <meter busAddr="15" modelXML="orno/orno516.xml" />
             <meter busAddr="16" modelXML="orno/orno504.xml" />
          </ttydev>

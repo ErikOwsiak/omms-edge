@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    electric meter type strings:
+        e1 => single-phase
+        e3 => three-phase
+-->
+<meter type="e1" tag="fif le_01mr / 1 phase" brand="fif" model="le_01mr">
+    <comm type="serial" baudrate="9600" parity="E" stopbits="1" timeoutSecs="0.25" />
+    <regs>
+        <!-- mode="" -> defaults: register; unit="" -> defaults: no unit -->
+        <reg type="ModbusAddr" addr="0x0110" size="1" decpnt="0" mode="" units="" />
+        <reg type="BaudRate" addr="0x0111" size="1" decpnt="0" mode="" units="" />
+        <reg type="grid_hz" addr="0x0130" size="1" decpnt="2" mode="float" units="" formatter="round2" />
+        <reg type="ln_v" addr="0x0131" size="1" decpnt="2" mode="float" units="" formatter="round2" />
+        <!-- amps -->
+        <reg type="tl_a" addr="0x0139" size="2" decpnt="2" mode="float" units="" formatter="round2" />
+        <!-- reactive power -->
+        <reg type="tl_w" addr="0x0140" size="2" decpnt="2" mode="float" units="kw" formatter="times1000r2" />
+        <!-- reactive power -->
+        <!-- power factor -->
+        <reg type="tl_pf" addr="0x0034" size="2" decpnt="2" mode="float" units="" formatter="round2"/>
+        <!-- active energy -->
+        <reg type="tl_kwh" addr="0xA000" size="2" decpnt="2" mode="float" units="" formatter="round2"/>
+    </regs>
+</meter>
