@@ -40,6 +40,7 @@ class mqttMeterReaderV1(object):
       self.kwh_report_interval: int = self.mqtt_core_ini.getint("KWH_REPORT_INTERVAL", 120)
       self.report_loop_intv: float = self.mqtt_core_ini.getfloat("LOOP_SLEEP_SECS", 4)
       self.running_meters: [et.Element] = []
+      self.first_runs: [] = []
       self.global_register_table: {str, mqttMeterInfo} = {}
       self.report_thread = _th.Thread(target=self.__report_thread__, args=(None,))
       self.clt: mqtt.Client = mqtt.Client()
@@ -63,7 +64,6 @@ class mqttMeterReaderV1(object):
          this.on_msg_lock.acquire()
          reg: regInfo = this.global_register_table[msg.topic]
          reg.update_data(msg.payload)
-         # print(reg)
       except Exception as e:
          logUtils.log_exp(e)
       finally:
@@ -150,17 +150,17 @@ class mqttMeterReaderV1(object):
    def __report__(self):
       try:
          # - - - - - - - - - - - - - - - -
+         CHNL_TYPE = "MQTT"
          self.on_msg_lock.acquire()
          # -- redis save --
-         def redis_save(syspath: str, s_name: str, _buff: str):
-            CHNL_TYPE = "MQTT"
+         def redis_save(syspath: str, s_name: str, _buff: str, with_del: bool = False):
             rpt_key: str = f"#RPT_{s_name}"
             dts_key = f"{rpt_key}_dtsutc_epoch"
             dtsutc_epoch = utils.dtsutc_epoch()
             d = {rpt_key: f"[{_buff}]", dts_key: dtsutc_epoch
                , "LAST_READ": f"{rpt_key} | {readStatus.READ_OK} | {utils.dts_utc(with_tz=True)}"
                , "CHANNEL_TYPE": CHNL_TYPE}
-            self.redops.save_meter_data(syspath, _dict=d)
+            self.redops.save_meter_data(syspath, _dict=d, delold=with_del)
          # -- -- -- -- -- -- -- --
          stream_name = "kWhrs"
          for m in self.running_meters:
@@ -181,6 +181,9 @@ class mqttMeterReaderV1(object):
             # -- publish to redis --
             self.redops.pub_read_on_sec("MQTT_CORE", _buff=f"({buff})")
             # -- -- -- save -- -- --
+            if m.syspath not in self.first_runs:
+               redis_save(m.syspath, stream_name, buff, with_del=True)
+               self.first_runs.append(m.syspath)
             redis_save(m.syspath, stream_name, buff)
          # - - - - - - - - - - - - - - - -
       except Exception as e:
