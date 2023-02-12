@@ -8,7 +8,7 @@ from core.utils import sysUtils
 from core.redisOps import redisOps
 from core.logutils import logUtils
 from core.meterInfoData import meterInfoData
-from ommslib.shared.core.datatypes import redisDBIdx
+from ommslib.shared.core.datatypes import redisDBIdx, readStatus
 
 
 class pzemRedisBot(th.Thread):
@@ -57,6 +57,7 @@ class pzemRedisBot(th.Thread):
    def __run_loop(self):
       try:
          # -- -- -- -- -- -- -- -- -- -- -- --
+         CHANNEL = "PZEM"
          buff = None
          time.sleep(0.48)
          if self.ser.inWaiting():
@@ -83,7 +84,9 @@ class pzemRedisBot(th.Thread):
          buff = "|".join(arr)
          # -- -- publish & set -- --
          _d: {} = {"#RPT_kWhrs_dtsutc_epoch": sysUtils.dtsutc_epoch()
-            , "#RPT_kWhrs": f"[{buff[:-1]}]", "CHANNEL_TYPE": "PZEM"
+            , "#RPT_kWhrs": f"[{buff[:-1]}]"
+            , "CHANNEL_TYPE": CHANNEL
+            , "LAST_READ": f"#RPT_kWhrs | {readStatus.READ_OK} | {sysUtils.dts_utc(with_tz=True)}"
             , self.m_info.red_key: str(self.m_info)}
          # -- -- -- -- -- -- -- --
          if syspath not in self.first_reads:
