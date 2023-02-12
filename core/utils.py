@@ -35,10 +35,11 @@ class sysUtils(object):
          print(e)
 
    @staticmethod
-   def dts_utc():
+   def dts_utc(with_tz: bool = False):
       d = datetime.datetime.utcnow()
-      return f"{d.year}-{d.month:02d}-{d.day:02d}T" \
+      _t: str = f"{d.year}-{d.month:02d}-{d.day:02d}T" \
          f"{d.hour:02d}:{d.minute:02d}:{d.second:02d}"
+      return f"{_t} UTC" if with_tz else _t
 
    @staticmethod
    def ts_utc():

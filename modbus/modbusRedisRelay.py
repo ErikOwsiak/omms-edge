@@ -14,6 +14,7 @@ from modbus.ttydevMeters import ttydevMeters
 from system.ports import ports
 # -- shared --
 from ommslib.shared.core.elecRegStream import elecRegStream
+from ommslib.shared.core.datatypes import readStatus
 
 
 class modbusRedisRelay(_th.Thread):
@@ -217,7 +218,8 @@ class modbusRedisRelay(_th.Thread):
          dts_key = f"{rpt_key}_dtsutc_epoch"
          dtsutc_epoch = sysUtils.dtsutc_epoch()
          d = {rpt_key: f"[{s}]", dts_key: dtsutc_epoch, "CHANNEL_TYPE": CHNL_TYPE
-            , "LAST_READ": sysUtils.dts_utc(), "LAST_READ_STATUS": read_status}
+            , "LAST_READ_DTS": sysUtils.dts_utc(with_tz=True)
+            , "LAST_READ": f"{rpt_key} : {read_status}"}
          self.redops.save_meter_data(meter.syspath, _dict=d)
       # -- -- do -- --
       for meter_xml in dev_meters.meters:
@@ -235,10 +237,10 @@ class modbusRedisRelay(_th.Thread):
             if meter.read_stream_frame_registers():
                arr: [] = meter.reads_str_arr()
                arr.insert(0, f"#RPT:{stream_regs.name}")
-               status = "READ_OK"
+               status = readStatus.READ_OK
             else:
                arr = [f"#RPT:ERROR|MSG:UnableToReadStreamFrame|ModbusAddr:{meter.modbus_addr}"]
-               status = "READ_FAILED"
+               status = readStatus.READ_FAILED
             # -- -- -- --
             redis_save(stream_regs.name, arr, read_status=status)
             redis_publish(stream_regs.name, arr)

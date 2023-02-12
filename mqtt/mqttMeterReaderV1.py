@@ -12,6 +12,7 @@ from core.logutils import logUtils
 from ommslib.shared.core.datatypes import mqttMeterInfo
 from core.meterInfoData import meterInfoData
 from ommslib.shared.core.elecRegStrEnums import elecRegStrEnumsShort as _erses
+from ommslib.shared.core.datatypes import readStatus
 
 
 # noinspection PyTypeChecker
@@ -157,7 +158,9 @@ class mqttMeterReaderV1(object):
             dts_key = f"{rpt_key}_dtsutc_epoch"
             dtsutc_epoch = utils.dtsutc_epoch()
             d = {rpt_key: f"[{_buff}]", dts_key: dtsutc_epoch
-               , "CHANNEL_TYPE": CHNL_TYPE, "LAST_READ": utils.dts_utc()}
+               , "LAST_READ": f"{rpt_key} : {readStatus.READ_OK}"
+               , "CHANNEL_TYPE": CHNL_TYPE
+               , "LAST_READ_DTS": utils.dts_utc(with_tz=True)}
             self.redops.save_meter_data(syspath, _dict=d)
          # -- -- -- -- -- -- -- --
          stream_name = "kWhrs"
