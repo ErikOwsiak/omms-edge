@@ -22,6 +22,6 @@
         <!-- power factor -->
         <reg type="tl_pf" addr="0x0158" size="1" decpnt="0" mode="" units="" formatter="div100r2"/>
         <!-- active energy -->
-        <reg type="tl_kwh" addr="0xA000" size="2" decpnt="0" mode="" units="" formatter="div100r2"/>
+        <reg type="tl_kwh" addr="0xA000" size="2" decpnt="0" mode="int" units="" formatter="div100r2"/>
     </regs>
 </meter>
