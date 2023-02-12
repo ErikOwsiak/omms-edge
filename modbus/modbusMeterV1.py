@@ -133,6 +133,7 @@ class modbusMeterV1(object):
       error_counter: int = 0
       self.stream_reads.clear()
       # -- for each register in stream registers --
+      print(colored(f"\t[ Reading Stream Frame: {self.stream_regs.name} ]", "yellow"))
       for reg in self.stream_regs.reg_arr:
          try:
             print(f"\t[ reading reg: {reg.regtype.name}]")
