@@ -14,15 +14,6 @@ from core.meterInfoData import meterInfoData
 from ommslib.shared.core.elecRegStrEnums import elecRegStrEnumsShort as _erses
 
 
-"""
-   [MQTT]
-   REDIS_PUB_CHNL: CK_READS_MQTT_???
-   DIAG_TAG: ???_MQTT_RELAY
-   PROC_NAME: omms-mqtt
-   MAIN_LOOP_SECS: 20
-   SYSPATH_CHANNEL: MQTT
-"""
-
 # noinspection PyTypeChecker
 class mqttMeterReaderV1(object):
 
@@ -71,7 +62,7 @@ class mqttMeterReaderV1(object):
          this.on_msg_lock.acquire()
          reg: regInfo = this.global_register_table[msg.topic]
          reg.update_data(msg.payload)
-         print(reg)
+         # print(reg)
       except Exception as e:
          logUtils.log_exp(e)
       finally:

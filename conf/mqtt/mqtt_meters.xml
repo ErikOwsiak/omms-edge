@@ -5,26 +5,30 @@
       <reg type="l1_kwh" key="channels/0/state/phases/1/total_forward_active_energy" />
       <reg type="l2_kwh" key="channels/0/state/phases/2/total_forward_active_energy" />
       <reg type="l3_kwh" key="channels/0/state/phases/3/total_forward_active_energy" />
+      <reg type="mqtt_uptime" key="state/uptime" />
+      <reg type="mqtt_connected" key="state/connected" />
    </regtable>
-   <!--
-      in case of zamel meter each register generates its own push event;
+   <!-- in case of zamel meter each register generates its own push event;
       so it make sense to treat each register as a "1 register meter"
       these will be turned in a single "register table" with events coming per
       register independently; this program will collect them to a meter based
-      readings and push to redis as such
-   -->
+      readings and push to redis as such -->
    <omms_edge hostname="omms-edge-p16">
       <meter tag="ZAMEL_MEW1_00" mid="supla/devices/zamel-mew-01-11d2be">
          <reg type="tl_kwh" topic_template="$mid/$key" />
          <reg type="l1_kwh" topic_template="$mid/$key" />
          <reg type="l2_kwh" topic_template="$mid/$key" />
          <reg type="l3_kwh" topic_template="$mid/$key" />
+         <reg type="mqtt_uptime" topic_template="$mid/$key" />
+         <reg type="mqtt_connected" topic_template="$mid/$key" />
       </meter>
       <meter tag="ZAMEL_MEW1_01" mid="supla/devices/zamel-mew-01-472378">
          <reg type="tl_kwh" topic_template="$mid/$key" />
          <reg type="l1_kwh" topic_template="$mid/$key" />
          <reg type="l2_kwh" topic_template="$mid/$key" />
          <reg type="l3_kwh" topic_template="$mid/$key" />
+         <reg type="mqtt_uptime" topic_template="$mid/$key" />
+         <reg type="mqtt_connected" topic_template="$mid/$key" />
       </meter>
    </omms_edge>
    <omms_edge hostname="3cpo">
@@ -33,12 +37,16 @@
          <reg type="l1_kwh" topic_template="$mid/$key" />
          <reg type="l2_kwh" topic_template="$mid/$key" />
          <reg type="l3_kwh" topic_template="$mid/$key" />
+         <reg type="mqtt_uptime" topic_template="$mid/$key" />
+         <reg type="mqtt_connected" topic_template="$mid/$key" />
       </meter>
       <meter tag="ZAMEL_MEW1_01" mid="supla/devices/zamel-mew-01-472378">
          <reg type="tl_kwh" topic_template="$mid/$key" />
          <reg type="l1_kwh" topic_template="$mid/$key" />
          <reg type="l2_kwh" topic_template="$mid/$key" />
          <reg type="l3_kwh" topic_template="$mid/$key" />
+         <reg type="mqtt_uptime" topic_template="$mid/$key" />
+         <reg type="mqtt_connected" topic_template="$mid/$key" />
       </meter>
    </omms_edge>
 </mqtt_meters>

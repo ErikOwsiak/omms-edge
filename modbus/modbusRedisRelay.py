@@ -108,7 +108,7 @@ class modbusRedisRelay(_th.Thread):
                no_pong_counter += 1
             # -- -- -- -- -- -- -- --
             minfo: str = str(meter.m_info)
-            _d = {"init_dts_utc": sysUtils.dts_utc(), "INIT_PING: ": msg,
+            _d = {"init_dts_utc": sysUtils.dts_utc(), "INIT_PING": msg,
                meter.m_info.red_key: minfo}
             self.redops.save_meter_data(meter.syspath, _dict=_d, delold=True)
             # -- -- -- -- -- -- -- --
@@ -210,14 +210,14 @@ class modbusRedisRelay(_th.Thread):
          _arr.insert(3, f"PATH:{meter.syspath}")
          self.redops.pub_read_on_sec(INI_SEC, _arr=_arr)
       # -- save to redis as a lost data read --
-      def redis_save(stream_name, _arr: []):
+      def redis_save(stream_name, _arr: [], read_status: str = None):
          CHNL_TYPE = "MODBUS"
          rpt_key: str = f"#RPT_{stream_name}"
          s = "|".join(_arr)
          dts_key = f"{rpt_key}_dtsutc_epoch"
          dtsutc_epoch = sysUtils.dtsutc_epoch()
-         d = {rpt_key: f"[{s}]", dts_key: dtsutc_epoch
-            , "CHANNEL_TYPE": CHNL_TYPE, "LAST_READ": sysUtils.dts_utc()}
+         d = {rpt_key: f"[{s}]", dts_key: dtsutc_epoch, "CHANNEL_TYPE": CHNL_TYPE
+            , "LAST_READ": sysUtils.dts_utc(), "LAST_READ_STATUS": read_status}
          self.redops.save_meter_data(meter.syspath, _dict=d)
       # -- -- do -- --
       for meter_xml in dev_meters.meters:
@@ -231,16 +231,17 @@ class modbusRedisRelay(_th.Thread):
                raise Exception(f"CreateModbusMeterNotZero: {err}")
             meter: modbusMeterV1 = meter
             meter.set_stream_regs(stream_regs)
-            print(f"reading modbus addr: {meter.modbus_addr}")
+            # print(f"reading modbus addr: {meter.modbus_addr}")
             if meter.read_stream_frame_registers():
                arr: [] = meter.reads_str_arr()
                arr.insert(0, f"#RPT:{stream_regs.name}")
-               redis_save(stream_regs.name, arr)
-               redis_publish(stream_regs.name, arr)
+               status = "READ_OK"
             else:
                arr = [f"#RPT:ERROR|MSG:UnableToReadStreamFrame|ModbusAddr:{meter.modbus_addr}"]
-               redis_save(stream_regs.name, arr)
-               redis_publish(stream_regs.name, arr)
+               status = "READ_FAILED"
+            # -- -- -- --
+            redis_save(stream_regs.name, arr, read_status=status)
+            redis_publish(stream_regs.name, arr)
             # -- -- -- --
          except Exception as e:
             logUtils.log_exp(e)
