@@ -34,7 +34,8 @@ class modbusEdgeMeters(object):
                modbus_addr = m.attrib["busAddr"]
                syspath: str = utils.syspath("MODBUS", modbus_addr)
                m.attrib["syspath"] = syspath
-               xdict: {} = {"init_dts_utc": utils.dts_utc(), "ttydev": dev, "bus_addr": modbus_addr}
+               xdict: {} = {"INIT_DTS": utils.dts_utc(with_tz=True)
+                  , "ttydev": dev, "bus_addr": modbus_addr}
                self.redops.save_meter_data(syspath, _dict=xdict, delold=True)
             except Exception as e:
                logUtils.log_exp(e)
