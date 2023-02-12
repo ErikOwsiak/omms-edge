@@ -90,7 +90,7 @@ class modbusRedisRelay(_th.Thread):
       exp_counter = 0
       pong_counter = 0
       no_pong_counter = 0
-      # -- --
+      # -- -- -- --
       for meter_xml in _ttydev.meters:
          try:
             meter_xml.attrib["full_dev_path"] = full_dev_path
