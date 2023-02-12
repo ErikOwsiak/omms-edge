@@ -12,7 +12,7 @@
         <reg type="BaudRate" addr="0x0111" size="1" decpnt="0" mode="" units="" />
         <reg type="grid_hz" addr="0x0130" size="1" decpnt="0" mode="int"
              units="" formatter="div100r2" />
-        <reg type="ln_v" addr="0x0131" size="1" decpnt="0" mode="int"
+        <reg type="ln_v" addr="0x0131" size="1" decpnt="0" mode=""
              units="" formatter="div100r2" />
         <!-- amps -->
         <reg type="tl_a" addr="0x0139" size="2" decpnt="2" mode="int" units="" formatter="div100r2" />

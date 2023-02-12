@@ -21,9 +21,8 @@ class meterReading(object):
          self.regVal = func(self.regVal)
 
    def __str__(self) -> str:
-      buff = "regName: %s; regVal: %s; regValUnit: %s; fldRegMapped: %s; hasError: %s" \
-             % (self.regName, self.regVal, self.regValUnit, self.fldRegMapped, self.hasError)
-      return buff
+      return "regName: %s; regVal: %s; regValUnit: %s; fldRegMapped: %s; hasError: %s" \
+         % (self.regName, self.regVal, self.regValUnit, self.fldRegMapped, self.hasError)
 
    def toJson(self) -> str:
       return json.dumps(self, default=lambda o: o.__dict__)

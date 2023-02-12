@@ -147,6 +147,7 @@ class modbusMeterV1(object):
             # -- -- run -- --
             meter_reg: meterReg = _regs[0]
             meter_read: meterReading = self.__read_meter_reg(meter_reg)
+            print(meter_read)
             if not meter_read.hasError:
                self.stream_reads.append(meter_read)
             else:
