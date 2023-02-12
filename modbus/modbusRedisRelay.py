@@ -1,6 +1,5 @@
 
-import os.path
-import typing as _t
+import os.path, typing as _t
 import time, threading as _th
 import xml.etree.ElementTree as _et
 import configparser as _cp
