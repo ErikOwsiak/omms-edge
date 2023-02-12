@@ -10,7 +10,7 @@
         <!-- mode="" -> defaults: register; unit="" -> defaults: no unit -->
         <reg type="ModbusAddr" addr="0x0110" size="1" decpnt="0" mode="" units="" />
         <reg type="BaudRate" addr="0x0111" size="1" decpnt="0" mode="" units="" />
-        <reg type="grid_hz" addr="0x0130" size="1" decpnt="0" mode="int"
+        <reg type="grid_hz" addr="0x0130" size="1" decpnt="0" mode=""
              units="" formatter="div100r2" />
         <reg type="ln_v" addr="0x0131" size="1" decpnt="0" mode=""
              units="" formatter="div100r2" />
