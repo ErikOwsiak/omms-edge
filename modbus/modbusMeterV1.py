@@ -151,7 +151,7 @@ class modbusMeterV1(object):
                self.stream_reads.append(meter_read)
             else:
                # -- retry 2 more times --
-               print(meter_read)
+               print(f"\t{meter_read}")
                error_counter += 1
                for i in range(0, 2):
                   print(f"\t\t[ retrying reading reg: {reg.regtype.name} ]")

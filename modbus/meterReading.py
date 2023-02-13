@@ -1,5 +1,6 @@
 
 import json
+from termcolor import colored
 from modbus.meterRegFormatter import meterRegFormatter as rf
 
 
@@ -21,8 +22,9 @@ class meterReading(object):
          self.regVal = func(self.regVal)
 
    def __str__(self) -> str:
-      return "regName: %s; regVal: %s; regValUnit: %s; fldRegMapped: %s; hasError: %s" \
+      buff = "regName: %s; regVal: %s; regValUnit: %s; fldRegMapped: %s; hasError: %s" \
          % (self.regName, self.regVal, self.regValUnit, self.fldRegMapped, self.hasError)
+      return colored(buff, "light_blue")
 
    def toJson(self) -> str:
       return json.dumps(self, default=lambda o: o.__dict__)
