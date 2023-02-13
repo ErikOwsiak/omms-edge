@@ -214,9 +214,11 @@ class modbusRedisRelay(_th.Thread):
          CHNL_TYPE = "MODBUS"
          rpt_key: str = f"#RPT_{stream_name}"
          s = "|".join(_arr)
-         dts_key = f"{rpt_key}_dtsutc_epoch"
-         dtsutc_epoch = sysUtils.dtsutc_epoch()
-         d = {rpt_key: f"[{s}]", dts_key: dtsutc_epoch, "CHANNEL_TYPE": CHNL_TYPE
+         rpt_stat_key = f"{rpt_key}_STATUS"
+         dtsutc, epoch = sysUtils.dtsutc_epoch()
+         d = {rpt_key: f"[{s}]"
+            , rpt_stat_key: f"{dtsutc} | {epoch} | {read_status}"
+            , "CHANNEL_TYPE": CHNL_TYPE
             , "LAST_READ": f"{rpt_key} | {read_status} | {sysUtils.dts_utc(with_tz=True)}"}
          self.redops.save_meter_data(meter.syspath, _dict=d)
       # -- -- do -- --
@@ -231,7 +233,6 @@ class modbusRedisRelay(_th.Thread):
                raise Exception(f"CreateModbusMeterNotZero: {err}")
             meter: modbusMeterV1 = meter
             meter.set_stream_regs(stream_regs)
-            # print(f"reading modbus addr: {meter.modbus_addr}")
             if meter.read_stream_frame_registers():
                arr: [] = meter.reads_str_arr()
                arr.insert(0, f"#RPT:{stream_regs.name}")

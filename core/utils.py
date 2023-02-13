@@ -51,10 +51,10 @@ class sysUtils(object):
      return int(time.time())
 
    @staticmethod
-   def dtsutc_epoch() -> str:
+   def dtsutc_epoch() -> (str, str):
       d = sysUtils.dts_utc()
       e = sysUtils.dts_epoch()
-      return f"{d} | {e}"
+      return d, e
 
    @staticmethod
    def syspath(channel: str, ep: str):

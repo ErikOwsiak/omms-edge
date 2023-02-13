@@ -155,9 +155,10 @@ class mqttMeterReaderV1(object):
          # -- redis save --
          def redis_save(syspath: str, s_name: str, _buff: str, with_del: bool = False):
             rpt_key: str = f"#RPT_{s_name}"
-            dts_key = f"{rpt_key}_dtsutc_epoch"
-            dtsutc_epoch = utils.dtsutc_epoch()
-            d = {rpt_key: f"[{_buff}]", dts_key: dtsutc_epoch
+            dts_key = f"{rpt_key}_STATUS"
+            dtsutc, epoch = utils.dtsutc_epoch()
+            d = {rpt_key: f"[{_buff}]"
+               , dts_key: f"{dtsutc} | {epoch} | {readStatus.READ_OK}"
                , "LAST_READ": f"{rpt_key} | {readStatus.READ_OK} | {utils.dts_utc(with_tz=True)}"
                , "CHANNEL_TYPE": CHNL_TYPE}
             self.redops.save_meter_data(syspath, _dict=d, delold=with_del)

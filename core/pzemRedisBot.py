@@ -83,7 +83,8 @@ class pzemRedisBot(th.Thread):
          arr.insert(3, f"PATH:{syspath}")
          buff = "|".join(arr)
          # -- -- publish & set -- --
-         _d: {} = {"#RPT_kWhrs_dtsutc_epoch": sysUtils.dtsutc_epoch()
+         dtsutc, epoch = sysUtils.dtsutc_epoch()
+         _d: {} = {"#RPT_kWhrs_STATUS": f"{dtsutc} | {epoch} | {readStatus.READ_OK}"
             , "#RPT_kWhrs": f"[{buff[:-1]}]"
             , "CHANNEL_TYPE": CHANNEL
             , "LAST_READ": f"#RPT_kWhrs | {readStatus.READ_OK} | {sysUtils.dts_utc(with_tz=True)}"
