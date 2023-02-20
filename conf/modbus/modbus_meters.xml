@@ -38,12 +38,12 @@
             <meter busAddr="14" modelXML="orno/orno516.xml" />
             <meter busAddr="15" modelXML="orno/orno516.xml" /> -->
             <meter busAddr="16" modelXML="orno/orno516.xml" />
-            <meter busAddr="17" modelXML="orno/orno516.xml" />
+            <!--  <meter busAddr="17" modelXML="orno/orno516.xml" />
             <meter busAddr="18" modelXML="orno/orno516.xml" />
-            <meter busAddr="19" modelXML="orno/orno516.xml" />
+            <meter busAddr="19" modelXML="orno/orno516.xml" /> -->
             <meter busAddr="20" modelXML="orno/orno516.xml" />
             <meter busAddr="21" modelXML="orno/orno516.xml" />
-            <meter busAddr="22" modelXML="orno/orno516.xml" />
+            <!-- <meter busAddr="22" modelXML="orno/orno516.xml" /> -->
             <meter busAddr="23" modelXML="orno/orno516.xml" />
             <meter busAddr="24" modelXML="orno/orno516.xml" />
             <meter busAddr="25" modelXML="orno/orno516.xml" />
@@ -53,7 +53,7 @@
             <meter busAddr="31" modelXML="orno/orno516.xml" />
             <meter busAddr="32" modelXML="orno/orno516.xml" />
             <meter busAddr="33" modelXML="orno/orno516.xml" />
-            <meter busAddr="34" modelXML="orno/orno516.xml" />
+            <!-- <meter busAddr="34" modelXML="orno/orno516.xml" /> -->
             <meter busAddr="35" modelXML="orno/orno516.xml" />
             <meter busAddr="37" modelXML="orno/orno516.xml" />
             <meter busAddr="38" modelXML="orno/orno516.xml" />
