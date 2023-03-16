@@ -53,6 +53,7 @@
             <meter busAddr="31" modelXML="orno/orno516.xml" />
             <meter busAddr="32" modelXML="orno/orno516.xml" />
             <meter busAddr="33" modelXML="orno/orno516.xml" />
+            <!-- 34 is good -->
             <meter busAddr="34" modelXML="orno/orno516.xml" />
             <meter busAddr="35" modelXML="orno/orno516.xml" />
             <meter busAddr="37" modelXML="orno/orno516.xml" />
